@@ -1,0 +1,13 @@
+@import '~antd/dist/antd.css';
+.float-left{
+  float: left;
+}
+.display-content{
+  display: contents;
+}
+.text-center{
+  text-align: center;
+}
+.m-t-15{
+  margin-top: 15px;
+}
