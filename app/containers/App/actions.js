@@ -15,7 +15,13 @@
  *    }
  */
 
-import { LOAD_REPOS, LOAD_REPOS_SUCCESS, LOAD_REPOS_ERROR } from './constants';
+import {
+  LOAD_REPOS,
+  LOAD_REPOS_SUCCESS,
+  LOAD_REPOS_ERROR,
+  SHOW_LOADING,
+  HIDDEN_LOADING,
+} from './constants';
 
 /**
  * Load the repositories, this action starts the request saga
@@ -28,6 +34,25 @@ export function loadRepos() {
   };
 }
 
+/**
+ *
+ * @returns {{type: *}}
+ */
+export function showLoading() {
+  return {
+    type: SHOW_LOADING,
+  };
+}
+
+/**
+ *
+ * @returns {{type: *}}
+ */
+export function hiddenLoading() {
+  return {
+    type: HIDDEN_LOADING,
+  };
+}
 /**
  * Dispatched when the repositories are loaded by the request saga
  *

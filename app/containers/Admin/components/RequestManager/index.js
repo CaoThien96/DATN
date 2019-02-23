@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { database } from 'containers/commons/firebase';
 import Button from 'antd/es/button/button';
 import Modal from 'antd/es/modal/Modal';
 import WrapperFormSearch from 'components/WrappedAdvancedSearchForm';
@@ -9,7 +10,7 @@ import request from 'utils/request';
 import FromNew from './Form/New';
 import FormSearch from './Search/Form';
 import Result from './Search/Result';
-class LayoutEmployee extends Component {
+class RequestManagement extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -19,17 +20,23 @@ class LayoutEmployee extends Component {
   }
 
   componentWillMount() {
-    // request('/api/employee').then(data => {
-    //   console.log({ data });
-    //   this.setState({ resultSearch: data });
-    // });
+    request('/api/request').then(data => {
+      console.log({ data });
+      this.setState({ resultSearch: data.payload });
+    });
+  }
+
+  componentDidMount() {
+    database.ref('/').on('value', snapshot => {
+      console.log('data change', snapshot.val());
+    });
   }
 
   onNewSuccess = () => {
     this.setState({ visible: false });
-    request('/api/employee').then(data => {
+    request('/api/request').then(data => {
       console.log({ data });
-      this.setState({ resultSearch: data });
+      this.setState({ resultSearch: (data.payload) });
     });
   };
 
@@ -69,8 +76,7 @@ class LayoutEmployee extends Component {
   handleDelete = item => {
     request(`/api/employee/${item.iid}`, {
       method: 'DELETE',
-    }).then(data => {
-    });
+    }).then(data => {});
     const resultSearch = this.state.resultSearch.filter(i => {
       if (i.iid !== item.iid) {
         return true;
@@ -84,7 +90,7 @@ class LayoutEmployee extends Component {
   };
 
   handleChangeActive = (item, status) => {
-    request(`/api/employee/${item.iid}`, {
+    request(`/api/request/${item.iid}`, {
       method: 'PUT',
       body: JSON.stringify({ status }),
       headers: {
@@ -92,11 +98,11 @@ class LayoutEmployee extends Component {
       },
     }).then(data => {
       const resultSearch = this.state.resultSearch.map(el => {
-        const tmp = status ? 1  :2;
+        const tmp = status ? 1 : 2;
         if (el.iid == item.iid) {
           return {
             ...item,
-            status:tmp,
+            status: tmp,
           };
         }
         return el;
@@ -112,7 +118,7 @@ class LayoutEmployee extends Component {
     return (
       <div>
         <Modal
-          title="New Employee"
+          title="New Request"
           visible={this.state.visible}
           onOk={this.handleOk}
           onCancel={this.handleCancel}
@@ -135,24 +141,12 @@ class LayoutEmployee extends Component {
           handleDelete={this.handleDelete}
           handleChangeActive={this.handleChangeActive}
         />
-        {/* <Button>New Employee</Button> */}
-        {/* <Modal */}
-        {/* title="Basic Modal" */}
-        {/* visible={this.state.visible} */}
-        {/* onOk={this.handleOk} */}
-        {/* onCancel={this.handleCancel} */}
-        {/* > */}
-        {/* <p>Some contents...</p> */}
-        {/* <p>Some contents...</p> */}
-        {/* <p>Some contents...</p> */}
-        {/* </Modal> */}
-        {/* <FromNew /> */}
       </div>
     );
   }
 }
 
-LayoutEmployee.defaultProps = {};
-LayoutEmployee.propTypes = {};
+RequestManagement.defaultProps = {};
+RequestManagement.propTypes = {};
 
-export default LayoutEmployee;
+export default RequestManagement;

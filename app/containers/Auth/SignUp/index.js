@@ -1,11 +1,11 @@
-import React, { PureComponent } from 'react';
+import React, { PureComponent,Component } from 'react';
 import { Button, Checkbox, Form, Icon, Input } from 'antd';
 import { Link } from 'react-router-dom';
 // import Request from 'utils/request.api';
 import './styles.css';
 
 const FormItem = Form.Item;
-class NormalLoginForm extends PureComponent {
+class NormalLoginForm extends Component {
   handleSubmit = e => {
     // e.preventDefault();
     // const { history } = this.props;
@@ -128,7 +128,7 @@ class NormalLoginForm extends PureComponent {
             >
               Register new acount
             </Button>
-            <Link to="/user/signin">Or login now!</Link>
+            <Link to="/sign-in">Or login now!</Link>
           </FormItem>
         </Form>
       </div>

@@ -4,12 +4,21 @@ import Form from 'antd/es/form/Form';
 import { Button } from 'antd';
 
 class Wrapper extends Component {
+  componentDidMount(){
+    this.props.form.validateFields((err, values) => {
+      // this.props.handleSearch(values);
+    });
+  }
   handleReset = () => {
     this.props.form.resetFields();
   };
-
+  handleSearch = (e)=>{
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      this.props.handleSearch(values);
+    });
+  }
   render() {
-    const { handleSearch } = this.props;
     const { getFieldDecorator } = this.props.form;
     const childrenWithProps = React.Children.map(this.props.children, child =>
       React.cloneElement(child, { getFieldDecorator }),
@@ -17,7 +26,7 @@ class Wrapper extends Component {
     console.log({ getFieldDecorator, childrenWithProps });
     return (
       <div>
-        <Form className="ant-advanced-search-form" onSubmit={handleSearch}>
+        <Form className="ant-advanced-search-form" onSubmit={this.handleSearch}>
           {childrenWithProps}
           <div className='text-center'>
             <Button type="primary" htmlType="submit">

@@ -54,3 +54,24 @@ export const EmployeeTraining = Loadable({
   loader: () => import('containers/Admin/components/Employee/components/Training/index'),
   loading: LoadingIndicator,
 })
+/**
+ * Module notification management
+ */
+export const NotificationLayoutManagement = Loadable({
+  loader: () => import('containers/Admin/components/Notification/Layout'),
+  loading: LoadingIndicator,
+})
+/**
+ * Module request management
+ */
+export const RequestLayoutManagement = Loadable({
+  loader: () => import('containers/Admin/components/RequestManager/layout'),
+  loading: LoadingIndicator,
+})
+/**
+ * Module Attendance
+ */
+export const Attendance = Loadable({
+  loader: () => import('containers/Admin/components/Attendance/index'),
+  loading: LoadingIndicator,
+});

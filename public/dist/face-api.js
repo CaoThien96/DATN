@@ -5503,7 +5503,6 @@
 
     function detectSingleFace(input, options) {
         if (options === void 0) { options = new SsdMobilenetv1Options(); }
-        console.log({input})
         return new DetectSingleFaceTask(input, options);
     }
     function detectAllFaces(input, options) {
@@ -5768,4 +5767,4 @@
     Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-//# sourceMappingURL=face-api.js.map
+//# sourceMappingURL=face-apiEmployee.js.map

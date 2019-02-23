@@ -10,6 +10,9 @@ class LayoutAuth extends Component {
       this.props.history.replace('/admin')
     }
   }
+  componentDidUpdate(){
+    console.log(this.props)
+  }
   render() {
     const { routes } = this.props;
     return (

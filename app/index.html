@@ -12,27 +12,26 @@
   <meta name="mobile-web-app-capable" content="yes">
 
   <link rel="icon" href="/favicon.ico" />
+  <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@0.14.1/dist/tf.min.js"></script>
   <script src="/dist/face-api.js"></script>
-  <script>
-    console.log(faceapi)
-    async function loadModel(){
-        try {
-          await  faceapi.nets.tinyFaceDetector.load('/dist/weights');
-          await faceapi.loadFaceLandmarkModel('/dist/weights');
-          await faceapi.loadFaceRecognitionModel('/dist/weights')
-          console.log('Load model successfully')
-        } catch (error) {
-          console.log('Error load model')
-        }
-        const minConfidence = 0.5
-        // tiny_face_detector options
-        const inputSize = 512
-        const scoreThreshold = 0.5
-        const options= new faceapi.TinyFaceDetectorOptions({ inputSize, scoreThreshold })
-        console.log({options})
-    }
-    loadModel();
-  </script>
+
+  <!--<script>-->
+    <!--console.log(tf)-->
+    <!--console.log(faceapi)-->
+    <!--async function loadModel(){-->
+        <!--try {-->
+          <!--await  faceapi.nets.tinyFaceDetector.load('/dist/weights');-->
+          <!--await faceapi.loadFaceLandmarkModel('/dist/weights');-->
+          <!--await faceapi.loadFaceRecognitionModel('/dist/weights')-->
+          <!--console.log('Load model successfully')-->
+        <!--} catch (error) {-->
+          <!--console.log('Error load model')-->
+        <!--}-->
+    <!--}-->
+
+    <!--loadModel();-->
+    <!--console.log('oke')-->
+  <!--</script>-->
   <title>React.js Boilerplate</title>
 </head>
 

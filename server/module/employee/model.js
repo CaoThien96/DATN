@@ -17,16 +17,7 @@ const UserSchema = new Schema({
     type: String,
     required: true,
   },
-  name: {
-    type: String,
-  },
-  type: {
-    type: Number,
-  },
-  firstName: {
-    type: String,
-  },
-  lastName: {
+  full_name: {
     type: String,
   },
   phone: {
@@ -44,6 +35,9 @@ const UserSchema = new Schema({
   },
   status: {
     type: Number,
+  },
+  training: {
+    type: String,
   },
 });
 UserSchema.plugin(autoIncrement.plugin, {

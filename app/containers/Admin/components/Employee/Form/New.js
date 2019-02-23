@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 // import Form from 'react-jsonschema-form';
-import { Form, Icon, Input, Button, Checkbox } from 'antd';
+import { Form, Icon, Input, Button, Checkbox, Radio } from 'antd';
 // import schema from './schema';
 // import uiSchema from './uiSchema';
 // import Demo from './test'
@@ -11,20 +11,20 @@ class New extends Component {
   submit = e => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
-      request('/api/employee', {
-        method: 'POST', // or 'PUT'
-        body: JSON.stringify(values), // data can be `string` or {object}!
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(res => {
-          this.handleReset();
-          this.props.onSuccess();
-        })
-        .catch(err => {
-          alert(JSON.stringify(err));
-        });
+      alert(JSON.stringify(values));
+      // request('/api/employee', {
+      //   method: 'POST', // or 'PUT'
+      //   body: JSON.stringify(values), // data can be `string` or {object}!
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      // })
+      //   .then(res => {
+      //     this.handleReset();
+      //     this.props.onSuccess();
+      //   })
+      //   .catch(err => {
+      //   });
     });
   };
 
@@ -67,10 +67,46 @@ class New extends Component {
               />,
             )}
           </Form.Item>
-          <p style={{ color: 'red' }}>error</p>
+          <Form.Item>
+            {getFieldDecorator('full_name', {
+              rules: [
+                { required: true, message: 'Please input your full name!' },
+              ],
+            })(
+              <Input
+                prefix={
+                  <Icon type="solution" style={{ color: 'rgba(0,0,0,.25)' }} />
+                }
+                placeholder="enter your full name"
+              />,
+            )}
+          </Form.Item>
+          <Form.Item>
+            {getFieldDecorator('phone', {
+              rules: [{ required: true, message: 'Please input your phone!' }],
+            })(
+              <Input
+                prefix={
+                  <Icon type="phone" style={{ color: 'rgba(0,0,0,.25)' }} />
+                }
+                placeholder="enter your phone number"
+              />,
+            )}
+          </Form.Item>
+          <Form.Item>
+            {getFieldDecorator('role', {
+              valuePropName: 'defaultValue',
+              initialValue: 1001,
+            })(
+              <Radio.Group defaultValue="a" buttonStyle="solid">
+                <Radio value={1001}>Nhân Viên</Radio>
+                <Radio value={1002}>Giám Sát Viên</Radio>
+              </Radio.Group>,
+            )}
+          </Form.Item>
           <div className="text-center">
             <Button type="primary" htmlType="submit">
-              Search
+              Save
             </Button>
             <Button style={{ marginLeft: 8 }} onClick={this.handleReset}>
               Clear

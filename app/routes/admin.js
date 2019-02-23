@@ -6,6 +6,9 @@ import {
   Employee,
   EmployeeTraining,
   Manager,
+  Attendance,
+  RequestLayoutManagement,
+  NotificationLayoutManagement
 } from 'routes/loadModule';
 // import subRoutes from 'containers/Admin/Routes';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
@@ -21,13 +24,29 @@ const routes = [
     label: 'Dashboard',
     icon: <Icon type="dashboard" />,
   },
+
   {
-    path: '/admin/checker',
-    key: 'admin-checker',
-    exact: true,
-    component: Checker,
-    label: 'Checker',
+    path: '/admin/employee',
+    key: 'admin-employee',
+    // exact: true,
+    component: EmployeeLayout,
+    label: 'Employee',
+    icon: <Icon type="team" />,
+  },
+  {
+    path: '/admin/request',
+    key: 'admin-request',
+    component: RequestLayoutManagement,
+    label: 'Request',
     icon: <Icon type="clock-circle" />,
+  },
+  {
+    path: '/admin/notification',
+    key: 'admin-notification',
+    exact: true,
+    component: NotificationLayoutManagement,
+    label: 'Notification',
+    icon: <Icon type="sound" />,
   },
   {
     path: '/admin/manager',
@@ -38,28 +57,20 @@ const routes = [
     icon: <Icon type="user" />,
   },
   {
-    path: '/admin/employee',
-    key: 'admin-employee',
-    // exact: true,
-    component: EmployeeLayout,
-    label: 'Employee',
-    icon: <Icon type="team" />,
-    // employee_routes: [
-    //   {
-    //     path: '/admin/employee',
-    //     hidden: true,
-    //     key: 'admin-employee-main',
-    //     exact: true,
-    //     component: Employee,
-    //   },
-    //   {
-    //     path: '/admin/employee/training/:id',
-    //     hidden: true,
-    //     key: 'admin-employee-training',
-    //     exact: true,
-    //     component: EmployeeTraining,
-    //   },
-    // ],
+    path: '/admin/checker',
+    key: 'admin-checker',
+    exact: true,
+    component: Checker,
+    label: 'Checker',
+    icon: <Icon type="clock-circle" />,
+  },
+  {
+    path: '/admin/attendance',
+    key: 'admin-attendance',
+    exact: true,
+    component: Attendance,
+    label: 'Attendance',
+    icon: <Icon type="search" />,
   },
   {
     path: '',

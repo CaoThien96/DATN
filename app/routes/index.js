@@ -18,12 +18,12 @@ const routes = [
     routes: [
       {
         path: '/',
-        // exact: true,
+        exact: true,
         component: SignIn,
       },
       {
         path: '/sign-up',
-        // exact: true,
+        exact: true,
         component: SignUp,
       },
       {

@@ -97,7 +97,7 @@ class NormalLoginForm extends Component {
             >
               Log in
             </Button>
-            <Link to="/user/signup">Or register now!</Link>
+            <Link to="/sign-up">Or register now!</Link>
           </FormItem>
         </Form>
       </div>

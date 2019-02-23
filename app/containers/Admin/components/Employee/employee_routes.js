@@ -1,9 +1,4 @@
-// import React from 'react';
-// import {
-//   Employee,
-//   EmployeeTraining,
-// } from 'routes/loadModule';
-// import subRoutes from 'containers/Admin/Routes';
+
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
 import Icon from 'antd/es/icon';
 import Loadable from 'react-loadable';
@@ -15,6 +10,10 @@ const Employee = Loadable({
 });
 const EmployeeTraining = Loadable({
   loader: () => import('containers/Admin/components/Employee/components/Training/index'),
+  loading: LoadingIndicator,
+})
+const EmployeeTest = Loadable({
+  loader: () => import('containers/Admin/components/Employee/components/Test/index'),
   loading: LoadingIndicator,
 })
 const routes = [
@@ -29,6 +28,12 @@ const routes = [
     key: 'admin-employee-training',
     exact: true,
     component: EmployeeTraining,
+  },
+  {
+    path: '/admin/employee/training/:id/test',
+    key: 'admin-employee-test',
+    exact: true,
+    component: EmployeeTest,
   },
   {
     path: '',

@@ -13,7 +13,8 @@ const makeSelectCurrentUser = () =>
 
 const makeSelectLoading = () =>
   createSelector(selectGlobal, globalState => globalState.get('loading'));
-
+const makeSelectShowLoading = () =>
+  createSelector(selectGlobal, globalState => globalState.get('showLoading'));
 const makeSelectError = () =>
   createSelector(selectGlobal, globalState => globalState.get('error'));
 
@@ -30,6 +31,7 @@ const makeSelectLocation = () =>
 export {
   selectGlobal,
   makeSelectCurrentUser,
+  makeSelectShowLoading,
   makeSelectLoading,
   makeSelectError,
   makeSelectRepos,
