@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const User = require('../modules/User/model/user');
+const User = require('../module/employee/model');
 
 const config = require('./index');
 
@@ -12,7 +12,7 @@ module.exports = (req, res, next) => {
     return res.status(401).end();
   }
   // get the last part from a authorization header string like "bearer token-value"
-  const token = req.headers.authorization.split(' ')[1];
+  const token = req.headers.authorization;
   // decode the token using a secret key-phrase
   return jwt.verify(token, config.jwtSecret, (err, decoded) => {
     if (err) {

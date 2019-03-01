@@ -3,6 +3,7 @@
 const express = require('express');
 const logger = require('./logger');
 const bodyParser = require('body-parser');
+const passport = require('passport');
 require('./configs/db');
 const argv = require('./argv');
 const port = require('./port');
@@ -15,11 +16,19 @@ const ngrok =
     : false;
 const { resolve } = require('path');
 const app = express();
+/**
+ * Implement passport
+ */
+
+
 app.use(express.static('public'));
 // If you need a backend, e.g. an API, add your custom backend-specific middleware here
 // app.use('/api', myApi);
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(bodyParser.json({ limit: '50mb' }));
+
+app.use(passport.initialize());
+require('./configs/passport');
 // In production we need to pass these values in instead of relying on webpack
 api(app);
 setup(app, {
@@ -44,7 +53,9 @@ app.listen(port, host, async err => {
   if (err) {
     return logger.error(err.message);
   }
-  console.error(`Node cluster worker ${process.pid}: listening on port ${port}`);
+  console.error(
+    `Node cluster worker ${process.pid}: listening on port ${port}`,
+  );
   // Connect to ngrok in dev mode
   if (ngrok) {
     let url;
