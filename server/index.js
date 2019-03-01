@@ -44,7 +44,7 @@ app.listen(port, host, async err => {
   if (err) {
     return logger.error(err.message);
   }
-
+  console.error(`Node cluster worker ${process.pid}: listening on port ${port}`);
   // Connect to ngrok in dev mode
   if (ngrok) {
     let url;

@@ -24,7 +24,7 @@ class RequestManagement extends Component {
   }
 
   componentWillMount() {
-    request('/api/request').then(data => {
+    request('/api/notification').then(data => {
       console.log({ data });
       this.setState({ resultSearch: data.payload });
     });
@@ -38,7 +38,7 @@ class RequestManagement extends Component {
 
   onNewSuccess = () => {
     this.setState({ visible: false });
-    request('/api/request').then(data => {
+    request('/api/notification').then(data => {
       console.log({ data });
       this.setState({ resultSearch: data.payload });
     });
@@ -126,7 +126,8 @@ class RequestManagement extends Component {
       <div>
         <CanWrapper I="create" a="Request" user={user}>
           <Modal
-            title="New Request"
+            width={1200}
+            title="Tạo thông báo"
             visible={this.state.visible}
             onOk={this.handleOk}
             onCancel={this.handleCancel}
@@ -137,7 +138,7 @@ class RequestManagement extends Component {
           <Row type="flex" justify="end">
             <Col>
               <Button type="primary" onClick={this.handleNew}>
-                Tạo yêu cầu
+                Tạo thông báo
               </Button>
             </Col>
           </Row>

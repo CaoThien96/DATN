@@ -8,7 +8,8 @@ import {
   Manager,
   Attendance,
   RequestLayoutManagement,
-  NotificationLayoutManagement
+  NotificationLayoutManagement,
+  Configuration
 } from 'routes/loadModule';
 // import subRoutes from 'containers/Admin/Routes';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
@@ -43,18 +44,10 @@ const routes = [
   {
     path: '/admin/notification',
     key: 'admin-notification',
-    exact: true,
+    // exact: true,
     component: NotificationLayoutManagement,
     label: 'Notification',
     icon: <Icon type="sound" />,
-  },
-  {
-    path: '/admin/manager',
-    key: 'admin-manager',
-    exact: true,
-    component: Manager,
-    label: 'Manager',
-    icon: <Icon type="user" />,
   },
   {
     path: '/admin/checker',
@@ -71,6 +64,14 @@ const routes = [
     component: Attendance,
     label: 'Attendance',
     icon: <Icon type="search" />,
+  },
+  {
+    path: '/admin/configuration',
+    key: 'admin-configuration',
+    exact: true,
+    component: Configuration,
+    label: 'Configuration',
+    icon: <Icon type="setting" />,
   },
   {
     path: '',

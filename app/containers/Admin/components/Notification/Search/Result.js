@@ -13,16 +13,6 @@ const Result = ({ items, handleDelete, handleChangeActive }) => {
       key: 'iid',
     },
     {
-      title: 'Người tạo',
-      dataIndex: 'userIid',
-      key: 'userIid',
-    },
-    {
-      title: 'Loại yêu cầu',
-      dataIndex: 'type',
-      key: 'type',
-    },
-    {
       title: 'Tiêu đề',
       dataIndex: 'title',
       key: 'title',
@@ -30,6 +20,12 @@ const Result = ({ items, handleDelete, handleChangeActive }) => {
     {
       title: 'Chi tiết',
       dataIndex: 'descriptions',
+      render(text,record){
+        if(text){
+          return <div>{`${text.toString().slice(0,20)}....`}</div>
+        }
+        return <div>Không có dữ liệu</div>
+      },
       key: 'descriptions',
     },
     {
@@ -38,16 +34,10 @@ const Result = ({ items, handleDelete, handleChangeActive }) => {
       render(text, record){
         if(record.status == 0){
           return (
-            <div>Đang chờ</div>
+            <div>Đã xóa</div>
           )
-        }else if (record.status == 1) {
-          return (
-            <div>Đã chấp nhận</div>
-          )
-        }else{
-          return (
-            <div>Bị từ chối</div>
-          )
+        }else {
+          return <div>Hoạt động</div>
         }
       },
       key: 'status',
@@ -61,15 +51,14 @@ const Result = ({ items, handleDelete, handleChangeActive }) => {
         return (
           <div>
             <CanWrapper I="handle" a="Request" user={user}>
-              <Switch
-                onChange={status => handleChangeActive(record, status)}
-                checkedChildren="Approve"
-                unCheckedChildren="Reject"
-                checked={record.status == 1?true:false}
-              />
+              <Button icon="diff">
+                <Link to={`/admin/request/${record && record.iid}`}>
+                  Xóa
+                </Link>
+              </Button>
             </CanWrapper>
             <Button icon="diff">
-              <Link to={`/admin/request/${record && record.iid}`}>
+              <Link to={`/admin/notification/${record && record.iid}`}>
                 Xem chi tiết
               </Link>
             </Button>

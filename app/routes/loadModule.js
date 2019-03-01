@@ -75,3 +75,10 @@ export const Attendance = Loadable({
   loader: () => import('containers/Admin/components/Attendance/index'),
   loading: LoadingIndicator,
 });
+/**
+ * Configuration
+ */
+export const Configuration = Loadable({
+  loader: () => import('containers/Admin/components/Configuration/index'),
+  loading: LoadingIndicator,
+})
