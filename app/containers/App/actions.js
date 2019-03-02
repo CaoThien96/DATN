@@ -16,11 +16,12 @@
  */
 
 import {
-  LOAD_REPOS,
-  LOAD_REPOS_SUCCESS,
-  LOAD_REPOS_ERROR,
+  LOAD_USER_LOGIN,
+  LOAD_USER_LOGIN_SUCCESS,
+  LOAD_USER_LOGIN_FAIL,
   SHOW_LOADING,
   HIDDEN_LOADING,
+  REMOVE_USER
 } from './constants';
 
 /**
@@ -28,12 +29,28 @@ import {
  *
  * @return {object} An action object with a type of LOAD_REPOS
  */
-export function loadRepos() {
+export function loadUserLogin() {
   return {
-    type: LOAD_REPOS,
+    type: LOAD_USER_LOGIN,
   };
 }
-
+export function loadUserSuccess(user) {
+  return {
+    type: LOAD_USER_LOGIN_SUCCESS,
+    user,
+  };
+}
+export function loadUserFail(error) {
+  return {
+    type: LOAD_USER_LOGIN_FAIL,
+    error,
+  };
+}
+export function removeUser(error) {
+  return {
+    type: REMOVE_USER,
+  };
+}
 /**
  *
  * @returns {{type: *}}
@@ -51,34 +68,5 @@ export function showLoading() {
 export function hiddenLoading() {
   return {
     type: HIDDEN_LOADING,
-  };
-}
-/**
- * Dispatched when the repositories are loaded by the request saga
- *
- * @param  {array} repos The repository data
- * @param  {string} username The current username
- *
- * @return {object}      An action object with a type of LOAD_REPOS_SUCCESS passing the repos
- */
-export function reposLoaded(repos, username) {
-  return {
-    type: LOAD_REPOS_SUCCESS,
-    repos,
-    username,
-  };
-}
-
-/**
- * Dispatched when loading the repositories fails
- *
- * @param  {object} error The error
- *
- * @return {object}       An action object with a type of LOAD_REPOS_ERROR passing the error
- */
-export function repoLoadingError(error) {
-  return {
-    type: LOAD_REPOS_ERROR,
-    error,
   };
 }

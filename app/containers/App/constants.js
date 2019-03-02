@@ -12,5 +12,13 @@
 export const LOAD_REPOS = 'boilerplate/App/LOAD_REPOS';
 export const LOAD_REPOS_SUCCESS = 'boilerplate/App/LOAD_REPOS_SUCCESS';
 export const LOAD_REPOS_ERROR = 'boilerplate/App/LOAD_REPOS_ERROR';
+
+export const LOAD_USER_LOGIN = 'boilerplate/App/LOAD_USER_LOGIN';
+export const LOAD_USER_LOGIN_SUCCESS =
+  'boilerplate/App/LOAD_USER_LOGIN_SUCCESS';
+export const LOAD_USER_LOGIN_FAIL = 'boilerplate/App/LOAD_USER_LOGIN_FAIL';
+
+export const REMOVE_USER = 'boilerplate/App/REMOVE_USER';
+
 export const SHOW_LOADING = 'boilerplate/App/SHOW_LOADING';
 export const HIDDEN_LOADING = 'boilerplate/App/HIDDEN_LOADING';

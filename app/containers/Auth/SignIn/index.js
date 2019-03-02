@@ -10,7 +10,7 @@ import './styles.css';
 // import { makeSelectGlobal } from 'containers/App/selectors';
 // import { createStructuredSelector } from 'reselect';
 // import { checkLogin } from '../../App/actions';
-
+import request from 'utils/request';
 const Error = styled.div`
   color: red;
 `;
@@ -21,26 +21,24 @@ class NormalLoginForm extends Component {
   };
 
   handleSubmit = e => {
-    // e.preventDefault();
-    // const { history } = this.props;
-    // this.props.form.validateFields((err, values) => {
-    //   console.log(values);
-    //   if (!err) {
-    //     Request.post('/api/users/login', values)
-    //       .then(res => res.data)
-    //       .then(data => {
-    //         if (data && data.success) {
-    //           localStorage.setItem('token', get(data, 'token', false));
-    //           this.props.onHandleCheckLogin();
-    //           history.push('/');
-    //         }
-    //       })
-    //       .catch(err => {
-    //         console.log(err);
-    //         this.setState({ error: 'username or password not correct' });
-    //       });
-    //   }
-    // });
+    e.preventDefault();
+    const { history } = this.props;
+    this.props.form.validateFields((err, values) => {
+      if(!err){
+        request('/sign-in', {
+          method: 'POST', // or 'PUT'
+          body: JSON.stringify(values), // data can be `string` or {object}!
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+          .then(res => {
+            localStorage.setItem('token', res.token);
+            history.replace('/admin')
+          })
+          .catch(err => {});
+      }
+    });
   };
 
   render() {
@@ -50,17 +48,17 @@ class NormalLoginForm extends Component {
         <h1 className="text-center text-header-form">Login</h1>
         <Form onSubmit={this.handleSubmit} className="login-form">
           <FormItem>
-            {getFieldDecorator('username', {
+            {getFieldDecorator('email', {
               rules: [
-                { required: true, message: 'Please input your username!' },
-                { min: 6, message: 'Username is min 6 charter!' },
+                { required: true, message: 'Please input your email!' },
+                { min: 6, message: 'Email is min 6 charter!' },
               ],
             })(
               <Input
                 prefix={
                   <Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />
                 }
-                placeholder="Username"
+                placeholder="Email"
               />,
             )}
           </FormItem>

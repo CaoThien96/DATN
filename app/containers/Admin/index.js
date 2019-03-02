@@ -3,15 +3,20 @@ import lodashcommon from 'containers/commons/lodash_commons';
 import PropTypes from 'prop-types';
 import { Layout, Menu, Breadcrumb, Icon } from 'antd';
 import './style.css';
-import { Switch } from 'react-router-dom';
+import { Switch, withRouter } from 'react-router-dom';
 import adminSubRoutes from 'routes/admin';
 import Link from 'react-router-dom/es/Link';
 import defineAbilitiesFor from 'containers/casl/abilityForMenu';
-import RenderRoute from '../../routes/render';
 import Dropdown from 'antd/es/dropdown/dropdown';
+import { createStructuredSelector } from 'reselect';
+import connect from 'react-redux/es/connect/connect';
+import { compose } from 'redux';
+import RenderRoute from '../../routes/render';
+import request from '../../utils/request';
+import { makeSelectCurrentUser, makeSelectError } from '../App/selectors';
+import { loadUserLogin, removeUser } from '../App/actions';
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
-const MenuItemGroup = Menu.ItemGroup;
 const menu = (
   <Menu>
     <Menu.Item key="0">
@@ -25,20 +30,28 @@ const menu = (
   </Menu>
 );
 class LayoutAdmin extends Component {
+  componentWillMount() {
+    const token = localStorage.getItem('token');
+    this.props.getCurrentUser();
+  }
+
   render() {
-    const { routes } = this.props;
-    const ability = defineAbilitiesFor({ role: 1001 });
+    const { routes, currentUser, error, history } = this.props;
+    if (error) {
+      history.replace('/');
+    }
+    console.log(this.props);
+    const ability = defineAbilitiesFor(currentUser);
     const filter = lodashcommon.lodashFilter(routes, el =>
       ability.can(el.key, 'Menu'),
     );
-    console.log({ routes });
+    console.log({ filter });
     const pathName = this.props.location.pathname;
     const breadcrumbe = pathName.slice(1).split('/');
     let parentPathName = `/${breadcrumbe[0]}`;
     if (breadcrumbe.length > 1) {
       parentPathName = parentPathName.concat('/', breadcrumbe[1]);
     }
-    console.log(parentPathName);
     const routerCurrent = lodashcommon.lodashFind(routes, el => {
       if (el.path == parentPathName) {
         return true;
@@ -47,9 +60,9 @@ class LayoutAdmin extends Component {
     });
     return (
       <Layout>
-        <Header style={{ background: '#fff', padding: 0 }} >
+        <Header style={{ background: '#fff', padding: 0 }}>
           <div className="logo" />
-          <div style={{ float: 'right',marginRight:'15px' }}>
+          <div style={{ float: 'right', marginRight: '15px' }}>
             <Menu
               mode="horizontal"
               defaultSelectedKeys={['2']}
@@ -57,27 +70,35 @@ class LayoutAdmin extends Component {
             >
               <Menu.Item key="4">
                 <Dropdown overlay={menu} trigger={['click']}>
-                  <div><Icon type="notification" /></div>
+                  <div>
+                    <Icon type="notification" />
+                  </div>
                 </Dropdown>
               </Menu.Item>
-              <SubMenu onClick={()=>alert('dấd')}  title={<span className="submenu-title-wrapper"><Icon type="smile" theme="twoTone" />Cao</span>}>
-                <MenuItemGroup title="Item 1">
-                  <Menu.Item key="setting:1">Option 1</Menu.Item>
-                  <Menu.Item key="setting:2">Option 2</Menu.Item>
-                </MenuItemGroup>
-                <MenuItemGroup title="Item 2">
-                  <Menu.Item key="setting:3">Option 3</Menu.Item>
-                  <Menu.Item key="setting:4">Option 4</Menu.Item>
-                </MenuItemGroup>
+              <SubMenu
+                onClick={dom => {
+                  if (dom.key == 'logout') {
+                    localStorage.removeItem('token');
+                    this.props.history.replace('/');
+                  }
+                }}
+                title={
+                  <span className="submenu-title-wrapper">
+                    <Icon type="smile" theme="twoTone" />
+                    {currentUser && currentUser.email.slice(0, 4)}
+                  </span>
+                }
+              >
+                <Menu.Item key="logout">Đăng xuất</Menu.Item>
               </SubMenu>
             </Menu>
           </div>
         </Header>
         <Layout>
-          <Sider width={200} style={{paddingTop: '25px' }}>
+          <Sider width={200} style={{ paddingTop: '25px' }}>
             <Menu
               mode="inline"
-              theme={'dark'}
+              theme="dark"
               selectedKeys={[routerCurrent.key]}
               // defaultOpenKeys={['sub1']}
               style={{ height: '100%', borderRight: 0 }}
@@ -145,8 +166,18 @@ class LayoutAdmin extends Component {
     );
   }
 }
-
+const mapStateToProps = createStructuredSelector({
+  currentUser: makeSelectCurrentUser(),
+  error: makeSelectError(),
+});
+const mapDispatchToProps = dispatch => ({
+  logout: () => dispatch(removeUser()),
+  getCurrentUser: () => dispatch(loadUserLogin()),
+});
+const withConnect = connect(
+  mapStateToProps,
+  mapDispatchToProps,
+);
 LayoutAdmin.defaultProps = {};
 LayoutAdmin.propTypes = {};
-
-export default LayoutAdmin;
+export default withRouter(compose(withConnect)(LayoutAdmin));

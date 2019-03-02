@@ -1,17 +1,23 @@
 import React, { Component } from 'react';
 import { Switch } from 'react-router-dom';
-import PropTypes from 'prop-types';
 import RenderRoute from 'routes/render';
+import request from '../../utils/request';
 class LayoutAuth extends Component {
-  componentDidMount(){
+  componentWillMount() {
     console.log(this.props)
-    const isLogin = true
-    if(isLogin){
-      this.props.history.replace('/admin')
-    }
-  }
-  componentDidUpdate(){
-    console.log(this.props)
+    const token = localStorage.getItem('token')
+    request('api/get-current-user', {
+      method: 'GET',
+      headers: new Headers({
+        authorization: token,
+      }),
+    })
+      .then(data => {
+        this.props.history.replace('/admin');
+      })
+      .catch(e => {
+
+      });
   }
   render() {
     const { routes } = this.props;
@@ -22,7 +28,6 @@ class LayoutAuth extends Component {
             <RenderRoute key={i} {...route} />
           ))}
         </Switch>
-
       </div>
     );
   }
@@ -30,5 +35,4 @@ class LayoutAuth extends Component {
 
 LayoutAuth.defaultProps = {};
 LayoutAuth.propTypes = {};
-
 export default LayoutAuth;
