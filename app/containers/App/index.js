@@ -55,7 +55,6 @@ class Index extends Component {
   }
   render() {
     const { showLoading } = this.props;
-    console.log({ showLoading });
     return (
       <AppWrapper>
         <Switch>

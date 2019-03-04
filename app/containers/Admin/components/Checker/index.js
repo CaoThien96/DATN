@@ -6,19 +6,30 @@ import Row from 'antd/es/grid/row';
 import Divider from 'antd/es/divider';
 import Camera from './component/Camera';
 import Result from './component/Result';
+import CheckInManual from './component/CheckInManual/index';
 
 class LayoutChecker extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      listCheckIn: [],
+      listCheckIn: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(el => ({
+        id: el,
+        user: {
+          fullName: 'Cao Van Thien',
+        },
+        time: `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()} ${new Date().getDate()}-${new Date().getMonth()}-${new Date().getFullYear()}`,
+      })),
+      checkInManual: true,
     };
   }
 
   onSuccessFindObject = infor => {};
 
   render() {
-    return (
+    const { listCheckIn, checkInManual } = this.state;
+    return checkInManual ? (
+      <CheckInManual checkInManual={checkInManual} />
+    ) : (
       <Row>
         <Col
           style={{ borderRight: '1px solid', height: '-webkit-fill-available' }}
@@ -31,7 +42,7 @@ class LayoutChecker extends Component {
         <Col style={{ height: '-webkit-fill-available' }} span={11}>
           <h2 className="text-center">Thông tin giám sát ngày 4/3/2019</h2>
           <Divider />
-          <Result listCheckIn={[]} />
+          <Result listCheckIn={listCheckIn} />
         </Col>
       </Row>
     );
