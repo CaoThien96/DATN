@@ -13,15 +13,25 @@ function subjectName(item) {
 export default function defineAbilitiesFor(user) {
   return AbilityBuilder.define((can, cannot) => {
     if (user.role === 1001) {
-      //Quan tri
-      can(['admin-dashboard', 'admin-employee', 'admin-notification', 'admin-request', 'admin-config', 'admin-checker','admin-configuration'], 'Menu');
+      // Quan tri
+      can(
+        [
+          'admin-dashboard',
+          'admin-employee',
+          'admin-notification',
+          'admin-request',
+          'admin-config',
+          'admin-checker',
+          'admin-configuration',
+        ],
+        'Menu',
+      );
     } else if (user.role === 1000) {
-      //Nhan vien
+      // Nhan vien
       can(['admin-notification', 'admin-request'], 'Menu');
-    }else if (user.role === 1003){
-      //Giam sat vien
+    } else if (user.role === 1002) {
+      // Giam sat vien
       can(['admin-config', 'admin-checker'], 'Menu');
     }
   });
 }
-

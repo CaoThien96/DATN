@@ -22,7 +22,7 @@ class RequestDetail extends Component {
     const { match } = this.props;
     const id = match.params.id;
     request(`/api/request/${id}`).then(data => {
-      console.log({ data });
+
       this.setState({ requestDetail: data.payload });
     });
   }
@@ -61,7 +61,7 @@ class RequestDetail extends Component {
     const { match } = this.props;
     const { requestDetail } = this.state;
     const { getFieldDecorator } = this.props.form;
-    console.log(requestDetail);
+
     return requestDetail == null ? (
       <LoadingIndicator />
     ) : (

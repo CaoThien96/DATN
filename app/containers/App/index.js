@@ -9,7 +9,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { Switch, Route, Link,withRouter } from 'react-router-dom';
+import { Switch, Route, Link, withRouter } from 'react-router-dom';
 import routes from 'routes';
 import RenderRoute from 'routes/render';
 // import 'antd/dist/antd.css';
@@ -19,16 +19,14 @@ import connect from 'react-redux/es/connect/connect';
 import { compose } from 'redux';
 import Button from 'antd/es/button/button';
 import GlobalStyle from '../../global-styles';
-import LoadingIndicator from '../../components/LoadingIndicator';
-import { makeSelectError, makeSelectLoading, makeSelectRepos, makeSelectShowLoading } from './selectors';
+import { makeSelectShowLoading } from './selectors';
 // import { mapDispatchToProps } from '../HomePage';
 import injectReducer from '../../utils/injectReducer';
 import reducer from '../HomePage/reducer';
-import { changeUsername } from '../HomePage/actions';
 import { showLoading, hiddenLoading } from './actions';
-import { loadRepos } from './actions';
-import { makeSelectUsername } from '../HomePage/selectors';
-
+import { loadUserLogin } from './actions';
+import injectSaga from '../../utils/injectSaga';
+import saga from './saga';
 const AppWrapper = styled.div`
   margin: 0 auto;
   display: flex;
@@ -48,28 +46,31 @@ const SpinWrapper = styled.div`
   height: 100%;
   width: 100%;
 `;
-const X = () => <div>Admin</div>;
-const Y = () => <div>Employee</div>;
-const Z = () => <div>Checker</div>;
 class Index extends Component {
+  componentDidMount() {
+    const token = localStorage.getItem('token');
+    if(token !== null){
+      this.props.getCurrentUser();
+    }
+  }
   render() {
     const { showLoading } = this.props;
     console.log({ showLoading });
     return (
       <AppWrapper>
         <Switch>
-           {routes.map((route, i) => (
-           <RenderRoute key={i} {...route} />
-           ))}
-          {/*<Route path="/" exact component={X} />*/}
-          {/*<Route path="/y" exact component={Y} />*/}
-          {/*<Route path="/z" exact component={Z} />*/}
+          {routes.map((route, i) => (
+            <RenderRoute key={i} {...route} />
+          ))}
+          {/* <Route path="/" exact component={X} /> */}
+          {/* <Route path="/y" exact component={Y} /> */}
+          {/* <Route path="/z" exact component={Z} /> */}
         </Switch>
 
-        {/*<Link to="/">Home</Link><br/>*/}
-        {/*<Link to="/y">Employee</Link><br/>*/}
-        {/*<Link to="/z">Checker</Link><br/>*/}
-        <Button onClick={this.props.onShowLoading}>Show loading</Button>
+        {/* <Link to="/">Home</Link><br/> */}
+        {/* <Link to="/y">Employee</Link><br/> */}
+        {/* <Link to="/z">Checker</Link><br/> */}
+        {/*<Button onClick={this.props.onShowLoading}>Show loading</Button>*/}
         {showLoading && (
           <SpinWrapper>
             <Button onClick={this.props.onHiddenLoading}>Hidden loading</Button>
@@ -92,13 +93,18 @@ const mapStateToProps = createStructuredSelector({
 const mapDispatchToProps = dispatch => ({
   onShowLoading: () => dispatch(showLoading()),
   onHiddenLoading: () => dispatch(hiddenLoading()),
+  getCurrentUser: () => dispatch(loadUserLogin()),
 });
 const withConnect = connect(
   mapStateToProps,
-  mapDispatchToProps
+  mapDispatchToProps,
 );
 const withReducer = injectReducer({ key: 'home', reducer });
-export default withRouter(compose(
-  withReducer,
-  withConnect,
-)(Index));
+const withSaga = injectSaga({ key: 'home', saga });
+export default withRouter(
+  compose(
+    withReducer,
+    withSaga,
+    withConnect,
+  )(Index),
+);

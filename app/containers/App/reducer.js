@@ -13,11 +13,12 @@
 import { fromJS } from 'immutable';
 
 import {
-  LOAD_REPOS_SUCCESS,
-  LOAD_REPOS,
-  LOAD_REPOS_ERROR,
+  LOAD_USER_LOGIN,
+  LOAD_USER_LOGIN_SUCCESS,
+  LOAD_USER_LOGIN_FAIL,
   SHOW_LOADING,
   HIDDEN_LOADING,
+  REMOVE_USER,
 } from './constants';
 
 // The initial state of the App
@@ -26,9 +27,6 @@ const initialState = fromJS({
   showLoading: false,
   error: false,
   currentUser: false,
-  userData: {
-    repositories: false,
-  },
 });
 
 function appReducer(state = initialState, action) {
@@ -37,18 +35,14 @@ function appReducer(state = initialState, action) {
       return state.set('showLoading', true);
     case HIDDEN_LOADING:
       return state.set('showLoading', false);
-    case LOAD_REPOS:
-      return state
-        .set('loading', true)
-        .set('error', false)
-        .setIn(['userData', 'repositories'], false);
-    case LOAD_REPOS_SUCCESS:
-      return state
-        .setIn(['userData', 'repositories'], action.repos)
-        .set('loading', false)
-        .set('currentUser', action.username);
-    case LOAD_REPOS_ERROR:
+    case LOAD_USER_LOGIN:
+      return state.set('loading', true).set('error', false);
+    case LOAD_USER_LOGIN_SUCCESS:
+      return state.set('loading', false).set('currentUser', action.user);
+    case LOAD_USER_LOGIN_FAIL:
       return state.set('error', action.error).set('loading', false);
+    case REMOVE_USER:
+      return state.set('currentUser', false);
     default:
       return state;
   }

@@ -29,7 +29,7 @@ class Index extends Component {
       <Row gutter={16}>
         <Col span={12} style={{borderRight:'1px solid'}}>
           <h1>{notificationDetail.title}</h1>
-          <PreviewHtml>{notificationDetail.descriptions}</PreviewHtml>
+          <PreviewHtml>{notificationDetail.descriptions !== undefined ? notificationDetail.descriptions : ''}</PreviewHtml>
         </Col>
         <Col span={12}>
           <Row>
@@ -56,7 +56,6 @@ class Index extends Component {
                   <Row>
                     <a>Cao Van Thien</a> dasdasdadasdasdasdadasdasd
                   </Row>
-                  {/*<Row><a>Tra loi</a></Row>*/}
                 </Col>
               </Row>
             </Row>
