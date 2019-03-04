@@ -9,7 +9,7 @@ import { Form, Icon, Input, Button, Checkbox, Radio, DatePicker } from 'antd';
 // import Demo from './test'
 import request from 'utils/request';
 import Select from 'antd/es/select';
-const onSubmit = formData => console.log('Data submitted: ', formData);
+
 const { TextArea } = Input;
 function disabledDate(current) {
   // Can not select days before today and today
@@ -26,8 +26,6 @@ class New extends Component {
   submit = e => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
-      console.log(values);
-      console.log(values.date.unix());
       const date = values.date.unix();
       // database.ref("/request")
       //   .push({...values,date:date,status:0});

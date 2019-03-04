@@ -28,7 +28,6 @@ class LayoutEmployee extends Component {
   onNewSuccess = () => {
     this.setState({ visible: false });
     request('/api/employee').then(data => {
-      console.log({ data });
       this.setState({ resultSearch: data });
     });
   };
@@ -39,7 +38,6 @@ class LayoutEmployee extends Component {
       const apiUrl = `/api/employee?value=${json}`;
       request(apiUrl)
         .then(data => {
-          console.log({ data });
           this.setState({ resultSearch: data });
         })
         .catch(err => alert(err));
@@ -53,14 +51,12 @@ class LayoutEmployee extends Component {
   };
 
   handleOk = e => {
-    console.log(e);
     this.setState({
       visible: false,
     });
   };
 
   handleCancel = e => {
-    console.log(e);
     this.setState({
       visible: false,
     });
@@ -101,7 +97,6 @@ class LayoutEmployee extends Component {
         }
         return el;
       });
-      console.log({ resultSearch });
       this.setState({
         resultSearch,
       });

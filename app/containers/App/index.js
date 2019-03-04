@@ -48,11 +48,11 @@ const SpinWrapper = styled.div`
 `;
 class Index extends Component {
   componentDidMount() {
-    this.props.getCurrentUser();
+    const token = localStorage.getItem('token');
+    if(token !== null){
+      this.props.getCurrentUser();
+    }
   }
-componentWillMount(){
-    console.log('will')
-}
   render() {
     const { showLoading } = this.props;
     console.log({ showLoading });
@@ -70,7 +70,7 @@ componentWillMount(){
         {/* <Link to="/">Home</Link><br/> */}
         {/* <Link to="/y">Employee</Link><br/> */}
         {/* <Link to="/z">Checker</Link><br/> */}
-        <Button onClick={this.props.onShowLoading}>Show loading</Button>
+        {/*<Button onClick={this.props.onShowLoading}>Show loading</Button>*/}
         {showLoading && (
           <SpinWrapper>
             <Button onClick={this.props.onHiddenLoading}>Hidden loading</Button>

@@ -6,7 +6,6 @@ import { Form, Icon, Input, Button, Checkbox, Radio } from 'antd';
 // import uiSchema from './uiSchema';
 // import Demo from './test'
 import request from 'utils/request';
-const onSubmit = formData => console.log('Data submitted: ', formData);
 class New extends Component {
   submit = e => {
     e.preventDefault();

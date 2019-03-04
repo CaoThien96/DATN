@@ -40,12 +40,10 @@ class LayoutAdmin extends Component {
     if (error) {
       history.replace('/');
     }
-    console.log(this.props);
     const ability = defineAbilitiesFor(currentUser);
     const filter = lodashcommon.lodashFilter(routes, el =>
       ability.can(el.key, 'Menu'),
     );
-    console.log({ filter });
     const pathName = this.props.location.pathname;
     const breadcrumbe = pathName.slice(1).split('/');
     let parentPathName = `/${breadcrumbe[0]}`;
@@ -150,8 +148,7 @@ class LayoutAdmin extends Component {
               style={{
                 background: '#fff',
                 padding: 24,
-                margin: 0,
-                minHeight: 280,
+                height: '-webkit-fill-available',
               }}
             >
               <Switch>

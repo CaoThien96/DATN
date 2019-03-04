@@ -120,7 +120,7 @@ routes.put('/:id', (req, res) => {
   const iid = parseInt(req.params.id);
   const status = req.body.status ? 1 : 2;
   Request.update({ iid }, { status }, (err, docs) => {
-    console.log(err);
+
     res.send({
       success: true,
       payload: docs,

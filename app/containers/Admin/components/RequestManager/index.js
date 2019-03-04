@@ -25,21 +25,21 @@ class RequestManagement extends Component {
 
   componentWillMount() {
     request('/api/request').then(data => {
-      console.log({ data });
+
       this.setState({ resultSearch: data.payload });
     });
   }
 
   componentDidMount() {
     database.ref('/').on('value', snapshot => {
-      console.log('data change', snapshot.val());
+
     });
   }
 
   onNewSuccess = () => {
     this.setState({ visible: false });
     request('/api/request').then(data => {
-      console.log({ data });
+
       this.setState({ resultSearch: data.payload });
     });
   };
@@ -50,7 +50,7 @@ class RequestManagement extends Component {
       const apiUrl = `/api/employee?value=${json}`;
       request(apiUrl)
         .then(data => {
-          console.log({ data });
+
           this.setState({ resultSearch: data });
         })
         .catch(err => alert(err));
@@ -64,14 +64,14 @@ class RequestManagement extends Component {
   };
 
   handleOk = e => {
-    console.log(e);
+
     this.setState({
       visible: false,
     });
   };
 
   handleCancel = e => {
-    console.log(e);
+
     this.setState({
       visible: false,
     });
@@ -111,7 +111,7 @@ class RequestManagement extends Component {
         }
         return el;
       });
-      console.log({ resultSearch });
+
       this.setState({
         resultSearch,
       });

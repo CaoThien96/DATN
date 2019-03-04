@@ -38,7 +38,15 @@ function checkStatus(response) {
  * @return {object}           The response data
  */
 export default function request(url, options) {
-  return fetch(url, options)
+  const token = localStorage.getItem('token');
+  const newConfig = {
+    ...options,
+    headers: new Headers({
+      authorization: token,
+      ...(options && options.headers),
+    }),
+  };
+  return fetch(url, newConfig)
     .then(checkStatus)
     .then(parseJSON);
 }

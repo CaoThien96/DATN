@@ -27,7 +27,6 @@ class Image extends Component {
       ctx: this.canvasTag.current.getContext('2d'),
       test: this.canvasTest.current.getContext('2d'),
     });
-    console.log('use face api');
     const inputSize = 512;
     const scoreThreshold = 0.5;
     const options = await new faceapi.TinyFaceDetectorOptions({

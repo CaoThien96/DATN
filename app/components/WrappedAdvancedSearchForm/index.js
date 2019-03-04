@@ -6,7 +6,11 @@ import { Button } from 'antd';
 class Wrapper extends Component {
   componentDidMount(){
     this.props.form.validateFields((err, values) => {
-      // this.props.handleSearch(values);
+      if(err){
+
+      }else{
+        this.props.handleSearch(values);
+      }
     });
   }
   handleReset = () => {

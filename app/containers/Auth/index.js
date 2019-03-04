@@ -4,20 +4,25 @@ import RenderRoute from 'routes/render';
 import request from '../../utils/request';
 class LayoutAuth extends Component {
   componentWillMount() {
-    console.log(this.props)
     const token = localStorage.getItem('token')
-    request('api/get-current-user', {
-      method: 'GET',
-      headers: new Headers({
-        authorization: token,
-      }),
-    })
-      .then(data => {
-        this.props.history.replace('/admin');
+    if(token !== null){
+      request('api/get-current-user', {
+        method: 'GET',
+        headers: new Headers({
+          authorization: token,
+        }),
       })
-      .catch(e => {
+        .then(data => {
+          this.props.history.replace('/admin');
+        })
+        .catch(e => {
 
-      });
+        });
+    }else{
+      console.log('not found token')
+    }
+
+
   }
   render() {
     const { routes } = this.props;

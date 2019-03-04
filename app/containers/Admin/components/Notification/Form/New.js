@@ -12,7 +12,6 @@ import Select from 'antd/es/select';
 import ReactQuill from 'react-quill';
 import './react-draft-wysiwyg.css';
 import 'react-quill/dist/quill.snow.css'; // ES6
-const onSubmit = formData => console.log('Data submitted: ', formData);
 const { TextArea } = Input;
 function disabledDate(current) {
   // Can not select days before today and today
@@ -38,7 +37,6 @@ class New extends Component {
         return;
       }
       const newValue = { ...values, descriptions: this.state.text };
-      console.log(newValue);
       request('/api/notification', {
         method: 'POST', // or 'PUT'
         body: JSON.stringify(newValue), // data can be `string` or {object}!
