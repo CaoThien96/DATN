@@ -4,14 +4,18 @@ import Form from 'antd/es/form/Form';
 import Icon from 'antd/es/icon';
 import Input from 'antd/es/input/Input';
 import Button from 'antd/es/button/button';
-
+import request from 'utils/request';
 class FormSearch extends Component {
   onSubmit = e => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       if (!err) {
         console.log('Received values of form: ', values);
-        this.props.onSearchSuccess({fullName:'CaoVanThien'})
+        request(`/api/employee/${values.iid}`)
+          .then(data => {
+            this.props.onSearchSuccess(data.payload);
+          })
+          .catch(e => console.log(e));
       }
     });
   };
@@ -34,9 +38,12 @@ class FormSearch extends Component {
             )}
           </Form.Item>
           <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Tìm Kiếm
-            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              shape="circle"
+              icon="search"
+            />
           </Form.Item>
         </Form>
       </div>

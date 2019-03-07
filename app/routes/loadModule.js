@@ -82,3 +82,10 @@ export const Configuration = Loadable({
   loader: () => import('containers/Admin/components/Configuration/index'),
   loading: LoadingIndicator,
 })
+/**
+ * Tesst
+ */
+export const Test = Loadable({
+  loader: () => import('containers/Admin/components/TestTf'),
+  loading: LoadingIndicator,
+})

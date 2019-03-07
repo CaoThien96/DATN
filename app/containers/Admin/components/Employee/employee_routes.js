@@ -9,7 +9,7 @@ const Employee = Loadable({
   loading: LoadingIndicator,
 });
 const EmployeeTraining = Loadable({
-  loader: () => import('containers/Admin/components/Employee/components/Training/index'),
+  loader: () => import('containers/Admin/components/Employee/components/AddTraining/index'),
   loading: LoadingIndicator,
 })
 const EmployeeTest = Loadable({

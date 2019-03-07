@@ -5,6 +5,7 @@ const logger = require('./logger');
 const bodyParser = require('body-parser');
 const passport = require('passport');
 require('./configs/db');
+require('./configs/cronJob');
 const argv = require('./argv');
 const port = require('./port');
 const setup = require('./middlewares/frontendMiddleware');

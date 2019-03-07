@@ -10,20 +10,20 @@ class New extends Component {
   submit = e => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
-      alert(JSON.stringify(values));
-      // request('/api/employee', {
-      //   method: 'POST', // or 'PUT'
-      //   body: JSON.stringify(values), // data can be `string` or {object}!
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      // })
-      //   .then(res => {
-      //     this.handleReset();
-      //     this.props.onSuccess();
-      //   })
-      //   .catch(err => {
-      //   });
+      // alert(JSON.stringify(values));
+      request('/api/employee', {
+        method: 'POST', // or 'PUT'
+        body: JSON.stringify(values), // data can be `string` or {object}!
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(res => {
+          this.handleReset();
+          this.props.onSuccess();
+        })
+        .catch(err => {
+        });
     });
   };
 
