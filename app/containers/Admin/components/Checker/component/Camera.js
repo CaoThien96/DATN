@@ -62,9 +62,13 @@ class CameraWrapper extends Component {
   onContinue = ()=>{
     this.videoTag.current.play()
   }
+  changeState=()=>{
+    this.setState({images:1})
+  }
   render() {
     return (
       <DivWrapper>
+        <button onClick={this.changeState}>Cap nHat state</button>
         <VideoTag
           // style={{ position: 'absolute' }}
           onPlay={this.onPlay}

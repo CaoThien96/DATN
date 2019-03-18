@@ -29,6 +29,48 @@ const menu = (
     <Menu.Item key="3">3rd menu item</Menu.Item>
   </Menu>
 );
+const LayoutResponsive = () => (
+  <Layout>
+    <Sider
+      breakpoint="lg"
+      collapsedWidth="0"
+      onBreakpoint={broken => {
+        console.log(broken);
+      }}
+      onCollapse={(collapsed, type) => {
+        console.log(collapsed, type);
+      }}
+    >
+      <div className="logo" />
+      <Menu theme="dark" mode="inline" defaultSelectedKeys={['4']}>
+        <Menu.Item key="1">
+          <Icon type="user" />
+          <span className="nav-text">nav 1</span>
+        </Menu.Item>
+        <Menu.Item key="2">
+          <Icon type="video-camera" />
+          <span className="nav-text">nav 2</span>
+        </Menu.Item>
+        <Menu.Item key="3">
+          <Icon type="upload" />
+          <span className="nav-text">nav 3</span>
+        </Menu.Item>
+        <Menu.Item key="4">
+          <Icon type="user" />
+          <span className="nav-text">nav 4</span>
+        </Menu.Item>
+      </Menu>
+    </Sider>
+    <Layout>
+      <Header style={{ background: '#fff', padding: 0 }} />
+      <Content style={{ margin: '24px 16px 0' }}>
+        <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
+          content
+        </div>
+      </Content>
+    </Layout>
+  </Layout>
+);
 class LayoutAdmin extends Component {
   componentWillMount() {
     const token = localStorage.getItem('token');
@@ -38,7 +80,7 @@ class LayoutAdmin extends Component {
   render() {
     const { routes, currentUser, error, history } = this.props;
     if (error) {
-      history.replace('/');
+      // history.replace('/');
     }
     const ability = defineAbilitiesFor(currentUser);
     const filter = lodashcommon.lodashFilter(routes, el =>
@@ -93,7 +135,17 @@ class LayoutAdmin extends Component {
           </div>
         </Header>
         <Layout>
-          <Sider width={200} style={{ paddingTop: '25px' }}>
+          <Sider
+            breakpoint="lg"
+            collapsedWidth="0"
+            onBreakpoint={broken => {
+              console.log(broken);
+            }}
+            onCollapse={(collapsed, type) => {
+              console.log(collapsed, type);
+            }}
+            // width={200} style={{ paddingTop: '25px' }}
+          >
             <Menu
               mode="inline"
               theme="dark"

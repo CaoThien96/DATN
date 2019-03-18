@@ -100,6 +100,7 @@ class Image extends Component {
     model.compile({
       loss: 'meanSquaredError',
       optimizer: tf.train.adam(0.06),
+      metrics: ['accuracy'],
     });
     // train/fit our network
     const startTime = Date.now();
@@ -124,7 +125,7 @@ class Image extends Component {
           value: tmp[arr[j] + j * depth],
         });
       }
-      console.log({xx})
+      console.log({ xx });
       const boxWithText = faceRef.map(
         (item, key) =>
           xx[key].value > 0.8
