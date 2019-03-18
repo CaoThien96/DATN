@@ -19,18 +19,16 @@ class CheckInManual extends Component {
     });
   };
 
+  onCheckInSuccess = () => {
+    this.props.onCheckInManualSuccess();
+  };
+
   render() {
-    const { checkInManual } = this.props;
+    const { checkInManual,onCheckInManualSuccess } = this.props;
     return (
       <div>
-        <Modal
-          title="Giám sát thủ công"
-          visible={checkInManual}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
-          footer={null}
-        >
-         <StepFormWrapper/>
+        <Modal title="Giám sát thủ công" visible={checkInManual} footer={null}>
+          <StepFormWrapper onCheckInSuccess={this.onCheckInSuccess}/>
         </Modal>
       </div>
     );
@@ -38,6 +36,7 @@ class CheckInManual extends Component {
 }
 CheckInManual.propTypes = {
   checkInManual: PropTypes.bool.isRequired,
+  onCheckInManualSuccess: PropTypes.func.isRequired,
 };
 const WrappedNormalCheckInManual = Form.create({ name: 'CheckInManual' })(
   CheckInManual,

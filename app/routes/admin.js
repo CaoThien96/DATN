@@ -9,7 +9,8 @@ import {
   Attendance,
   RequestLayoutManagement,
   NotificationLayoutManagement,
-  Configuration
+  Configuration,
+  Test
 } from 'routes/loadModule';
 // import subRoutes from 'containers/Admin/Routes';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
@@ -25,7 +26,14 @@ const routes = [
     label: 'Dashboard',
     icon: <Icon type="dashboard" />,
   },
-
+  {
+    path: '/admin/test',
+    key: 'admin-test',
+    exact: true,
+    component: Test,
+    label: 'Test',
+    icon: <Icon type="dashboard" />,
+  },
   {
     path: '/admin/employee',
     key: 'admin-employee',

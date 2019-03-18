@@ -23,7 +23,7 @@ function fetchUserByToken(token) {
 }
 export function* getCurrentUser() {
   // Select username from store
-  const requestURL = `http://localhost:3000/api/get-current-user`;
+  const requestURL = `/api/get-current-user`;
   const token = localStorage.getItem('token');
   try {
     // Call our request helper (see 'utils/request')

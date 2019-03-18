@@ -23,6 +23,7 @@ export default function defineAbilitiesFor(user) {
           'admin-config',
           'admin-checker',
           'admin-configuration',
+          'admin-test',
         ],
         'Menu',
       );

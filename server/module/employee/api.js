@@ -4,7 +4,7 @@ const User = require('./model');
 routes.get('/', async (req, res) => {
   try {
     const body = req.body;
-    let condition = {};
+    let condition = {role:1000};
     if (!lodash.isEmpty(req.query)) {
       const query = JSON.parse(req.query.value);
       const status = query.status;
@@ -37,11 +37,18 @@ routes.get('/', async (req, res) => {
 routes.get('/:id', async (req, res) => {
   const id = parseInt(req.params.id);
   try {
-    const user = await User.findOne({ iid: id });
-    res.send({
-      success: true,
-      payload: user,
-    });
+    const user = await User.findOne({ iid: id,role:1000 });
+    if (user !== null) {
+      res.send({
+        success: true,
+        payload: user,
+      });
+    } else {
+      res.send({
+        success: false,
+        message: 'Not found user',
+      });
+    }
   } catch (e) {
     res.staus(500).send({
       success: false,
@@ -80,7 +87,7 @@ routes.put('/', async (req, res) => {
   try {
     await User.findOneAndUpdate(
       { iid: req.body.id },
-      { $set: { training: JSON.stringify(req.body.labelFaceDetector) } },
+      { $set: { training: JSON.stringify(req.body.data) } },
     );
     res.send({
       success: true,
@@ -88,6 +95,7 @@ routes.put('/', async (req, res) => {
   } catch (e) {
     res.staus(500).send({
       success: false,
+      error:e
     });
   }
 });

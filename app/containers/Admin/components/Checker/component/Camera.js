@@ -20,18 +20,14 @@ class CameraWrapper extends Component {
     this.videoTag = React.createRef();
     this.imageTag = React.createRef();
     this.canvasRef = React.createRef();
+    this.state = {
+      object: false,
+    };
   }
 
   async componentDidMount() {
     const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
-    // this.videoTag.current.srcObject = stream;
-    // console.log({ faceapi });
-    // const options = getFaceDetectorOptions();
-    // console.log({ options });
-    // console.log(faceapi.nets.tinyFaceDetector.params);
-    // const result = await faceapi.detectAllFaces(this.imageTag.current, options);
-    // console.log({ result });
-    // drawDetections(this.imageTag.current, this.canvasRef.current, result);
+    this.videoTag.current.srcObject = stream;
   }
 
   onPlay = async () => {
@@ -45,27 +41,42 @@ class CameraWrapper extends Component {
       return setTimeout(() => this.onPlay(this.videoTag.current));
     const options = getFaceDetectorOptions();
     console.log({ options });
-    const result = await faceapi.detectAllFaces(this.videoTag.current, options);
-    console.log({ result });
-    drawDetections(this.imageTag.current, this.canvasRef.current, result);
+    const result = await faceapi.detectSingleFace(this.videoTag.current, options).withFaceLandmarks().withFaceDescriptor();
+    console.log(result)
+
+    if(result){
+      const alignedRect = result.alignedRect
+      this.onRecognition();
+      drawDetections(this.imageTag.current, this.canvasRef.current, [alignedRect]);
+    }else {
+      drawDetections(this.imageTag.current, this.canvasRef.current, []);
+    }
     setTimeout(() => this.onPlay(this.videoTag.current));
   };
-
-  grabFrame = () => {};
-
-  onGrabFrame = () => {};
-
+  onRecognition(){
+    // setTimeout(()=>this.setState())
+  }
+  onStop = ()=>{
+    this.videoTag.current.stop()
+  }
+  onContinue = ()=>{
+    this.videoTag.current.play()
+  }
+  changeState=()=>{
+    this.setState({images:1})
+  }
   render() {
     return (
       <DivWrapper>
+        <button onClick={this.changeState}>Cap nHat state</button>
         <VideoTag
           // style={{ position: 'absolute' }}
           onPlay={this.onPlay}
           ref={this.videoTag}
-          width="640"
-          height="480"
+          width="594"
+          height="383"
           controls
-          // autoPlay
+          autoPlay
           muted
         />
         <img

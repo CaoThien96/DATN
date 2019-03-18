@@ -19,16 +19,20 @@ class LayoutChecker extends Component {
         },
         time: `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()} ${new Date().getDate()}-${new Date().getMonth()}-${new Date().getFullYear()}`,
       })),
-      checkInManual: true,
+      checkInManual: false,
     };
   }
 
   onSuccessFindObject = infor => {};
-
+  onCheckInManualSuccess = ()=>{
+    this.setState({
+      checkInManual: false,
+    })
+  }
   render() {
     const { listCheckIn, checkInManual } = this.state;
     return checkInManual ? (
-      <CheckInManual checkInManual={checkInManual} />
+      <CheckInManual checkInManual={checkInManual} onCheckInManualSuccess={this.onCheckInManualSuccess} />
     ) : (
       <Row>
         <Col
