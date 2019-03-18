@@ -1,7 +1,6 @@
 import React from 'react';
 import Loadable from 'react-loadable';
 
-import Loading from 'components/LoadingIndicator';
 import LoadingIndicator from '../components/LoadingIndicator';
 /**
  * Loading module Auth
@@ -45,29 +44,26 @@ export const Manager = Loadable({
 export const EmployeeLayout = Loadable({
   loader: () => import('containers/Admin/components/Employee/Layout'),
   loading: LoadingIndicator,
-})
+});
 export const Employee = Loadable({
   loader: () => import('containers/Admin/components/Employee/index'),
   loading: LoadingIndicator,
 });
-export const EmployeeTraining = Loadable({
-  loader: () => import('containers/Admin/components/Employee/components/Training/index'),
-  loading: LoadingIndicator,
-})
+
 /**
  * Module notification management
  */
 export const NotificationLayoutManagement = Loadable({
   loader: () => import('containers/Admin/components/Notification/Layout'),
   loading: LoadingIndicator,
-})
+});
 /**
  * Module request management
  */
 export const RequestLayoutManagement = Loadable({
   loader: () => import('containers/Admin/components/RequestManager/layout'),
   loading: LoadingIndicator,
-})
+});
 /**
  * Module Attendance
  */
@@ -81,11 +77,11 @@ export const Attendance = Loadable({
 export const Configuration = Loadable({
   loader: () => import('containers/Admin/components/Configuration/index'),
   loading: LoadingIndicator,
-})
+});
 /**
  * Tesst
  */
 export const Test = Loadable({
   loader: () => import('containers/Admin/components/TestTf'),
   loading: LoadingIndicator,
-})
+});
