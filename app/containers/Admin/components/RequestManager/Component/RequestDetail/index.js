@@ -3,12 +3,12 @@ import request from 'utils/request';
 import LoadingIndicator from 'components/LoadingIndicator';
 import Col from 'antd/es/grid/col';
 import Row from 'antd/es/grid/row';
-import Input from 'antd/es/Input';
+import { Input } from 'antd';
 import Switch from 'antd/es/switch';
 import Button from 'antd/es/button/button';
 import Form from 'antd/es/form/Form';
-import Comment from './Comment';
 import Divider from 'antd/es/divider';
+import Comment from './Comment';
 const { TextArea } = Input;
 class RequestDetail extends Component {
   constructor(props) {
@@ -22,7 +22,6 @@ class RequestDetail extends Component {
     const { match } = this.props;
     const id = match.params.id;
     request(`/api/request/${id}`).then(data => {
-
       this.setState({ requestDetail: data.payload });
     });
   }

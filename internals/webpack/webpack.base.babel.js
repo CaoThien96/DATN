@@ -122,6 +122,10 @@ module.exports = options => ({
         NODE_ENV: JSON.stringify(process.env.NODE_ENV),
       },
     }),
+    new webpack.ContextReplacementPlugin(
+      /moment[\\\/]locale$/,
+      /^\.\/(en|de|cz|eu)$/,
+    ),
   ]),
   resolve: {
     modules: ['node_modules', 'app'],
