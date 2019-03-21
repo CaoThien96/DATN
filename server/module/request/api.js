@@ -57,7 +57,24 @@ routes.post('/comment', (req, res) => {
  * Truy van lay yeu cau
  */
 routes.get('/', (req, res) => {
-  Request.find({}, (err, data) => {
+  let condition = {};
+  if (!lodash.isEmpty(req.query)) {
+    const query = JSON.parse(req.query.value);
+    const status = query.status;
+    const iid = parseInt(query.iid);
+    if (iid) {
+      condition = { ...condition, iid };
+    }
+
+    if (status.length) {
+      let or = [];
+      for (let i = 0; i < status.length; i++) {
+        or = [...or, { status: status[i] }];
+      }
+      condition = { ...condition, $or: or };
+    }
+  }
+  Request.find(condition, (err, data) => {
     if (err) {
       return res.status(500).send({
         success: false,
@@ -74,6 +91,22 @@ routes.get('/', (req, res) => {
  * Lay chi tiet mot yeu cau
  */
 routes.get('/:id', (req, res) => {
+  const iid = req.params.id;
+  const u = req.user
+  Request.findOne({ iid }, (err, data) => {
+    if (err) {
+      return res.status(500).send({
+        success: false,
+        err,
+      });
+    }
+    res.status(200).send({
+      success: true,
+      payload: data,
+    });
+  });
+});
+routes.get('/search/:key', (req, res) => {
   const iid = req.params.id;
   Request.findOne({ iid }, (err, data) => {
     if (err) {

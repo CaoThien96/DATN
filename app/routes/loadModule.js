@@ -78,6 +78,12 @@ export const Configuration = Loadable({
   loader: () => import('containers/Admin/components/Configuration/index'),
   loading: LoadingIndicator,
 });
+export const ConfigurationModel = Loadable({
+  loader: () =>
+    import('containers/Admin/components/Configuration_Model/Layout'),
+  loading: LoadingIndicator,
+});
+
 /**
  * Tesst
  */

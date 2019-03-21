@@ -68,7 +68,6 @@ class CameraWrapper extends Component {
   render() {
     return (
       <DivWrapper>
-        <button onClick={this.changeState}>Cap nHat state</button>
         <VideoTag
           // style={{ position: 'absolute' }}
           onPlay={this.onPlay}

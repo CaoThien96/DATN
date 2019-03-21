@@ -29,7 +29,7 @@ const RequestSchema = new Schema({
   ],
   status: {
     type: Number,
-    default: 0,
+    default: 0,//0 la dang cho, 1 la chap nhan, 2 la khong chap nhan, 3 huy bo yeu cau
   },
 });
 RequestSchema.plugin(autoIncrement.plugin, {

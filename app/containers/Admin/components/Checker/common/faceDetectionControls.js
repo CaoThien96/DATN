@@ -10,7 +10,7 @@ let minConfidence = 0.5
 
 // tiny_face_detector options
 let inputSize = 224
-let scoreThreshold = 0.9
+let scoreThreshold = 0.8
 
 //mtcnn options
 let minFaceSize = 20

@@ -36,7 +36,10 @@ class Index extends Component {
               borderRight: '1px solid',
               height: '-webkit-fill-available',
             }}
-            span={13}
+            xs={24}
+            sm={24}
+            md={24}
+            xl={11}
           >
             <CameraWrapper
               {...this.props}
@@ -45,7 +48,13 @@ class Index extends Component {
               onDetectedFaceSuccess={this.onDetectedFaceSuccess}
             />
           </Col>
-          <Col style={{ height: '-webkit-fill-available' }} span={11}>
+          <Col
+            xs={24}
+            sm={24}
+            md={24}
+            style={{ height: '-webkit-fill-available' }}
+            xl={13}
+          >
             <Preview
               resultTag={this.resultTag}
               listFaceDetected={listFaceDetected}

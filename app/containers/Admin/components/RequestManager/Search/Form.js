@@ -14,26 +14,17 @@ export default ({ getFieldDecorator }) => (
           )}
         </Form.Item>
       </Col>
-      <Col span={6}>
-        <Form.Item>
-          {getFieldDecorator('email')(
-            <Input
-              prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
-              placeholder="enter email"
-            />,
-          )}
-        </Form.Item>
-      </Col>
       <Col span={12}>
         <Form.Item>
           {getFieldDecorator('status',{
-            initialValue: [1],
+            initialValue: [0],
           })(
             <Checkbox.Group style={{ width: "100%" }}>
               <Row>
-                <Col span={4}><Checkbox value={1}>Active</Checkbox></Col>
-                <Col span={4}><Checkbox value={2}>Block</Checkbox></Col>
-                <Col span={4}><Checkbox value={0}>Delete</Checkbox></Col>
+                <Col span={4}><Checkbox value={0}>Đang chờ</Checkbox></Col>
+                <Col span={4}><Checkbox value={1}>Đã chấp nhận</Checkbox></Col>
+                <Col span={4}><Checkbox value={2}>Không chấp nhân</Checkbox></Col>
+                <Col span={4}><Checkbox value={3}>Hủy bỏ</Checkbox></Col>
               </Row>
             </Checkbox.Group>
           )}

@@ -47,11 +47,11 @@ class RequestManagement extends Component {
   handleSearch = value => {
     try {
       const json = JSON.stringify(value);
-      const apiUrl = `/api/employee?value=${json}`;
+      const apiUrl = `/api/request?value=${json}`;
       request(apiUrl)
         .then(data => {
-
-          this.setState({ resultSearch: data });
+          console.log(data)
+          this.setState({ resultSearch: (data.payload) });
         })
         .catch(err => alert(err));
     } catch (e) {
