@@ -1,16 +1,16 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { database } from 'containers/commons/firebase';
-import { Can } from '@casl/react';
-import CanWrapper  from './Can';
-
-import { AbilityBuilder } from '@casl/ability';
+import injectReducer from 'utils/injectReducer';
 import Button from 'antd/es/button/button';
 import Modal from 'antd/es/modal/Modal';
 import WrapperFormSearch from 'components/WrappedAdvancedSearchForm';
 import Row from 'antd/es/grid/row';
 import Col from 'antd/es/grid/col';
 import request from 'utils/request';
+import { withRouter } from 'react-router-dom';
+import { compose } from 'redux';
+import CanWrapper from './Can';
 import FromNew from './Form/New';
 import FormSearch from './Search/Form';
 import Result from './Search/Result';
@@ -25,14 +25,12 @@ class RequestManagement extends Component {
 
   componentWillMount() {
     request('/api/notification').then(data => {
-
       this.setState({ resultSearch: data.payload });
     });
   }
 
   componentDidMount() {
-    database.ref('/').on('value', snapshot => {
-    });
+    database.ref('/').on('value', snapshot => {});
   }
 
   onNewSuccess = () => {
@@ -152,5 +150,4 @@ class RequestManagement extends Component {
 
 RequestManagement.defaultProps = {};
 RequestManagement.propTypes = {};
-
-export default RequestManagement;
+export default withRouter(compose()(RequestManagement));

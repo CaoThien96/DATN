@@ -22,20 +22,24 @@ class Index extends Component {
   };
   handleReply = (e)=>{
     const keyCode = e.keyCode;
+    const {currentUser} = this.props
     if(keyCode == 13){
       this.props.onHandleReply(true,{
         iid:(this.props.iid),
         comment:{
           u:{
-            email:'caothien'
+            email:(currentUser.email),
+            iid:(currentUser.iid)
           },
-          content:'chao lai'
+          content:(e.target.value)
         }
       })
+      e.target.value=null;
+      this.setState({isReply:false})
     }
   }
   render() {
-    const { comment } = this.props;
+    const { comment,currentUser } = this.props;
     const { isReply } = this.state;
     return (
       <div>
@@ -50,15 +54,7 @@ class Index extends Component {
             <Row>
               <a onClick={this.onClickReply}>Tra loi</a>
             </Row>
-            {isReply ? (
-              <Row>
-                <TextArea
-                  placeholder="Autosize height based on content lines"
-                  autosize
-                  onKeyDown={this.handleReply}
-                />
-              </Row>
-            ) : null}
+
           </Col>
         </Row>
         <Row style={{ marginLeft: '20px', marginTop: '15px' }}>
@@ -77,6 +73,15 @@ class Index extends Component {
             ))
           }
         </Row>
+        {isReply ? (
+          <Row>
+                <TextArea
+                  placeholder="Autosize height based on content lines"
+                  autosize
+                  onKeyDown={this.handleReply}
+                />
+          </Row>
+        ) : null}
       </div>
     );
   }

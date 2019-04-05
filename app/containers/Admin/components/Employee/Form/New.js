@@ -7,23 +7,36 @@ import { Form, Icon, Input, Button, Checkbox, Radio } from 'antd';
 // import Demo from './test'
 import request from 'utils/request';
 class New extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      err: false,
+    };
+  }
+
   submit = e => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
       // alert(JSON.stringify(values));
-      request('/api/employee', {
-        method: 'POST', // or 'PUT'
-        body: JSON.stringify(values), // data can be `string` or {object}!
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(res => {
-          this.handleReset();
-          this.props.onSuccess();
+      if (err) {
+      } else {
+        request('/api/employee', {
+          method: 'POST', // or 'PUT'
+          body: JSON.stringify(values), // data can be `string` or {object}!
+          headers: {
+            'Content-Type': 'application/json',
+          },
         })
-        .catch(err => {
-        });
+          .then(res => {
+            if (res.success) {
+              this.handleReset();
+              this.props.onSuccess();
+            } else {
+              this.setState({ err: res.err });
+            }
+          })
+          .catch(err => {});
+      }
     });
   };
 
@@ -40,9 +53,22 @@ class New extends Component {
     return (
       <div>
         <Form layout="vertical" onSubmit={this.submit} className="login-form">
-          <Form.Item>
+          <Form.Item
+            // validateStatus={this.state.err ? 'error' : ''}
+            // hasFeedback
+            // help={this.state.err ? this.state.err : ''}
+          >
             {getFieldDecorator('email', {
-              rules: [{ required: true, message: 'Please input your email!' }],
+              rules: [
+                {
+                  type: 'email',
+                  message: 'The input is not valid E-mail!',
+                },
+                {
+                  required: true,
+                  message: 'Please input your E-mail!',
+                },
+              ],
             })(
               <Input
                 prefix={
@@ -62,6 +88,7 @@ class New extends Component {
                 prefix={
                   <Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />
                 }
+                type="password"
                 placeholder="password"
               />,
             )}
@@ -99,10 +126,13 @@ class New extends Component {
             })(
               <Radio.Group defaultValue="a" buttonStyle="solid">
                 <Radio value={1001}>Nhân Viên</Radio>
-                <Radio value={1002}>Giám Sát Viên</Radio>
+                {/*<Radio value={1002}>Giám Sát Viên</Radio>*/}
               </Radio.Group>,
             )}
           </Form.Item>
+          <div style={{color:'red'}}>
+            {this.state.err}
+          </div>
           <div className="text-center">
             <Button type="primary" htmlType="submit">
               Save

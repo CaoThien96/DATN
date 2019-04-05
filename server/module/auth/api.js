@@ -6,7 +6,10 @@ const config = require('../../configs/index');
 routes.post('/sign-in', (req, res, next) =>
   passport.authenticate('local-sign-in', { session: false }, (err, token) => {
     if (err) {
-      return next(err);
+      return res.status(200).send({
+        success: false,
+        err: (err.message),
+      });
     }
     return res.status(200).send({
       success: true,

@@ -104,6 +104,14 @@ routes.post('/', async (req, res) => {
   const newUser = new User();
   newUser.email = email;
   newUser.password = password;
+  //Check email
+  const check = await User.findOne({email});
+  if(check){
+    return res.send({
+      success: false,
+      err: 'Email is exists',
+    });
+  }
   try {
     const user = await newUser.save();
     console.log({ user });

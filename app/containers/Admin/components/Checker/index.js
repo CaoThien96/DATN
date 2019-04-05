@@ -7,6 +7,10 @@ import Divider from 'antd/es/divider';
 import Camera from './component/Camera';
 import Result from './component/Result';
 import CheckInManual from './component/CheckInManual/index';
+import injectReducer from '../../../../utils/injectReducer';
+import reducer from './reducer';
+import { withRouter } from 'react-router-dom';
+import { compose } from 'redux';
 
 class LayoutChecker extends Component {
   constructor(props) {
@@ -55,5 +59,5 @@ class LayoutChecker extends Component {
 
 LayoutChecker.defaultProps = {};
 LayoutChecker.propTypes = {};
-
-export default LayoutChecker;
+const withReducer = injectReducer({ key: 'checker', reducer });
+export default withRouter(compose(withReducer)(LayoutChecker));

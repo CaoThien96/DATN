@@ -15,6 +15,8 @@ import RenderRoute from '../../routes/render';
 import request from '../../utils/request';
 import { makeSelectCurrentUser, makeSelectError } from '../App/selectors';
 import { loadUserLogin, removeUser } from '../App/actions';
+import injectReducer from '../../utils/injectReducer';
+import reducer from './components/Notification/reducer';
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 const menu = (
@@ -200,7 +202,7 @@ class LayoutAdmin extends Component {
               style={{
                 background: '#fff',
                 padding: 24,
-                height: '-webkit-fill-available',
+                // height: '-webkit-fill-available',
               }}
             >
               <Switch>

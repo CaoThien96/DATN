@@ -22,7 +22,7 @@ import GlobalStyle from '../../global-styles';
 import { makeSelectShowLoading } from './selectors';
 // import { mapDispatchToProps } from '../HomePage';
 import injectReducer from '../../utils/injectReducer';
-import reducer from '../HomePage/reducer';
+import reducer from '../Admin/components/Notification/reducer';
 import { showLoading, hiddenLoading, loadUserLogin } from './actions';
 import injectSaga from '../../utils/injectSaga';
 import saga from './saga';
@@ -98,11 +98,9 @@ const withConnect = connect(
   mapStateToProps,
   mapDispatchToProps,
 );
-const withReducer = injectReducer({ key: 'home', reducer });
 const withSaga = injectSaga({ key: 'home', saga });
 export default withRouter(
   compose(
-    withReducer,
     withSaga,
     withConnect,
   )(Index),

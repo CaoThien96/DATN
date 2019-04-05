@@ -17,6 +17,11 @@ const list_config = [
     type:'time'
   },
   {
+    label:'Thời gian đi muộn',
+    name:'late_time',
+    type:'time'
+  },
+  {
     label:'Thời gian cập nhật model',
     name:'time_update_model',
     type:'time'

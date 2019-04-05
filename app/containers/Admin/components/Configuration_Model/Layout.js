@@ -5,11 +5,16 @@ import Row from 'antd/es/grid/row';
 import Col from 'antd/es/grid/col';
 
 import ShowConfusion from './components/ShowConfusion';
+import ShowReport from './components/ShowReport';
 
 class LayoutConfigurationModel extends Component {
   constructor(props) {
     super(props);
     this.state = {};
+  }
+
+  componentWillMount() {
+    this.startTraining();
   }
 
   startTraining = () => {
@@ -19,7 +24,13 @@ class LayoutConfigurationModel extends Component {
         'Content-Type': 'application/json',
       },
     }).then(
-      ({labels, trueLabels, predictedLabels, reportTraining, reportDataTest }) => {
+      ({
+        labels,
+        trueLabels,
+        predictedLabels,
+        reportTraining,
+        reportDataTest,
+      }) => {
         this.setState({
           labels,
           trueLabels,
@@ -33,6 +44,21 @@ class LayoutConfigurationModel extends Component {
 
   showEvaluation = data => {};
 
+  onSaveModel = () => {
+    request('/api/ai/save', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(data => {
+      if (data.success) {
+        alert(data.message);
+      } else {
+        alert('co loi');
+      }
+    });
+  };
+
   render() {
     const {
       labels,
@@ -44,17 +70,22 @@ class LayoutConfigurationModel extends Component {
     return (
       <div>
         <Button onClick={this.startTraining}>Chạy đạo tạo mô hình ngay!</Button>
+        <Button onClick={this.onSaveModel}>Save model!</Button>
         <Row>
           <Col>
             {trueLabels ? (
-              <ShowConfusion
-                labels={labels}
-                trueLabels={trueLabels}
-                predictedLabels={predictedLabels}
-              />
+              <div>
+                <ShowConfusion
+                  labels={labels}
+                  trueLabels={trueLabels}
+                  predictedLabels={predictedLabels}
+                />
+                <ShowReport reportDataTest={reportDataTest} />
+              </div>
             ) : null}
           </Col>
         </Row>
+        <Row />
       </div>
     );
   }

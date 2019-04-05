@@ -1,8 +1,11 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Switch } from 'react-router-dom';
+import { Switch, withRouter } from 'react-router-dom';
 import routes from './routes';
 import RenderRoute from 'routes/render';
+import injectReducer from '../../../../utils/injectReducer';
+import reducer from './reducer';
+import { compose } from 'redux';
 
 const LayoutNotificationManagement = ()=>(
   <Switch>
@@ -13,5 +16,5 @@ const LayoutNotificationManagement = ()=>(
 )
 LayoutNotificationManagement.defaultProps = {};
 LayoutNotificationManagement.propTypes = {};
-
-export default LayoutNotificationManagement;
+const withReducer = injectReducer({ key: 'notification', reducer });
+export default withRouter(compose(withReducer)(LayoutNotificationManagement));

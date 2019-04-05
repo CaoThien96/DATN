@@ -33,10 +33,17 @@ class NormalLoginForm extends Component {
           },
         })
           .then(res => {
-            localStorage.setItem('token', res.token);
-            history.replace('/admin')
+            if(res.success){
+              localStorage.setItem('token', res.token);
+              history.replace('/admin')
+            }else{
+              this.setState({err:res.err})
+            }
           })
-          .catch(err => {});
+          .catch(err => {
+            console.log({err})
+            console.log(err.toString() )
+          });
       }
     });
   };
@@ -88,6 +95,15 @@ class NormalLoginForm extends Component {
             <a className="login-form-forgot" href="">
               Forgot password
             </a>
+          </FormItem>
+          <div>
+            {
+              this.state.err?(
+                <div style={{color:'red'}}>
+                  {this.state.err}
+                </div>
+              ):null
+            }
             <Button
               type="primary"
               htmlType="submit"
@@ -96,7 +112,7 @@ class NormalLoginForm extends Component {
               Log in
             </Button>
             <Link to="/sign-up">Or register now!</Link>
-          </FormItem>
+          </div>
         </Form>
       </div>
     );

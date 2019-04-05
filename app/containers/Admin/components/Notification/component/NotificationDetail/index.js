@@ -3,46 +3,24 @@ import request from 'utils/request';
 import Col from 'antd/es/grid/col';
 import Row from 'antd/es/grid/row';
 import Avatar from 'antd/es/avatar';
-import PreviewHtml from './PreviewHtml';
+import { createStructuredSelector } from 'reselect';
+import connect from 'react-redux/es/connect/connect';
+import { withRouter } from 'react-router-dom';
+import { compose } from 'redux';
+import {
+  makeSelectCurrentUser,
+  makeSelectError,
+} from 'containers/App/selectors';
+import { makeSelectNotificationDetail } from '../../selectors';
 import Comment from '../Comment/index';
+import PreviewHtml from './PreviewHtml';
+import { addNotification, addComment } from '../../actions';
 class Index extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       notificationDetail: null,
-      comments: [
-        {
-          iid: 1,
-          u: {
-            email: 'caothien',
-          },
-          content: 'hello',
-          reply: [
-            {
-              u: {
-                email: 'caoduc',
-              },
-              content: 'hello',
-            },
-          ],
-        },
-        {
-          iid: 2,
-          u: {
-            email: 'caothien',
-          },
-          content: 'hello',
-          reply: [
-            {
-              u: {
-                email: 'caoduc',
-              },
-              content: 'hello',
-            },
-          ],
-        },
-      ],
       textArea: '',
     };
   }
@@ -55,48 +33,87 @@ class Index extends Component {
         this.setState({
           notificationDetail: res.payload,
         });
+        this.props.onAddNotification(res.payload);
       })
       .catch(err => {});
   }
 
   handleOnKeyUpTextArea = e => {
     const keyCode = e.keyCode;
-    let comments = this.state.comments;
+    const { match, notificationDetail } = this.props;
+    const iid = match.params.id;
+    console.log(notificationDetail.comments);
     if (keyCode == 13) {
       e.preventDefault();
-      alert(e.target.value);
-      comments.push({
-        u:{
-          email:'trantuan'
+      const content = e.target.value;
+      request(`/api/notification/${iid}/comment`, {
+        method: 'POST', // or 'PUT'
+        body: JSON.stringify({ content }), // data can be `string` or {object}!
+        headers: {
+          'Content-Type': 'application/json',
         },
-        content:'hello'
       })
-      this.setState({
-        comments,
-      });
+        .then(res => {
+          this.props.onAddNotification(res.payload);
+          this.props.onAddComment(res.payload);
+        })
+        .catch(err => {});
+      // comments.push({
+      //   u:{
+      //     email:'trantuan'
+      //   },
+      //   content:'hello'
+      // })
+      // this.props.onAddComment(comments)
+      // this.setState({
+      //   comments,
+      // });
       e.target.value = null;
     }
   };
 
   onHandleReply = (reply, data) => {
-    const comments = this.state.comments;
+    const { match, currentUser, notificationDetail } = this.props;
+    const iid = match.params.id;
+    const comments = this.state.notificationDetail.comments;
+    console.log({ reply, data });
     if (reply) {
-      const index = comments.findIndex(el => {
-        if (el.iid == data.iid) {
+      const index = notificationDetail.comments.findIndex(el => {
+        if (el._id == data.iid) {
           return true;
         }
         return false;
       });
-      comments[index].reply.push(data.comment);
-      this.setState({
-        comments,
-      });
+      console.log(index);
+      if (index !== -1) {
+        if (comments[index].reply) {
+          notificationDetail.comments[index].reply.push(data.comment);
+        } else {
+          notificationDetail.comments[index].reply = [data.comment];
+        }
+      }
+
+      console.log({ notificationDetail });
+      request(`/api/notification/${iid}/comment`, {
+        method: 'POST', // or 'PUT'
+        body: JSON.stringify({ notificationDetail, type: 'reply' }), // data can be `string` or {object}!
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+        .then(res => {
+          this.props.onAddNotification(res.payload);
+          this.props.onAddComment(res.payload);
+        })
+        .catch(err => {});
+      this.props.onAddNotification(notificationDetail);
       // alert(JSON.stringify(cm));
     }
   };
 
   render() {
-    const { notificationDetail, comments } = this.state;
+    const { comments } = this.state;
+    const { currentUser, notificationDetail } = this.props;
     return notificationDetail ? (
       <Row gutter={16}>
         <Col span={12} style={{ borderRight: '1px solid' }}>
@@ -116,14 +133,24 @@ class Index extends Component {
                 onKeyDown={this.handleOnKeyUpTextArea}
               />
             </Row>
-            {comments.map((el, key) => (
-              <Comment
-                iid={el.iid}
-                onHandleReply={this.onHandleReply}
-                key={key}
-                comment={el}
-              />
-            ))}
+            {notificationDetail.comments &&
+              notificationDetail.comments.map((el, key) => (
+                <Comment
+                  iid={el._id}
+                  onHandleReply={this.onHandleReply}
+                  key={key}
+                  comment={el}
+                  currentUser={currentUser}
+                />
+              ))}
+            {/* {comments.map((el, key) => ( */}
+            {/* <Comment */}
+            {/* iid={el.iid} */}
+            {/* onHandleReply={this.onHandleReply} */}
+            {/* key={key} */}
+            {/* comment={el} */}
+            {/* /> */}
+            {/* ))} */}
           </Row>
         </Col>
       </Row>
@@ -132,5 +159,17 @@ class Index extends Component {
     );
   }
 }
-
-export default Index;
+const mapStateToProps = createStructuredSelector({
+  currentUser: makeSelectCurrentUser(),
+  notificationDetail: makeSelectNotificationDetail(),
+  error: makeSelectError(),
+});
+const mapDispatchToProps = dispatch => ({
+  onAddNotification: payload => dispatch(addNotification(payload)),
+  onAddComment: payload => dispatch(addComment(payload)),
+});
+const withConnect = connect(
+  mapStateToProps,
+  mapDispatchToProps,
+);
+export default withRouter(compose(withConnect)(Index));

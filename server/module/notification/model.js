@@ -21,6 +21,7 @@ const NotificationSchema = new Schema({
         email: String,
         iid: Number,
       },
+      reply:[]
     },
   ],
   status: {
