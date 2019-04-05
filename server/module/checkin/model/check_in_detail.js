@@ -34,8 +34,8 @@ CheckInDetailSchema.methods.updateStatus = function(cb) {
   Configuration.find(
     { $or: [{ name: 'on_time' }, { name: 'late_time' }] },
     (err, docs) => {
-      if(err){
-        return cb(err)
+      if (err) {
+        return cb(err);
       }
       const on_time = docs.find(el => {
         if (el.name == 'on_time') return true;
@@ -54,12 +54,21 @@ CheckInDetailSchema.methods.updateStatus = function(cb) {
         (err, res) => {
           // Updated at most one doc, `res.modifiedCount` contains the number
           // of docs that MongoDB updated
-          if(err){
-            return cb(err)
+          if (err) {
+            return cb(err);
           }
-          cb(null,res)
+          cb(null, res);
         },
       );
+    },
+  );
+};
+CheckInDetailSchema.statics.findCheckInSuccess = function(checkIn, cb) {
+  this.model('CheckInDetail').find(
+    { pid: checkIn.iid, status: { $ne: 0 } },
+    (err, docs) => {
+      if (err) return cb(err);
+      return cb(null, docs);
     },
   );
 };

@@ -5,6 +5,12 @@ import List from 'antd/es/list';
 import Avatar from 'antd/es/avatar';
 import Divider from 'antd/es/divider';
 import Button from 'antd/es/button/button';
+import { createStructuredSelector } from 'reselect';
+import connect from 'react-redux/es/connect/connect';
+import { withRouter } from 'react-router-dom';
+import { compose } from 'redux';
+import { makeSelectCurrentUser } from '../../../../App/selectors';
+import { makeSelectListCheckIn, makeSelectPredict } from '../seclectors';
 
 const ResultWarapper = styled.div`
   padding: 0px 10px;
@@ -25,7 +31,7 @@ class Result extends Component {
   }
 
   render() {
-    const { listCheckIn } = this.props;
+    const { listCheckIn, listCheckInV2 } = this.props;
     return (
       <ResultWarapper>
         {/* <List */}
@@ -51,17 +57,21 @@ class Result extends Component {
             boxShadow: '0px 0px 10px 0px #888888',
           }}
         >
-          {listCheckIn.map(el => (
+          {listCheckInV2.map(el => (
             <div>
               <List.Item key={el.id}>
                 <List.Item.Meta
                   avatar={
                     <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
                   }
-                  title={<a href="https://ant.design">{el.user.fullName}</a>}
-                  description={el.time}
+                  title={<a href="https://ant.design">{el.user.email}</a>}
+                  description={new Date(el.updatedAt).toLocaleString('en-US', {
+                    timeZone: 'Asia/Jakarta',
+                  })}
                 />
-                <Button style={{marginRight:'5px'}} type="primary">Đúng giờ</Button>
+                <Button style={{ marginRight: '5px' }} type="primary">
+                  {el.status == 1 ? 'Đúng giờ' : 'Đi muộn'}
+                </Button>
               </List.Item>
               <Divider style={{ margin: '0px', padding: '0px' }} />
             </div>
@@ -75,5 +85,9 @@ class Result extends Component {
 Result.propTypes = {
   listCheckIn: PropTypes.array.isRequired,
 };
-
-export default Result;
+const mapStateToProps = createStructuredSelector({
+  currentUser: makeSelectCurrentUser(),
+  listCheckInV2: makeSelectListCheckIn(),
+});
+const withConnect = connect(mapStateToProps);
+export default withRouter(compose(withConnect)(Result));

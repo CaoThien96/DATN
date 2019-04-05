@@ -74,7 +74,7 @@ class CameraWrapper extends Component {
       !faceapi.nets.tinyFaceDetector.params
     )
       return setTimeout(() => this.onPlay(this.videoTag.current));
-    const options = getFaceDetectorOptions();
+    const options = new faceapi.TinyFaceDetectorOptions({ inputSize:224, scoreThreshold:0.7 })
     const canvasClone = this.canvasClone.current.getContext('2d');
     canvasClone.drawImage(
       this.videoTag.current,

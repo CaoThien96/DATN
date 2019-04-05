@@ -109,6 +109,12 @@ io.listen(
     }
   }),
 );
+CheckIn.searchCheckIn(new Date(), (err, docs) => {
+  CheckInDetail.findCheckInSuccess(docs[0], (err, listCheckSuccess) => {
+    console.log({ docs, listCheckSuccess });
+  });
+});
+
 app.io = io.on('connection', async socket => {
   const id = socket.id;
   console.log(`Socket connected: ${socket.id}`);
@@ -166,7 +172,8 @@ app.io = io.on('connection', async socket => {
           descriptor,
         );
         const probabilities = predictProbabilitiesSync[prediction];
-        if (probabilities > 0.2) {
+        console.log({ prediction, probabilities });
+        if (probabilities > 0.3) {
           const time = new Date();
           console.log(
             `Nhan dang duoc doi tuong ${prediction} vao luc ${time.toTimeString()}`,
@@ -186,44 +193,42 @@ app.io = io.on('connection', async socket => {
                     check_in_detail.updateStatus((err, res) => {
                       const end = new Date();
                       console.log((end - st) / 1000);
-                      socket.emit('action', {
-                        type: 'boilerplate/Check/OnPredictResult',
-                        payload: {
-                          iid: prediction,
-                          message:`Diem danh thanh cong`
+                      CheckInDetail.findCheckInSuccess(
+                        checkIn,
+                        (err, listCheckSuccess) => {
+                          console.log({ listCheckSuccess });
+                          socket.emit('action', {
+                            type: 'boilerplate/Check/OnUpdateListCheckIn',
+                            payload: listCheckSuccess,
+                          });
                         },
-                      });
+                      );
                     });
                   } else {
                     const end = new Date();
                     console.log('bo qua doi tuong da duoc check_in_detail');
                     console.log((end - st) / 1000);
-                    socket.emit('action', {
-                      type: 'boilerplate/Check/OnPredictResult',
-                      payload: {
-                        iid: prediction,
-                        message:'Doi tuong da diem danh'
+                    CheckInDetail.findCheckInSuccess(
+                      checkIn,
+                      (err, listCheckSuccess) => {
+                        console.log({ listCheckSuccess });
+                        socket.emit('action', {
+                          type: 'boilerplate/Check/OnUpdateListCheckIn',
+                          payload: listCheckSuccess,
+                        });
                       },
-                    });
+                    );
                   }
                 },
               );
             }
           });
-          /**
-           * Cap nhat trang thai diem danh cho doi tuong
-           */
-
-
         } else {
-          check++;
-          if (check > 10) {
-            console.log(`Khong biet doi tuong`);
-            socket.emit('action', {
-              type: 'boilerplate/Checker/OnPredictUnknown',
-              payload: false,
-            });
-          }
+          console.log('Unknown')
+          socket.emit('action', {
+            type: 'boilerplate/Check/OnPredictUnknown',
+            payload: false,
+          });
         }
       } catch (e) {
         console.log(e);

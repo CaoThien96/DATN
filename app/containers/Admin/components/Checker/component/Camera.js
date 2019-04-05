@@ -13,7 +13,11 @@ import {
   makeSelectCurrentUser,
   makeSelectError,
 } from '../../../../App/selectors';
-import { makeSelectObject, makeSelectPredict } from '../seclectors';
+import {
+  makeSelectObject,
+  makeSelectPredict,
+  makeSelectPending,
+} from '../seclectors';
 
 const DivWrapper = styled.div`
   position: relative;
@@ -61,7 +65,7 @@ class CameraWrapper extends Component {
 
     if (result) {
       const alignedRect = result.alignedRect;
-      if(parseInt(this.videoTag.current.currentTime) % 10 == 0){
+      if (!this.props.pending) {
         this.onRecognition(result);
       }
       drawDetections(this.imageTag.current, this.canvasRef.current, [
@@ -93,13 +97,6 @@ class CameraWrapper extends Component {
   render() {
     return (
       <DivWrapper>
-        <p>
-          So doi tuong tim thay:
-          {this.state.numPerson}
-        </p>
-        <Button onClick={() => this.setState({ pending: false })}>
-          Kiem tra lai
-        </Button>
         <VideoTag
           // style={{ position: 'absolute' }}
           onPlay={this.onPlay}
@@ -125,6 +122,7 @@ const mapStateToProps = createStructuredSelector({
   currentUser: makeSelectCurrentUser(),
   object: makeSelectObject(),
   predict: makeSelectPredict(),
+  pending: makeSelectPending(),
 });
 const mapDispatchToProps = dispatch => ({
   onPredict: payload => dispatch(onPredict(payload)),
