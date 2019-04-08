@@ -8,6 +8,12 @@ import Avatar from 'antd/es/avatar';
 import request from 'utils/request';
 import FormSearch from './FormSearch';
 import FormCheckIn from './FormCheckIn';
+import { createStructuredSelector } from 'reselect';
+import { makeSelectCurrentUser } from '../../../../../App/selectors';
+import { onUpdateListCheckIn } from '../../actions';
+import connect from 'react-redux/es/connect/connect';
+import { withRouter } from 'react-router-dom';
+import { compose } from 'redux';
 
 const Error = styled.div`
   text-align: center;
@@ -80,7 +86,8 @@ class StepFormWrapper extends Component {
       },
     })
       .then(data => {
-        alert(JSON.stringify(data))
+        alert(data)
+        this.props.onUpdateListCheckIn(data.listCheckSuccess)
         this.props.onCheckInSuccess();
       })
       .catch(e => console.log(e));
@@ -137,5 +144,15 @@ class StepFormWrapper extends Component {
     );
   }
 }
+const mapStateToProps = createStructuredSelector({
+  currentUser: makeSelectCurrentUser(),
+});
+const mapDispatchToProps = dispatch => ({
+  onUpdateListCheckIn: payload => dispatch(onUpdateListCheckIn(payload)),
+});
+const withConnect = connect(
+  mapStateToProps,
+  mapDispatchToProps,
+);
+export default withRouter(compose(withConnect)(StepFormWrapper));
 
-export default StepFormWrapper;

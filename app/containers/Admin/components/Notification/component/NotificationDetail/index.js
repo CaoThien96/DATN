@@ -58,16 +58,6 @@ class Index extends Component {
           this.props.onAddComment(res.payload);
         })
         .catch(err => {});
-      // comments.push({
-      //   u:{
-      //     email:'trantuan'
-      //   },
-      //   content:'hello'
-      // })
-      // this.props.onAddComment(comments)
-      // this.setState({
-      //   comments,
-      // });
       e.target.value = null;
     }
   };
@@ -75,7 +65,7 @@ class Index extends Component {
   onHandleReply = (reply, data) => {
     const { match, currentUser, notificationDetail } = this.props;
     const iid = match.params.id;
-    const comments = this.state.notificationDetail.comments;
+    const comments = notificationDetail.comments;
     console.log({ reply, data });
     if (reply) {
       const index = notificationDetail.comments.findIndex(el => {

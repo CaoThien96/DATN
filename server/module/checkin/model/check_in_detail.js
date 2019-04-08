@@ -72,4 +72,13 @@ CheckInDetailSchema.statics.findCheckInSuccess = function(checkIn, cb) {
     },
   );
 };
+CheckInDetailSchema.statics.findCheckInDetailAll = function(checkIn, cb) {
+  this.model('CheckInDetail').find(
+    { pid: checkIn.iid},
+    (err, docs) => {
+      if (err) return cb(err);
+      return cb(null, docs);
+    },
+  );
+};
 module.exports = mongoose.model('CheckInDetail', CheckInDetailSchema);

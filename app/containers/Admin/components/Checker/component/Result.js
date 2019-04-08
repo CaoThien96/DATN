@@ -9,6 +9,7 @@ import { createStructuredSelector } from 'reselect';
 import connect from 'react-redux/es/connect/connect';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
+import request from 'utils/request';
 import { makeSelectCurrentUser } from '../../../../App/selectors';
 import { makeSelectListCheckIn, makeSelectPredict } from '../seclectors';
 
@@ -26,29 +27,18 @@ class Result extends Component {
     this.scrollTag = React.createRef();
   }
 
+  componentWillMount() {
+    request('/api/check-in/list-check-in-success').then(data => {});
+  }
+
   componentDidMount() {
     this.scrollTag.current.scrollTop = this.scrollTag.current.scrollHeight;
   }
 
   render() {
-    const { listCheckIn, listCheckInV2 } = this.props;
+    const { listCheckInV2 } = this.props;
     return (
       <ResultWarapper>
-        {/* <List */}
-        {/* dataSource={listCheckIn} */}
-        {/* renderItem={item => ( */}
-        {/* <List.Item key={item.id}> */}
-        {/* <List.Item.Meta */}
-        {/* avatar={ */}
-        {/* <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" /> */}
-        {/* } */}
-        {/* title={<a href="https://ant.design">{item.user.fullName}</a>} */}
-        {/* description={item.time} */}
-        {/* /> */}
-        {/* <div>Content</div> */}
-        {/* </List.Item> */}
-        {/* )} */}
-        {/* /> */}
         <div
           ref={this.scrollTag}
           style={{

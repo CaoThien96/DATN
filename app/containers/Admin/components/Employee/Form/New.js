@@ -78,21 +78,21 @@ class New extends Component {
               />,
             )}
           </Form.Item>
-          <Form.Item>
-            {getFieldDecorator('password', {
-              rules: [
-                { required: true, message: 'Please input your password!' },
-              ],
-            })(
-              <Input
-                prefix={
-                  <Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />
-                }
-                type="password"
-                placeholder="password"
-              />,
-            )}
-          </Form.Item>
+          {/*<Form.Item>*/}
+            {/*{getFieldDecorator('password', {*/}
+              {/*rules: [*/}
+                {/*{ required: true, message: 'Please input your password!' },*/}
+              {/*],*/}
+            {/*})(*/}
+              {/*<Input*/}
+                {/*prefix={*/}
+                  {/*<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />*/}
+                {/*}*/}
+                {/*type="password"*/}
+                {/*placeholder="password"*/}
+              {/*/>,*/}
+            {/*)}*/}
+          {/*</Form.Item>*/}
           <Form.Item>
             {getFieldDecorator('full_name', {
               rules: [

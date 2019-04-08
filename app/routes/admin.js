@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Checker,
   Dashboard,
+  DashboardEmployee,
   EmployeeLayout,
   Attendance,
   RequestLayoutManagement,
@@ -20,6 +21,14 @@ const routes = [
     key: 'admin-dashboard',
     exact: true,
     component: Dashboard,
+    label: 'Dashboard',
+    icon: <Icon type="dashboard" />,
+  },
+  {
+    path: '/admin/dashboard-employee',
+    key: 'admin-dashboard-employee',
+    exact: true,
+    component: DashboardEmployee,
     label: 'Dashboard',
     icon: <Icon type="dashboard" />,
   },

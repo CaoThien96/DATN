@@ -109,13 +109,10 @@ io.listen(
     }
   }),
 );
-CheckIn.searchCheckIn(new Date(), (err, docs) => {
-  CheckInDetail.findCheckInSuccess(docs[0], (err, listCheckSuccess) => {
-    console.log({ docs, listCheckSuccess });
-  });
-});
+
 
 app.io = io.on('connection', async socket => {
+  app.socket = socket
   const id = socket.id;
   console.log(`Socket connected: ${socket.id}`);
   jwt.verify(socket.handshake.query.token, config.jwtSecret, (err, decoded) => {

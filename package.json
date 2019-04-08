@@ -94,6 +94,7 @@
     "mongoose": "^5.4.3",
     "mongoose-auto-increment": "^5.0.1",
     "node-svm": "^2.1.9",
+    "nodemailer": "^6.1.0",
     "nodemon": "^1.18.9",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",

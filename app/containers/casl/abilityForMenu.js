@@ -30,7 +30,7 @@ export default function defineAbilitiesFor(user) {
       );
     } else if (user.role === 1000) {
       // Nhan vien
-      can(['admin-notification', 'admin-request'], 'Menu');
+      can(['admin-notification', 'admin-request','admin-dashboard-employee'], 'Menu');
     } else if (user.role === 1002) {
       // Giam sat vien
       can(['admin-config', 'admin-checker'], 'Menu');

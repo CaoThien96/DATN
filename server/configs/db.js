@@ -13,7 +13,9 @@ mongoose
   .connect(connectionString)
   .then(() => {
     console.log('Succession connected database');
+
   })
   .catch(() => {
     console.log('Errors connected database');
+    process.exit()
   });

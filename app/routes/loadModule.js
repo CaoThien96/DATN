@@ -30,6 +30,10 @@ export const Dashboard = Loadable({
   loader: () => import('containers/Admin/components/Dashboard/index'),
   loading: LoadingIndicator,
 });
+export const DashboardEmployee = Loadable({
+  loader: () => import('containers/Admin/components/DashboardEmployee/index'),
+  loading: LoadingIndicator,
+});
 export const Checker = Loadable({
   loader: () => import('containers/Admin/components/Checker/index'),
   loading: LoadingIndicator,

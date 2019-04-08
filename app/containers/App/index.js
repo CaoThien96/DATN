@@ -29,7 +29,7 @@ import saga from './saga';
 const AppWrapper = styled.div`
   margin: 0 auto;
   display: flex;
-  min-height: 100%;
+  min-height: 757px;
   // padding: 0 16px;
   flex-direction: column;
 `;

@@ -84,42 +84,45 @@ routes.post('/', (req, res) => {
 routes.post('/:id/comment', async (req, res) => {
   const iid = req.params.id;
   const body = req.body;
-  const comments= body.notificationDetail.comments
-  console.log(comments)
-  if(body.type == 'reply'){
-    Notification.update({ iid }, { comments:(body.notificationDetail.comments)}, async (err, docs) => {
-      if (err) {
-        return res.status(500).send(err);
-      }
-      const notification = await Notification.findOne({ iid });
-      console.log(notification)
-      return res.send({
-        payload: notification,
+  if (body.type == 'reply') {
+    Notification.update(
+      { iid },
+      { comments: body.notificationDetail.comments },
+      async (err, docs) => {
+        if (err) {
+          return res.status(500).send(err);
+        }
+        const notification = await Notification.findOne({ iid });
+        console.log(notification);
+        return res.send({
+          payload: notification,
+        });
+      },
+    );
+  }else{
+    try {
+      let notification = await Notification.findOne({ iid });
+      const comments = notification.comments;
+      comments.push({
+        u: req.user,
+        content: body.content,
+        time: new Date(),
       });
-    });
-    return;
-  }
-  try {
-    let notification = await Notification.findOne({ iid });
-    const comments = notification.comments;
-    comments.push({
-      u: req.user,
-      content: body.content,
-      time: new Date(),
-    });
-    // console.log(comments);
-    Notification.update({ iid }, { comments }, async (err, docs) => {
-      if (err) {
-        return res.status(500).send(err);
-      }
-      notification = await Notification.findOne({ iid });
-      return res.send({
-        payload: notification,
+      // console.log(comments);
+      Notification.update({ iid }, { comments }, async (err, docs) => {
+        if (err) {
+          return res.status(500).send(err);
+        }
+        notification = await Notification.findOne({ iid });
+        return res.send({
+          payload: notification,
+        });
       });
-    });
-  } catch (e) {
-    res.status(500).send(e);
+    } catch (e) {
+      res.status(500).send(e);
+    }
   }
+
 });
 
 routes.put('/:id', (req, res) => {

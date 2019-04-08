@@ -1,10 +1,11 @@
 const routes = require('express').Router();
 const lodash = require('lodash');
 const User = require('./model');
+const mail = require('../../configs/mail')
 routes.get('/', async (req, res) => {
   try {
     const body = req.body;
-    let condition = {role:1000};
+    let condition = { role: 1000 };
     if (!lodash.isEmpty(req.query)) {
       const query = JSON.parse(req.query.value);
       const status = query.status;
@@ -37,7 +38,7 @@ routes.get('/', async (req, res) => {
 routes.get('/:id', async (req, res) => {
   const id = parseInt(req.params.id);
   try {
-    const user = await User.findOne({ iid: id,role:1000 });
+    const user = await User.findOne({ iid: id, role: 1000 });
     if (user !== null) {
       res.send({
         success: true,
@@ -95,18 +96,22 @@ routes.put('/', async (req, res) => {
   } catch (e) {
     res.staus(500).send({
       success: false,
-      error:e
+      error: e,
     });
   }
 });
 routes.post('/', async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, full_name, phone } = req.body;
+  const randomPass = Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2,5);
   const newUser = new User();
   newUser.email = email;
-  newUser.password = password;
-  //Check email
-  const check = await User.findOne({email});
-  if(check){
+  newUser.password = randomPass;
+  newUser.full_name = full_name;
+  newUser.phone = phone;
+  // Check email
+  mail.sendOne('caothienbk@gmail.com','Register succession',`Your password is: ${randomPass}`,`<p>Your password is: ${randomPass}</p>`)
+  const check = await User.findOne({ email });
+  if (check) {
     return res.send({
       success: false,
       err: 'Email is exists',
@@ -115,6 +120,10 @@ routes.post('/', async (req, res) => {
   try {
     const user = await newUser.save();
     console.log({ user });
+    /**
+     * Send pass to mail
+     */
+    // mail.sendOne('caothienbk@gmail.com','Register succession',`Your password is: ${randomPass}`)
     res.send({
       success: true,
       payload: user,

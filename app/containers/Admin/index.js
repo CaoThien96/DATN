@@ -88,18 +88,29 @@ class LayoutAdmin extends Component {
     const filter = lodashcommon.lodashFilter(routes, el =>
       ability.can(el.key, 'Menu'),
     );
+
     const pathName = this.props.location.pathname;
     const breadcrumbe = pathName.slice(1).split('/');
     let parentPathName = `/${breadcrumbe[0]}`;
     if (breadcrumbe.length > 1) {
       parentPathName = parentPathName.concat('/', breadcrumbe[1]);
     }
-    const routerCurrent = lodashcommon.lodashFind(routes, el => {
+    console.log(parentPathName)
+    let routerCurrent = lodashcommon.lodashFind(routes, el => {
       if (el.path == parentPathName) {
         return true;
       }
       return false;
     });
+    console.log(routerCurrent)
+    console.log({filter})
+    if(routerCurrent.key=='admin-dashboard'){
+
+      if(currentUser.role != 1001){
+        routerCurrent = filter[0]
+        this.props.history.replace(routerCurrent.path);
+      }
+    }
     return (
       <Layout>
         <Header style={{ background: '#fff', padding: 0 }}>

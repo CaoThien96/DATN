@@ -42,9 +42,18 @@ class CameraWrapper extends Component {
     };
   }
 
+  componentWillUnmount() {
+    if (this.state.localStream) {
+      this.state.localStream.getVideoTracks()[0].stop();
+    }
+  }
+
   async componentDidMount() {
     const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
     this.videoTag.current.srcObject = stream;
+    this.setState({
+      localStream: stream,
+    });
   }
 
   onPlay = async () => {
@@ -78,7 +87,6 @@ class CameraWrapper extends Component {
   };
 
   onRecognition(result) {
-    const { pending } = this.state;
     this.props.onPredict(result.descriptor);
   }
 
