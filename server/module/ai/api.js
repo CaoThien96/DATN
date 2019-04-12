@@ -1,6 +1,6 @@
 const routes = require('express').Router();
 const passport = require('passport');
-const svm = require('node-svm');
+// const svm = require('node-svm');
 const jwt = require('jsonwebtoken');
 const tf = require('@tensorflow/tfjs');
 const faceapi = require('face-api.js');
@@ -88,82 +88,82 @@ routes.get('/testIo', (req, res) => {
   console.log({ connected });
 });
 routes.post('/', async (req, res) => {
-  try {
-    const { dataTraining, dataTest } = await training();
-    console.log(dataTest[0][0]);
-    const clf = new svm.SVM({
-      svmType: 'C_SVC',
-      gamma: 10,
-      c: 4, // allow you to evaluate several values during training
-      normalize: false,
-      reduce: false,
-      kFold: 1, // disable k-fold cross-validation
-      probability: true,
-    });
-    let labels = [];
-    let trueLabels = [];
-    let predictedLabels = [];
-    const accurancy = 0;
-    const f1Score = 0;
-    const recall = 0;
-    const precision = 0;
-    clf
-      .train(dataTraining)
-      .progress(progress => {
-        console.log('training progress: %d%', Math.round(progress * 100));
-      })
-      .spread((model, reportTraining) => {
-        // console.log('training report: %s\nPredictions:', so(report));\\
-        labels = model.labels;
-        console.log(model.labels);
-        dataTest.forEach(ex => {
-          const prediction = clf.predictSync(ex[0]);
-
-          trueLabels = [...trueLabels, ex[1]];
-          predictedLabels = [...predictedLabels, prediction];
-          clf.predictProbabilities(ex[0]).then(probabilities => {
-            if (probabilities[prediction] > 0.6) {
-              if (prediction !== ex[1]) {
-                console.log('Sai');
-              }
-              console.log(
-                `Label: ${ex[1]} label predict ${
-                  prediction !== ex[1] ? 'sai' : 'dung'
-                }: ${prediction} with probabilitie > 0.6: ${
-                  probabilities[prediction]
-                }`,
-              );
-            }
-            // else {
-            //   console.log(
-            //     `Label: ${
-            //       ex[1]
-            //     } label predict: ${prediction} with probabilitie: ${
-            //       probabilities[prediction]
-            //     }`,
-            //   );
-            // }
-          });
-          // console.log('   %d  => %d', ex[1], prediction);
-        });
-        return {
-          reportTraining,
-          reportDataTest: clf.evaluate(dataTest),
-        };
-      })
-      .done(({ reportTraining, reportDataTest }) => {
-        // console.log(testReport)
-        res.send({
-          labels,
-          trueLabels,
-          predictedLabels,
-          reportTraining,
-          reportDataTest,
-        });
-      });
-  } catch (e) {
-    res.send(e);
-  }
+  // try {
+  //   const { dataTraining, dataTest } = await training();
+  //   console.log(dataTest[0][0]);
+  //   const clf = new svm.SVM({
+  //     svmType: 'C_SVC',
+  //     gamma: 10,
+  //     c: 4, // allow you to evaluate several values during training
+  //     normalize: false,
+  //     reduce: false,
+  //     kFold: 1, // disable k-fold cross-validation
+  //     probability: true,
+  //   });
+  //   let labels = [];
+  //   let trueLabels = [];
+  //   let predictedLabels = [];
+  //   const accurancy = 0;
+  //   const f1Score = 0;
+  //   const recall = 0;
+  //   const precision = 0;
+  //   clf
+  //     .train(dataTraining)
+  //     .progress(progress => {
+  //       console.log('training progress: %d%', Math.round(progress * 100));
+  //     })
+  //     .spread((model, reportTraining) => {
+  //       // console.log('training report: %s\nPredictions:', so(report));\\
+  //       labels = model.labels;
+  //       console.log(model.labels);
+  //       dataTest.forEach(ex => {
+  //         const prediction = clf.predictSync(ex[0]);
+  //
+  //         trueLabels = [...trueLabels, ex[1]];
+  //         predictedLabels = [...predictedLabels, prediction];
+  //         clf.predictProbabilities(ex[0]).then(probabilities => {
+  //           if (probabilities[prediction] > 0.6) {
+  //             if (prediction !== ex[1]) {
+  //               console.log('Sai');
+  //             }
+  //             console.log(
+  //               `Label: ${ex[1]} label predict ${
+  //                 prediction !== ex[1] ? 'sai' : 'dung'
+  //               }: ${prediction} with probabilitie > 0.6: ${
+  //                 probabilities[prediction]
+  //               }`,
+  //             );
+  //           }
+  //           // else {
+  //           //   console.log(
+  //           //     `Label: ${
+  //           //       ex[1]
+  //           //     } label predict: ${prediction} with probabilitie: ${
+  //           //       probabilities[prediction]
+  //           //     }`,
+  //           //   );
+  //           // }
+  //         });
+  //         // console.log('   %d  => %d', ex[1], prediction);
+  //       });
+  //       return {
+  //         reportTraining,
+  //         reportDataTest: clf.evaluate(dataTest),
+  //       };
+  //     })
+  //     .done(({ reportTraining, reportDataTest }) => {
+  //       // console.log(testReport)
+  //       res.send({
+  //         labels,
+  //         trueLabels,
+  //         predictedLabels,
+  //         reportTraining,
+  //         reportDataTest,
+  //       });
+  //     });
+  // } catch (e) {
+  //   res.send(e);
+  // }
 });
 routes.post('/train-tf-model', (req, res) => {});
 routes.get('/dataset', async (req, res) => {
@@ -174,25 +174,25 @@ routes.get('/dataset', async (req, res) => {
       training: { $exists: true },
       status: 1,
     });
-    numberClass=users.length
+    numberClass = users.length;
     let {
       xTrainFull,
       yTrainFull,
       xTestFull,
       yTestFull,
     } = commonControll.getDataSetTfModel(users.length, users);
-    xTrainFull = xTrainFull.arraySync()
-    yTrainFull = yTrainFull.arraySync()
-    xTestFull = xTestFull.arraySync()
-    yTestFull = yTestFull.arraySync()
+    xTrainFull = xTrainFull.arraySync();
+    yTrainFull = yTrainFull.arraySync();
+    xTestFull = xTestFull.arraySync();
+    yTestFull = yTestFull.arraySync();
     console.log({
       xTrainFull,
       yTrainFull,
       xTestFull,
       yTestFull,
-    })
+    });
     // let valAcc;
-    const model = commonControll.getModel(numberClass)
+    const model = commonControll.getModel(numberClass);
     // const history = await model.fit(xTrainFull, yTrainFull, {
     //   batchSize: 7,
     //   epochs: 100,
@@ -243,59 +243,76 @@ routes.get('/dataset', async (req, res) => {
       xTestFull,
       yTestFull,
       numberClass,
-      users
+      users,
     });
   } catch (e) {
     res.send(e);
   }
 });
 routes.post('/save', async (req, res) => {
-  try {
-    const { dataTraining, dataTest } = await training();
-    const clf = new svm.SVM({
-      svmType: 'C_SVC',
-      gamma: 10,
-      c: 4, // allow you to evaluate several values during training
-      normalize: false,
-      reduce: false,
-      kFold: 1, // disable k-fold cross-validation
-      probability: true,
-    });
-    const labels = [];
-    const trueLabels = [];
-    const predictedLabels = [];
-    const accurancy = 0;
-    const f1Score = 0;
-    const recall = 0;
-    const precision = 0;
-    clf
-      .train(dataTraining)
-      .progress(progress => {
-        console.log('training progress: %d%', Math.round(progress * 100));
-      })
-      .spread((model, reportTraining) => {
-        try {
-          fs.writeFileSync(commonPath.model, JSON.stringify(model), 'utf8');
-          res.status(200).send({
-            success: true,
-            message: 'Luu thanh cong ',
-          });
-        } catch (error) {
-          console.log(error);
-          res.status(200).send({
-            success: false,
-            message: 'Co loi khi luu model',
-            err: error,
-          });
-        }
-      });
-  } catch (e) {
-    console.log({ e });
-    res.status(200).send({
-      success: false,
-      message: 'Co loi khi luu model',
-      err: e,
-    });
+  // try {
+  //   const { dataTraining, dataTest } = await training();
+  //   const clf = new svm.SVM({
+  //     svmType: 'C_SVC',
+  //     gamma: 10,
+  //     c: 4, // allow you to evaluate several values during training
+  //     normalize: false,
+  //     reduce: false,
+  //     kFold: 1, // disable k-fold cross-validation
+  //     probability: true,
+  //   });
+  //   const labels = [];
+  //   const trueLabels = [];
+  //   const predictedLabels = [];
+  //   const accurancy = 0;
+  //   const f1Score = 0;
+  //   const recall = 0;
+  //   const precision = 0;
+  //   clf
+  //     .train(dataTraining)
+  //     .progress(progress => {
+  //       console.log('training progress: %d%', Math.round(progress * 100));
+  //     })
+  //     .spread((model, reportTraining) => {
+  //       try {
+  //         fs.writeFileSync(commonPath.model, JSON.stringify(model), 'utf8');
+  //         res.status(200).send({
+  //           success: true,
+  //           message: 'Luu thanh cong ',
+  //         });
+  //       } catch (error) {
+  //         console.log(error);
+  //         res.status(200).send({
+  //           success: false,
+  //           message: 'Co loi khi luu model',
+  //           err: error,
+  //         });
+  //       }
+  //     });
+  // } catch (e) {
+  //   console.log({ e });
+  //   res.status(200).send({
+  //     success: false,
+  //     message: 'Co loi khi luu model',
+  //     err: e,
+  //   });
+  // }
+  if (Object.keys(req.files).length == 0) {
+    return res.status(400).send('No files were uploaded.');
   }
+  const tmp = Object.values(req.files);
+  const modelJson = tmp[0];
+  const modelWeight = tmp[1];
+  const pathSave = commonPath.pathModel;
+
+  // Use the mv() method to place the file somewhere on your server
+  modelJson.mv(`${pathSave}/${modelJson.name}`, err => {
+    if (err) return res.status(500).send(err);
+    modelWeight.mv(`${pathSave}/${modelWeight.name}`, err => {
+      if (err) return res.status(500).send(err);
+      res.send('File uploaded!');
+    });
+  });
 });
+
 module.exports = routes;

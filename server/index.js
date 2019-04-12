@@ -3,6 +3,8 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
+const cors = require('cors')
+const fileUpload = require('express-fileupload');
 const socket_io = require('socket.io');
 const logger = require('./logger');
 const bodyParser = require('body-parser');
@@ -36,7 +38,8 @@ app.jobs = jobs;
 /**
  * Implement passport
  */
-
+app.use(fileUpload());
+app.use(cors())
 app.use(express.static('public'));
 // If you need a backend, e.g. an API, add your custom backend-specific middleware here
 // app.use('/api', myApi);
@@ -89,7 +92,7 @@ io.listen(
      * @type {any}
      */
     const modelSave = JSON.parse(fs.readFileSync(commonPath.model));
-    app.newClf = svm.restore(modelSave);
+    // app.newClf = svm.restore(modelSave);
     console.error(`load model succession`);
     console.error(
       `Node cluster worker ${process.pid}: listening on port ${port}`,
