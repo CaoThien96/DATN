@@ -11,6 +11,8 @@ import {
   Test,
   ConfigurationModel,
   Information,
+  Center,
+  ChangePass,
 } from 'routes/loadModule';
 // import subRoutes from 'containers/Admin/Routes';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
@@ -93,6 +95,33 @@ const routes = [
     key: 'admin-configuration-model',
     exact: true,
     component: ConfigurationModel,
+    label: 'Configuration Model',
+    icon: <Icon type="setting" />,
+  },
+  {
+    path: '/admin/user',
+    key: 'admin-user',
+    routes: [
+      {
+        path: '/admin/user',
+        key: 'admin-user-center',
+        label: 'Thông tin cá nhân',
+        icon: <Icon type="setting" />,
+        exact: true,
+        component: Center,
+      },
+      {
+        path: '/admin/user/change-password',
+        key: 'admin-user-change-password',
+        icon: <Icon type="setting" />,
+        exact: true,
+        component: ChangePass,
+        label: 'Thay đổi mật khẩu',
+      },
+    ],
+    // exact: true,
+    component: Information,
+    hidden: true,
     label: 'Configuration Model',
     icon: <Icon type="setting" />,
   },

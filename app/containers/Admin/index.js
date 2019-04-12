@@ -11,6 +11,7 @@ import Dropdown from 'antd/es/dropdown/dropdown';
 import { createStructuredSelector } from 'reselect';
 import connect from 'react-redux/es/connect/connect';
 import { compose } from 'redux';
+import Modal from 'antd/es/modal/Modal';
 import RenderRoute from '../../routes/render';
 import request from '../../utils/request';
 import { makeSelectCurrentUser, makeSelectError } from '../App/selectors';
@@ -19,7 +20,6 @@ import injectReducer from '../../utils/injectReducer';
 import reducer from './components/Notification/reducer';
 import routes_not_menu from '../../routes/admin_routes_not_menu';
 import FormChangePassWord from './components/FormChangePassWord';
-import Modal from 'antd/es/modal/Modal';
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 const menu = (
@@ -79,30 +79,32 @@ const LayoutResponsive = () => (
 class LayoutAdmin extends Component {
   constructor(props) {
     super(props);
-    this.state={
-      visible:false
-    }
+    this.state = {
+      visible: false,
+    };
   }
 
   componentWillMount() {
     const token = localStorage.getItem('token');
     this.props.getCurrentUser();
+  }
 
-  }
-  handleOk = ()=>{
+  handleOk = () => {};
 
-  }
-  handleCancel = ()=>{
-    this.setState({visible:false})
-  }
-  onFormSubmitSuccess = ()=>{
-    this.setState({visible:false})
+  handleCancel = () => {
+    this.setState({ visible: false });
+  };
+
+  onFormSubmitSuccess = () => {
+    this.setState({ visible: false });
     localStorage.removeItem('token');
     this.props.history.replace('/');
-  }
-  handleOpen = ()=>{
-    this.setState({visible:true})
-  }
+  };
+
+  handleOpen = () => {
+    this.setState({ visible: true });
+  };
+
   render() {
     const { routes, currentUser, error, history } = this.props;
     if (error) {
@@ -127,115 +129,144 @@ class LayoutAdmin extends Component {
       }
       return false;
     });
-    console.log(routerCurrent)
-    console.log({filter})
-    if(routerCurrent.key=='admin-dashboard'){
+    let keySubRouterOpen = false;
+    if(routerCurrent.routes && routerCurrent.routes.length){
+      const subRoutesCurrent =  lodashcommon.lodashFind(routerCurrent.routes, el => {
+        if (el.path == pathName) {
+          return true;
+        }
+        return false;
+      });
+       keySubRouterOpen = routerCurrent.key;
+      routerCurrent = subRoutesCurrent
 
-      if(currentUser.role != 1001){
-        routerCurrent = filter[0]
+      console.log({subRoutesCurrent})
+    }
+    console.log(routerCurrent);
+    console.log({ filter });
+    if (routerCurrent.key == 'admin-dashboard') {
+      if (currentUser.role != 1001) {
+        routerCurrent = filter[0];
         this.props.history.replace(routerCurrent.path);
       }
     }
 
     return (
       <Layout>
-        <Modal
-          title="New Employee"
-          visible={this.state.visible}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
-          footer={null}
+        <Sider
+          breakpoint="lg"
+          collapsedWidth="0"
+          onBreakpoint={broken => {
+            console.log(broken);
+          }}
+          onCollapse={(collapsed, type) => {
+            console.log(collapsed, type);
+          }}
+          // width={200} style={{ paddingTop: '25px' }}
         >
-          <FormChangePassWord onSuccess={this.onFormSubmitSuccess} />
-        </Modal>
-        <Header style={{ background: '#fff', padding: 0 }}>
           <div className="logo" />
-          <div style={{ float: 'right', marginRight: '15px' }}>
-            <Menu
-              mode="horizontal"
-              defaultSelectedKeys={['2']}
-              style={{ lineHeight: '64px' }}
-            >
-              <Menu.Item key="4">
-                <Dropdown overlay={menu} trigger={['click']}>
-                  <div>
-                    <Icon type="notification" />
-                  </div>
-                </Dropdown>
-              </Menu.Item>
-              <SubMenu
-                onClick={dom => {
-                  if (dom.key == 'logout') {
-
-                  }
-                }}
-                title={
-                  <span className="submenu-title-wrapper">
-                    <Icon type="smile" theme="twoTone" />
-                    {currentUser && currentUser.email.slice(0, 4)}
-                  </span>
-                }
-              >
-                <Menu.Item key="detail">Thông tin cá nhân</Menu.Item>
-                <Menu.Item key="change-password" onClick={this.handleOpen}>Thay đổi mật khẩu</Menu.Item>
-                <Menu.Item key="logout" onClick={()=>{
-                  localStorage.removeItem('token');
-                  this.props.history.replace('/');
-                }}>Đăng xuất</Menu.Item>
-              </SubMenu>
-            </Menu>
-          </div>
-        </Header>
-        <Layout>
-          <Sider
-            breakpoint="lg"
-            collapsedWidth="0"
-            onBreakpoint={broken => {
-              console.log(broken);
-            }}
-            onCollapse={(collapsed, type) => {
-              console.log(collapsed, type);
-            }}
-            // width={200} style={{ paddingTop: '25px' }}
+          <Menu
+            mode="inline"
+            theme="dark"
+            selectedKeys={[routerCurrent && routerCurrent.key]}
+            defaultOpenKeys={keySubRouterOpen ? [keySubRouterOpen]:[]}
+            style={{ height: '100%', borderRight: 0 }}
           >
-            <Menu
-              mode="inline"
-              theme="dark"
-              selectedKeys={[routerCurrent && routerCurrent.key]}
-              // defaultOpenKeys={['sub1']}
-              style={{ height: '100%', borderRight: 0 }}
-            >
-              {filter &&
-                filter.map(menu => {
-                  if (!menu.label) {
-                    return false;
+            {filter &&
+            filter.map(menu => {
+              if (!menu.label) {
+                return false;
+              }
+              if (menu && menu.label && menu.routes) {
+                return (
+                  <SubMenu
+                    key={menu && menu.key}
+                    title={
+                      <span>
+                            <Icon type="notification" />
+                        {menu && menu.label}
+                          </span>
+                    }
+                  >
+                    {menu.routes.map(subMenu => (
+                      <Menu.Item key={subMenu.key}>
+                        <Link to={subMenu.path}>
+                          {menu && subMenu.icon ? (
+                            subMenu.icon
+                          ) : (
+                            <Icon type="user" />
+                          )}
+                          <span className="nav-text">
+                                {subMenu && subMenu.label}
+                              </span>
+                        </Link>
+                      </Menu.Item>
+                    ))}
+                  </SubMenu>
+                );
+              }
+              return (
+                <Menu.Item key={menu && menu.key}>
+                  <Link to={menu.path}>
+                    {menu && menu.icon ? menu.icon : <Icon type="user" />}
+                    <span className="nav-text">{menu && menu.label}</span>
+                  </Link>
+                </Menu.Item>
+              );
+            })}
+          </Menu>
+        </Sider>
+        <Layout>
+          <Header style={{ background: '#fff', padding: 0 }}>
+            <div style={{ float: 'right', marginRight: '15px' }}>
+              <Menu
+                mode="horizontal"
+                // defaultSelectedKeys={['2']}
+                style={{ lineHeight: '64px' }}
+              >
+                <Menu.Item key="4">
+                  <Dropdown overlay={menu} trigger={['click']}>
+                    <div>
+                      <Icon type="notification" />
+                    </div>
+                  </Dropdown>
+                </Menu.Item>
+                <SubMenu
+                  onClick={dom => {
+                    if (dom.key == 'logout') {
+                    }
+                  }}
+                  title={
+                    <span className="submenu-title-wrapper">
+                    <Icon type="smile" theme="twoTone" />
+                      {currentUser && currentUser.email.slice(0, 4)}
+                  </span>
                   }
-                  if (menu && menu.label && menu.routes) {
-                    return (
-                      <SubMenu
-                        key={menu && menu.key}
-                        title={
-                          <Link to={menu.path}>
-                            <span>
-                              <Icon type="notification" />
-                              {menu && menu.label}
-                            </span>
-                          </Link>
-                        }
-                      />
-                    );
-                  }
-                  return (
-                    <Menu.Item key={menu && menu.key}>
-                      <Link to={menu.path}>
-                        {menu && menu.icon ? menu.icon : <Icon type="user" />}
-                        <span className="nav-text">{menu && menu.label}</span>
-                      </Link>
-                    </Menu.Item>
-                  );
-                })}
-            </Menu>
-          </Sider>
+                >
+                  <Menu.Item key="detail">
+                    <Link to="/admin/user">
+                      <span>Thông tin cá nhân</span>
+                    </Link>
+                  </Menu.Item>
+                  <Menu.Item key="change-password">
+                    <Link to="/admin/user/change-password">
+                      <span>Thay đổi mật khẩu</span>
+                    </Link>
+                  </Menu.Item>
+                  <Menu.Item
+                    key="logout"
+                    onClick={() => {
+                      localStorage.removeItem('token');
+                      this.props.history.replace('/');
+                    }}
+                  >
+                    Đăng xuất
+                  </Menu.Item>
+                </SubMenu>
+              </Menu>
+            </div>
+          </Header>
+
           <Layout style={{ padding: '0 24px 24px' }}>
             <Breadcrumb style={{ margin: '16px 0' }}>
               {breadcrumbe.length == 1 ? (

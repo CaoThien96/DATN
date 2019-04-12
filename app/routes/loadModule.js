@@ -92,10 +92,19 @@ export const ConfigurationModel = Loadable({
  */
 export const Information = Loadable({
   loader: () =>
-    import('containers/Admin/components/Infomation/index'),
+    import('containers/Admin/components/Infomation/Layout'),
   loading: LoadingIndicator,
 });
-
+export const Center = Loadable({
+  loader: () =>
+    import('containers/Admin/components/Infomation/index'),
+  loading: LoadingIndicator,
+})
+export const ChangePass = Loadable({
+  loader: () =>
+    import('containers/Admin/components/Infomation/FormChangePassWord'),
+  loading: LoadingIndicator,
+})
 /**
  * Tesst
  */
