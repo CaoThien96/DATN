@@ -14,6 +14,10 @@ import CanWrapper from './Can';
 import FromNew from './Form/New';
 import FormSearch from './Search/Form';
 import Result from './Search/Result';
+import { createStructuredSelector } from 'reselect';
+import { makeSelectCurrentUser } from '../../../App/selectors';
+import connect from 'react-redux/es/connect/connect';
+import { Form } from 'antd';
 class RequestManagement extends Component {
   constructor(props) {
     super(props);
@@ -116,7 +120,7 @@ class RequestManagement extends Component {
     };
     return (
       <div>
-        <CanWrapper I="create" a="Request" user={user}>
+        <CanWrapper I="create" a="Notification" user={this.props.currentUser}>
           <Modal
             width={1200}
             title="Tạo thông báo"
@@ -150,4 +154,10 @@ class RequestManagement extends Component {
 
 RequestManagement.defaultProps = {};
 RequestManagement.propTypes = {};
-export default withRouter(compose()(RequestManagement));
+const mapStateToProps = createStructuredSelector({
+  currentUser: makeSelectCurrentUser(),
+});
+
+const withConnect = connect(mapStateToProps);
+
+export default withRouter(compose(withConnect)(RequestManagement));

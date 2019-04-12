@@ -27,7 +27,7 @@ export const LayoutAdmin = Loadable({
   loading: LoadingIndicator,
 });
 export const Dashboard = Loadable({
-  loader: () => import('containers/Admin/components/Dashboard/index'),
+  loader: () => import('containers/Admin/components/Dashboard/Layout'),
   loading: LoadingIndicator,
 });
 export const DashboardEmployee = Loadable({
@@ -85,6 +85,14 @@ export const Configuration = Loadable({
 export const ConfigurationModel = Loadable({
   loader: () =>
     import('containers/Admin/components/Configuration_Model/Layout'),
+  loading: LoadingIndicator,
+});
+/**
+ * Information
+ */
+export const Information = Loadable({
+  loader: () =>
+    import('containers/Admin/components/Infomation/index'),
   loading: LoadingIndicator,
 });
 

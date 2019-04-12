@@ -31,7 +31,8 @@ class Index extends Component {
             email:(currentUser.email),
             iid:(currentUser.iid)
           },
-          content:(e.target.value)
+          content:(e.target.value),
+          time:new Date()
         }
       })
       e.target.value=null;
@@ -52,7 +53,7 @@ class Index extends Component {
               <a>{comment.u.email}</a> {comment.content}
             </Row>
             <Row>
-              <a onClick={this.onClickReply}>Tra loi</a>
+              <a onClick={this.onClickReply}>Tra loi</a><span className='m-l-15'>{new Date(comment.time).toLocaleString()}</span>
             </Row>
 
           </Col>
@@ -67,6 +68,9 @@ class Index extends Component {
                 <Col className="m-l-15" span={20}>
                   <Row>
                     <a>{el.u.email}</a> {el.content}
+                    <div>
+                      <span className='m-l-15'>{new Date(el.time).toLocaleString()}</span>
+                    </div>
                   </Row>
                 </Col>
               </Row>

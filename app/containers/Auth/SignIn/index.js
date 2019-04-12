@@ -87,15 +87,15 @@ class NormalLoginForm extends Component {
           {this.state.error && (
             <Error>Username or password not correct!!</Error>
           )}
-          <FormItem>
-            {getFieldDecorator('remember', {
-              valuePropName: 'checked',
-              initialValue: true,
-            })(<Checkbox>Remember me</Checkbox>)}
-            <a className="login-form-forgot" href="">
-              Forgot password
-            </a>
-          </FormItem>
+          {/*<FormItem>*/}
+            {/*{getFieldDecorator('remember', {*/}
+              {/*valuePropName: 'checked',*/}
+              {/*initialValue: true,*/}
+            {/*})(<Checkbox>Remember me</Checkbox>)}*/}
+            {/*<a className="login-form-forgot" href="">*/}
+              {/*Forgot password*/}
+            {/*</a>*/}
+          {/*</FormItem>*/}
           <div>
             {
               this.state.err?(
@@ -111,7 +111,7 @@ class NormalLoginForm extends Component {
             >
               Log in
             </Button>
-            <Link to="/sign-up">Or register now!</Link>
+            {/*<Link to="/sign-up">Or register now!</Link>*/}
           </div>
         </Form>
       </div>

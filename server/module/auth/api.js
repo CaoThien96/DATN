@@ -44,4 +44,5 @@ routes.get('/api/get-current-user', (req, res, next) => {
     });
   });
 });
+
 module.exports = routes;

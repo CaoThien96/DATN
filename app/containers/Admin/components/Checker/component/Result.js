@@ -12,6 +12,7 @@ import { compose } from 'redux';
 import request from 'utils/request';
 import { makeSelectCurrentUser } from '../../../../App/selectors';
 import { makeSelectListCheckIn, makeSelectPredict } from '../seclectors';
+import { onUpdateListCheckIn } from '../actions';
 
 const ResultWarapper = styled.div`
   padding: 0px 10px;
@@ -28,7 +29,11 @@ class Result extends Component {
   }
 
   componentWillMount() {
-    request('/api/check-in/list-check-in-success').then(data => {});
+    request('/api/check-in/list-check-in-success').then(data => {
+      console.log(data)
+
+      this.props.onUpdateListCheckIn(data.listCheckSuccess)
+    });
   }
 
   componentDidMount() {
@@ -79,5 +84,12 @@ const mapStateToProps = createStructuredSelector({
   currentUser: makeSelectCurrentUser(),
   listCheckInV2: makeSelectListCheckIn(),
 });
-const withConnect = connect(mapStateToProps);
+
+const mapDispatchToProps = dispatch => ({
+  onUpdateListCheckIn: payload => dispatch(onUpdateListCheckIn(payload)),
+});
+const withConnect = connect(
+  mapStateToProps,
+  mapDispatchToProps,
+);
 export default withRouter(compose(withConnect)(Result));

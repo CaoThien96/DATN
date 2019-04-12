@@ -1,7 +1,7 @@
 const routes = require('express').Router();
 const lodash = require('lodash');
 const User = require('./model');
-const mail = require('../../configs/mail')
+const mail = require('../../configs/mail');
 routes.get('/', async (req, res) => {
   try {
     const body = req.body;
@@ -59,12 +59,47 @@ routes.get('/:id', async (req, res) => {
 routes.put('/:id', async (req, res) => {
   // res.status(200).send('oke');
   const iid = parseInt(req.params.id);
-  const status = req.body.status ? 1 : 2;
-  User.update({ iid }, { status }, (err, docs) => {
-    console.log(err);
+  let update = {};
+  if (req.body.status !== undefined) {
+    const status = req.body.status ? 1 : 2;
+    update = { ...update, status };
+  }
+  if (req.body.full_name) {
+    const full_name = req.body.full_name;
+    update = { ...update, full_name };
+  }
+  if (req.body.phone) {
+    const phone = req.body.phone;
+    update = { ...update, phone };
+  }
+  User.update({ iid }, update, (err, docs) => {
     res.send({
       success: true,
       payload: docs,
+    });
+  });
+});
+/**
+ * Change password
+ */
+routes.put('/:id/change-password', (req, res) => {
+  const iid = req.params.id;
+  const password = req.body.password;
+  const newPassword = req.body.newPassword;
+
+  User.findOne({ iid }, (err, user) => {
+    if (err)
+      return res.send({
+        success: false,
+        err,
+      });
+    user.changePassword(password, newPassword, (err, mes) => {
+      if (err)
+        return res.send({
+          success: false,
+          err,
+        });
+      return res.send({ success: true, payload: mes });
     });
   });
 });
@@ -100,17 +135,23 @@ routes.put('/', async (req, res) => {
     });
   }
 });
+
 routes.post('/', async (req, res) => {
   const { email, password, full_name, phone } = req.body;
-  const randomPass = Math.random().toString(36).substring(2, 5) + Math.random().toString(36).substring(2,5);
+  const randomPass =
+    Math.random()
+      .toString(36)
+      .substring(2, 5) +
+    Math.random()
+      .toString(36)
+      .substring(2, 5);
   const newUser = new User();
   newUser.email = email;
   newUser.password = randomPass;
   newUser.full_name = full_name;
   newUser.phone = phone;
   // Check email
-  mail.sendOne('caothienbk@gmail.com','Register succession',`Your password is: ${randomPass}`,`<p>Your password is: ${randomPass}</p>`)
-  const check = await User.findOne({ email });
+  const check = await User.findOne({ email, status: { $ne: 0 } });
   if (check) {
     return res.send({
       success: false,
@@ -123,7 +164,12 @@ routes.post('/', async (req, res) => {
     /**
      * Send pass to mail
      */
-    // mail.sendOne('caothienbk@gmail.com','Register succession',`Your password is: ${randomPass}`)
+    mail.sendOne(
+      'caothienbk@gmail.com',
+      'Register succession',
+      `Your password is: ${randomPass}`,
+      `<p>Your password is: ${randomPass}</p>`,
+    );
     res.send({
       success: true,
       payload: user,
@@ -134,5 +180,11 @@ routes.post('/', async (req, res) => {
       err: e,
     });
   }
+});
+routes.post('/upload-image', (req, res) => {
+  console.log(req.body);
+  res.send({
+    success: 'oke',
+  });
 });
 module.exports = routes;

@@ -43,11 +43,17 @@ CheckInDetailSchema.methods.updateStatus = function(cb) {
       const late_time = docs.find(el => {
         if (el.name == 'late_time') return true;
       });
-      const current_time = new Date().getTime() / 1000;
+      const current_time = new Date().toTimeString();
+      const late = new Date(late_time.value*1000).toTimeString()
       let status = 1;
-      if (current_time > late_time.value) {
+      if (current_time > late) {
         status = 2;
       }
+      console.log({ status });
+      console.log({ current_time});
+
+
+
       this.model('CheckInDetail').updateOne(
         { pid: this.pid, 'user.iid': this.user.iid },
         { status },
@@ -73,12 +79,9 @@ CheckInDetailSchema.statics.findCheckInSuccess = function(checkIn, cb) {
   );
 };
 CheckInDetailSchema.statics.findCheckInDetailAll = function(checkIn, cb) {
-  this.model('CheckInDetail').find(
-    { pid: checkIn.iid},
-    (err, docs) => {
-      if (err) return cb(err);
-      return cb(null, docs);
-    },
-  );
+  this.model('CheckInDetail').find({ pid: checkIn.iid }, (err, docs) => {
+    if (err) return cb(err);
+    return cb(null, docs);
+  });
 };
 module.exports = mongoose.model('CheckInDetail', CheckInDetailSchema);

@@ -15,6 +15,7 @@ import { makeSelectNotificationDetail } from '../../selectors';
 import Comment from '../Comment/index';
 import PreviewHtml from './PreviewHtml';
 import { addNotification, addComment } from '../../actions';
+import Divider from 'antd/es/divider';
 class Index extends Component {
   constructor(props) {
     super(props);
@@ -125,13 +126,17 @@ class Index extends Component {
             </Row>
             {notificationDetail.comments &&
               notificationDetail.comments.map((el, key) => (
-                <Comment
-                  iid={el._id}
-                  onHandleReply={this.onHandleReply}
-                  key={key}
-                  comment={el}
-                  currentUser={currentUser}
-                />
+                <div>
+                  <Comment
+                    iid={el._id}
+                    onHandleReply={this.onHandleReply}
+                    key={key}
+                    comment={el}
+                    currentUser={currentUser}
+                  />
+                  <Divider/>
+
+                </div>
               ))}
             {/* {comments.map((el, key) => ( */}
             {/* <Comment */}

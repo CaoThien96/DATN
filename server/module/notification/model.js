@@ -4,31 +4,37 @@ const autoIncrement = require('../../configs/auto-increment');
 
 const { Schema } = mongoose;
 
-const NotificationSchema = new Schema({
-  iid: {
-    type: Number,
-  },
-  title: {
-    type: String,
-  },
-  descriptions: {
-    type: String,
-  },
-  comments: [
-    {
-      content: String,
-      u: {
-        email: String,
-        iid: Number,
-      },
-      reply:[]
+const NotificationSchema = new Schema(
+  {
+    iid: {
+      type: Number,
     },
-  ],
-  status: {
-    type: Number,
-    default: 1,
+    title: {
+      type: String,
+    },
+    descriptions: {
+      type: String,
+    },
+    comments: [
+      {
+        content: String,
+        u: {
+          email: String,
+          iid: Number,
+        },
+        reply: [],
+        time: {
+          type: Date,
+        },
+      },
+    ],
+    status: {
+      type: Number,
+      default: 1,
+    },
   },
-},{ timestamps: { createdAt: 'created_at' } });
+  { timestamps: { createdAt: 'created_at' } },
+);
 NotificationSchema.plugin(autoIncrement.plugin, {
   model: 'Notification',
   field: 'iid',

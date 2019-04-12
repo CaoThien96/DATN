@@ -57,7 +57,6 @@ class CameraWrapper extends Component {
   }
 
   onPlay = async () => {
-    console.log('onplay');
     if (
       !this.videoTag.current.currentTime ||
       this.videoTag.current.paused ||

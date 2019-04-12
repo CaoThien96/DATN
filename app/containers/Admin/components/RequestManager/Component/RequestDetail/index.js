@@ -79,19 +79,19 @@ class RequestDetail extends Component {
           <Col span={6}>
             Trạng thái xử lý:{' '}
             {requestDetail.status == 0
-              ? 'Đang chờ'
-              : 'Đã hủy'}
+              ? 'Đang chờ':
+              requestDetail.status==1? 'Chấp nhận':requestDetail.status==2?'Không chấp nhận':'Hủy bỏ'}
           </Col>
-          <Col span={6}>
-            {requestDetail.status == 1 || requestDetail.status == 2 ? (
-              <Switch
-                // onChange={status => handleChangeActive(record, status)}
-                checkedChildren="Approve"
-                unCheckedChildren="Reject"
-                checked={requestDetail.status == 1?true:false}
-              />
-            ) : null}
-          </Col>
+          {/*<Col span={6}>*/}
+            {/*{requestDetail.status == 1 || requestDetail.status == 2 ? (*/}
+              {/*<Switch*/}
+                {/*// onChange={status => handleChangeActive(record, status)}*/}
+                {/*checkedChildren="Approve"*/}
+                {/*unCheckedChildren="Reject"*/}
+                {/*checked={requestDetail.status == 1?true:false}*/}
+              {/*/>*/}
+            {/*) : null}*/}
+          {/*</Col>*/}
         </Row>
         <Divider />
         <Row>

@@ -19,12 +19,12 @@ routes.post('/comment', (req, res) => {
       let comments = null;
       if (docs.comments) {
         const test = docs.comments.push({
-          content:comment,
-          u:{
-            email:u.email,
-            iid:u.iid
-          }
-        })
+          content: comment,
+          u: {
+            email: u.email,
+            iid: u.iid,
+          },
+        });
       } else {
         comments = [
           {
@@ -33,18 +33,22 @@ routes.post('/comment', (req, res) => {
           },
         ];
       }
-      Request.update({iid:requestIid},{comments:docs.comments},(err2,data)=>{
-        if(err){
-          return res.status(500).send({
-            success:false,
-            err:err2
-          })
-        }
-        res.status(200).send({
-          success:true,
-          payload:data
-        })
-      })
+      Request.update(
+        { iid: requestIid },
+        { comments: docs.comments },
+        (err2, data) => {
+          if (err) {
+            return res.status(500).send({
+              success: false,
+              err: err2,
+            });
+          }
+          res.status(200).send({
+            success: true,
+            payload: data,
+          });
+        },
+      );
     });
   } catch (e) {
     return res.status(500).send({
@@ -92,7 +96,7 @@ routes.get('/', (req, res) => {
  */
 routes.get('/:id', (req, res) => {
   const iid = req.params.id;
-  const u = req.user
+  const u = req.user;
   Request.findOne({ iid }, (err, data) => {
     if (err) {
       return res.status(500).send({
@@ -131,6 +135,7 @@ routes.post('/', (req, res) => {
   newRequest.descriptions = descriptions;
   newRequest.userIid = 1001;
   newRequest.date = date;
+  newRequest.u = req.user;
   newRequest
     .save()
     .then(data => {
@@ -151,9 +156,8 @@ routes.post('/', (req, res) => {
  */
 routes.put('/:id', (req, res) => {
   const iid = parseInt(req.params.id);
-  const status = req.body.status ? 1 : 2;
+  const status = req.body.status
   Request.update({ iid }, { status }, (err, docs) => {
-
     res.send({
       success: true,
       payload: docs,

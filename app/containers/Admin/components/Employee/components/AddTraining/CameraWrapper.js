@@ -40,7 +40,7 @@ class CameraWrapper extends Component {
     this.images = [];
     this.status = 'un-previewed';
     this.state = {
-      status: 'un-previewed',
+      status: 'un-previewed',// un-previewed chua tao du || previewed tao du
       statusTraining: 0, // If status = 0 is create manual else create auto
     };
   }
@@ -74,7 +74,7 @@ class CameraWrapper extends Component {
       !faceapi.nets.tinyFaceDetector.params
     )
       return setTimeout(() => this.onPlay(this.videoTag.current));
-    const options = new faceapi.TinyFaceDetectorOptions({ inputSize:224, scoreThreshold:0.7 })
+    const options = new faceapi.TinyFaceDetectorOptions({ inputSize:224, scoreThreshold:0.5 })
     const canvasClone = this.canvasClone.current.getContext('2d');
     canvasClone.drawImage(
       this.videoTag.current,
@@ -86,8 +86,10 @@ class CameraWrapper extends Component {
     const result = await faceapi
       .detectSingleFace(this.canvasClone.current, options)
       .withFaceLandmarks();
+    console.log({result})
     if (result) {
-      if (statusTraining == 1) {
+      if (statusTraining == 1 && result.detection.score > 0.85) {
+        console.log(statusTraining)
         if (this.images.length < 20) {
           const tmp = this.images;
           const imageExtract = await faceapi.extractFaces(
@@ -121,6 +123,7 @@ class CameraWrapper extends Component {
   onReTraining = () => {
     this.setState({
       status: 'un-previewed',
+      statusTraining:0
     });
     this.images = [];
     this.status = 'un-previewed';
@@ -129,6 +132,7 @@ class CameraWrapper extends Component {
 
   onCreateTrainingManual = async () => {
     this.buttonPressTimer = setInterval(async () => {
+      console.log('onCreateTrainingManual')
       const options = getFaceDetectorOptions();
       const canvasClone = this.canvasClone.current.getContext('2d');
       canvasClone.drawImage(
@@ -142,7 +146,6 @@ class CameraWrapper extends Component {
         .detectSingleFace(this.canvasClone.current, options)
         .withFaceLandmarks();
       if (result) {
-        console.log({result})
         if (this.images.length < 20) {
           const tmp = this.images;
           const imageExtract = await faceapi.extractFaces(
@@ -158,6 +161,7 @@ class CameraWrapper extends Component {
           this.images = tmp;
         } else if (this.status == 'un-previewed') {
           this.props.onDetectedFaceSuccess(this.images);
+          this.handleButtonRelease();
           this.status = 'previewed';
           this.setState({
             status: 'previewed',
@@ -249,7 +253,7 @@ class CameraWrapper extends Component {
           </Button>
           <Button
             className="m-l-15"
-            disabled={this.state.statusTraining === 1}
+            disabled={this.state.statusTraining === 1||this.state.status === 'previewed'}
             type="primary"
             onClick={() => this.setState({ statusTraining: 1 })}
           >
@@ -261,6 +265,7 @@ class CameraWrapper extends Component {
             onMouseDown={this.onCreateTrainingManual}
             onMouseUp={this.handleButtonRelease}
             onMouseLeave={this.handleButtonRelease}
+            disabled={this.state.status === 'previewed'}
             className="m-l-15"
             type="primary"
           >

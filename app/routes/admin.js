@@ -10,6 +10,7 @@ import {
   Configuration,
   Test,
   ConfigurationModel,
+  Information,
 } from 'routes/loadModule';
 // import subRoutes from 'containers/Admin/Routes';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';

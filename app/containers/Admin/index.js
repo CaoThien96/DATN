@@ -17,6 +17,9 @@ import { makeSelectCurrentUser, makeSelectError } from '../App/selectors';
 import { loadUserLogin, removeUser } from '../App/actions';
 import injectReducer from '../../utils/injectReducer';
 import reducer from './components/Notification/reducer';
+import routes_not_menu from '../../routes/admin_routes_not_menu';
+import FormChangePassWord from './components/FormChangePassWord';
+import Modal from 'antd/es/modal/Modal';
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 const menu = (
@@ -74,11 +77,32 @@ const LayoutResponsive = () => (
   </Layout>
 );
 class LayoutAdmin extends Component {
+  constructor(props) {
+    super(props);
+    this.state={
+      visible:false
+    }
+  }
+
   componentWillMount() {
     const token = localStorage.getItem('token');
     this.props.getCurrentUser();
-  }
 
+  }
+  handleOk = ()=>{
+
+  }
+  handleCancel = ()=>{
+    this.setState({visible:false})
+  }
+  onFormSubmitSuccess = ()=>{
+    this.setState({visible:false})
+    localStorage.removeItem('token');
+    this.props.history.replace('/');
+  }
+  handleOpen = ()=>{
+    this.setState({visible:true})
+  }
   render() {
     const { routes, currentUser, error, history } = this.props;
     if (error) {
@@ -95,7 +119,8 @@ class LayoutAdmin extends Component {
     if (breadcrumbe.length > 1) {
       parentPathName = parentPathName.concat('/', breadcrumbe[1]);
     }
-    console.log(parentPathName)
+    console.log(parentPathName);
+    console.log(routes);
     let routerCurrent = lodashcommon.lodashFind(routes, el => {
       if (el.path == parentPathName) {
         return true;
@@ -111,8 +136,18 @@ class LayoutAdmin extends Component {
         this.props.history.replace(routerCurrent.path);
       }
     }
+
     return (
       <Layout>
+        <Modal
+          title="New Employee"
+          visible={this.state.visible}
+          onOk={this.handleOk}
+          onCancel={this.handleCancel}
+          footer={null}
+        >
+          <FormChangePassWord onSuccess={this.onFormSubmitSuccess} />
+        </Modal>
         <Header style={{ background: '#fff', padding: 0 }}>
           <div className="logo" />
           <div style={{ float: 'right', marginRight: '15px' }}>
@@ -131,8 +166,7 @@ class LayoutAdmin extends Component {
               <SubMenu
                 onClick={dom => {
                   if (dom.key == 'logout') {
-                    localStorage.removeItem('token');
-                    this.props.history.replace('/');
+
                   }
                 }}
                 title={
@@ -142,7 +176,12 @@ class LayoutAdmin extends Component {
                   </span>
                 }
               >
-                <Menu.Item key="logout">Đăng xuất</Menu.Item>
+                <Menu.Item key="detail">Thông tin cá nhân</Menu.Item>
+                <Menu.Item key="change-password" onClick={this.handleOpen}>Thay đổi mật khẩu</Menu.Item>
+                <Menu.Item key="logout" onClick={()=>{
+                  localStorage.removeItem('token');
+                  this.props.history.replace('/');
+                }}>Đăng xuất</Menu.Item>
               </SubMenu>
             </Menu>
           </div>
@@ -162,7 +201,7 @@ class LayoutAdmin extends Component {
             <Menu
               mode="inline"
               theme="dark"
-              selectedKeys={[routerCurrent.key]}
+              selectedKeys={[routerCurrent && routerCurrent.key]}
               // defaultOpenKeys={['sub1']}
               style={{ height: '100%', borderRight: 0 }}
             >
@@ -217,6 +256,9 @@ class LayoutAdmin extends Component {
               }}
             >
               <Switch>
+                {routes_not_menu.map((route, i) => (
+                  <RenderRoute key={i} {...route} />
+                ))}
                 {filter.map((route, i) => (
                   <RenderRoute key={i} {...route} />
                 ))}

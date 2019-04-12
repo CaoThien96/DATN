@@ -148,6 +148,14 @@ app.io = io.on('connection', async socket => {
     if (action.type === 'server/hello') {
       socket.emit('action', { type: 'message', data: 'good day!' });
     }
+    if (action.type === 'server/boilerplate/Model/OnUpdateModel') {
+      const modelSave = JSON.parse(fs.readFileSync(commonPath.model));
+      app.newClf = svm.restore(modelSave);
+      socket.emit('action', { type: 'message', data: 'good day!' });
+    }
+    /**
+     * Lang nghe su kien them comment
+     */
     if (action.type === 'server/boilerplate/Notification/AddComment') {
       const newPayload = { ...action.payload, time: new Date() };
       socket.broadcast.emit('action', {

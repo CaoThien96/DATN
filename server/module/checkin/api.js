@@ -172,21 +172,71 @@ routes.get('/list-check-in-by-date', (req, res) => {
 });
 routes.get('/list-check-in-by-month-with-user', (req, res) => {
   CheckIn.searchCheckInByMonth(new Date(), (err, docs) => {
-    if(err){
+    if (err) {
       return res.status(500).send({
-        success:false,
-        err:err
-      })
+        success: false,
+        err,
+      });
     }
-    const listPid = docs.map(el=>el.iid);
-    console.log(listPid)
-    CheckInDetail.find({pid:{$in:listPid},"user.iid":1019},(err,listCheckInDetail)=>{
-      res.send({
-        success:true,
-        payload:listCheckInDetail
-      })
-    })
+    const listPid = docs.map(el => el.iid);
+    console.log(listPid);
+    CheckInDetail.find(
+      { pid: { $in: listPid }, 'user.iid': req.user.iid },
+      (err, listCheckInDetail) => {
+        res.send({
+          success: true,
+          payload: listCheckInDetail,
+        });
+      },
+    );
   });
+});
+routes.get('/list-check-in-by-range-with-admin/:start/:end', (req, res) => {
+  const { start, end } = req.params;
+  console.log({ start, end });
+  CheckIn.searchCheckInByRange(start, end, (err, docs) => {
+    if (err) {
+      return res.status(500).send({
+        success: false,
+        err,
+      });
+    }
+    if (docs === null) {
+      return res.status(500).send({
+        success: false,
+        err: 'Khong tim thay phien checkin nao',
+      });
+    }
+    const listPid = docs.map(el => el.iid);
+    console.log(listPid);
 
+    CheckIn.aggregate([
+      {
+        $match: {
+          iid: { $in: listPid },
+        },
+      },
+      {
+        $lookup: {
+          from: 'checkindetails',
+          localField: 'iid',
+          foreignField: 'pid',
+          as: 'check_in',
+        },
+      },
+    ]).exec((err, listCheckIn) => {
+      res.send({
+        success: true,
+        payload: listCheckIn,
+        err,
+      });
+    });
+    // CheckInDetail.find({ pid: { $in: listPid } }, (err, listCheckInDetail) => {
+    //   res.send({
+    //     success: true,
+    //     payload: listCheckInDetail,
+    //   });
+    // });
+  });
 });
 module.exports = routes;

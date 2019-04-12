@@ -11,7 +11,6 @@ export function resizeCanvasAndResults(dimensions, canvas, results) {
 }
 
 export function drawDetections(dimensions, canvas, detections) {
-  console.log(detections)
   const resizedDetections = resizeCanvasAndResults(dimensions, canvas, detections)
   faceapi.drawDetection(canvas, resizedDetections)
 }

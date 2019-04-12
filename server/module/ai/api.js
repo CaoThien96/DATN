@@ -2,12 +2,13 @@ const routes = require('express').Router();
 const passport = require('passport');
 const svm = require('node-svm');
 const jwt = require('jsonwebtoken');
+const tf = require('@tensorflow/tfjs');
 const faceapi = require('face-api.js');
-const fs  = require('fs')
+const fs = require('fs');
 const User = require('../employee/model');
 const config = require('../../configs/index');
 const commonPath = require('../../common/path');
-
+const commonControll = require('./common');
 async function training() {
   return new Promise(async (resolve, reject) => {
     User.find(
@@ -164,6 +165,90 @@ routes.post('/', async (req, res) => {
     res.send(e);
   }
 });
+routes.post('/train-tf-model', (req, res) => {});
+routes.get('/dataset', async (req, res) => {
+  try {
+    let numberClass = 12;
+    const users = await User.find({
+      role: 1000,
+      training: { $exists: true },
+      status: 1,
+    });
+    numberClass=users.length
+    let {
+      xTrainFull,
+      yTrainFull,
+      xTestFull,
+      yTestFull,
+    } = commonControll.getDataSetTfModel(users.length, users);
+    xTrainFull = xTrainFull.arraySync()
+    yTrainFull = yTrainFull.arraySync()
+    xTestFull = xTestFull.arraySync()
+    yTestFull = yTestFull.arraySync()
+    console.log({
+      xTrainFull,
+      yTrainFull,
+      xTestFull,
+      yTestFull,
+    })
+    // let valAcc;
+    const model = commonControll.getModel(numberClass)
+    // const history = await model.fit(xTrainFull, yTrainFull, {
+    //   batchSize: 7,
+    //   epochs: 100,
+    //   // validationData: [xTestFull, yTestFull],
+    //   // validationSplit:0.4,
+    //   shuffle: true,
+    //   callbacks: {
+    //     onBatchEnd: (onBatch, x) => {
+    //       // console.log(onBatch)
+    //     },
+    //     onEpochEnd: async (epoch, logs) => {
+    //       console.log(logs);
+    //       valAcc = logs.val_acc;
+    //       // console.log(`Epoch ${epoch} Accuracy:${valAcc}`)
+    //       if (logs.acc * 100 > 99) {
+    //         model.stopTraining = true;
+    //       } else {
+    //         await tf.nextFrame();
+    //       }
+    //       // await tf.nextFrame();
+    //     },
+    //   },
+    // });
+    // const yPredict = model.predict(xTestFull);
+    // yPredict.print(true);
+    // yPredict.argMax(1).print();
+    // yTestFull.print(true);
+    // console.log(history.history.loss[0]);
+    // const testResult = model.evaluate(xTestFull, yTestFull);
+    // const testAccPercent = testResult[1].dataSync()[0] * 100;
+    // const finalValAccPercent = valAcc * 100;
+    // console.log(
+    //   `Final validation accuracy: ${finalValAccPercent.toFixed(1)}%; ` +
+    //     `Final test accuracy: ${testAccPercent.toFixed(1)}%
+    //         `,
+    // );
+    // const out = tf.math.confusionMatrix(
+    //   yTestFull.argMax(1),
+    //   yPredict.argMax(1),
+    //   numberClass,
+    // );
+    // out.print();
+
+    res.send({
+      success: true,
+      xTrainFull,
+      yTrainFull,
+      xTestFull,
+      yTestFull,
+      numberClass,
+      users
+    });
+  } catch (e) {
+    res.send(e);
+  }
+});
 routes.post('/save', async (req, res) => {
   try {
     const { dataTraining, dataTest } = await training();
@@ -196,20 +281,20 @@ routes.post('/save', async (req, res) => {
             message: 'Luu thanh cong ',
           });
         } catch (error) {
-          console.log(error)
+          console.log(error);
           res.status(200).send({
             success: false,
             message: 'Co loi khi luu model',
-            err:error
+            err: error,
           });
         }
       });
   } catch (e) {
-    console.log({e})
+    console.log({ e });
     res.status(200).send({
       success: false,
       message: 'Co loi khi luu model',
-      err:e,
+      err: e,
     });
   }
 });
