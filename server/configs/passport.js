@@ -24,7 +24,7 @@ passport.use(
         (err, user) => {
           if (!user) {
             const error = new Error('Incorrect email');
-            error.name = 'IncorrectCredentialsError';
+            error.name = 'Incorrect email';
             return done(error);
           }
           return user.comparePassword(
@@ -35,7 +35,7 @@ passport.use(
               }
               if (!isMatch) {
                 const error = new Error('Incorrect password');
-                error.name = 'IncorrectCredentialsError';
+                error.name = 'Incorrect password';
 
                 return done(error);
               }

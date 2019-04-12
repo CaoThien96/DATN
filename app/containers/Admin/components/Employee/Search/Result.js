@@ -10,22 +10,67 @@ const Result = ({ items, handleDelete, handleChangeActive }) => {
       title: 'Mã số',
       dataIndex: 'iid',
       key: 'iid',
+      render: (text, record) => ({
+        props:
+          record.status == 0
+            ? {
+              style: { background: '#FFF1F0' },
+            }
+            : record.status == 2
+            ? { style: { background: '#FFFBE6' } }
+            : {},
+        children: <p>{text}</p>,
+      }),
     },
     {
       title: 'Email',
       dataIndex: 'email',
       key: 'email',
+      render: (text, record) => ({
+        props:
+          record.status == 0
+            ? {
+              style: { background: '#FFF1F0' },
+            }
+            : record.status == 2
+            ? { style: { background: '#FFFBE6' } }
+            : {},
+        children: <p>{text}</p>,
+      }),
     },
     {
       title: 'Tên đầy đủ',
       dataIndex: 'full_name',
       key: 'full_name',
+      render: (text, record) => ({
+        props:
+          record.status == 0
+            ? {
+              style: { background: '#FFF1F0' },
+            }
+            : record.status == 2
+              ? { style: { background: '#FFFBE6' } }
+              : {},
+        children: <p>{text}</p>,
+      }),
     },
     {
       title: 'Số điện thoại',
       dataIndex: 'phone',
       key: 'phone',
+      render: (text, record) => ({
+        props:
+          record.status == 0
+            ? {
+              style: { background: '#FFF1F0' },
+            }
+            : record.status == 2
+            ? { style: { background: '#FFFBE6' } }
+            : {},
+        children: <p>{text}</p>,
+      }),
     },
+
     {
       title: 'Actions',
       render(text, record) {
@@ -33,8 +78,10 @@ const Result = ({ items, handleDelete, handleChangeActive }) => {
           props:
             record.status == 0
               ? {
-                style: { background: '#f70707' },
+                style: { background: '#FFF1F0' },
               }
+              : record.status == 2
+              ? { style: { background: '#FFFBE6' } }
               : {},
           children:
             record.status == 0 ? (
@@ -45,7 +92,7 @@ const Result = ({ items, handleDelete, handleChangeActive }) => {
                   onChange={status => handleChangeActive(record, status)}
                   checkedChildren="Active"
                   unCheckedChildren="Unlock"
-                  checked={record.status == 1?true:false}
+                  checked={record.status == 1}
                 />
                 <Button
                   onClick={() => handleDelete(record)}

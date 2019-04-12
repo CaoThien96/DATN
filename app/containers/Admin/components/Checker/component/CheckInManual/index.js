@@ -24,10 +24,10 @@ class CheckInManual extends Component {
   };
 
   render() {
-    const { checkInManual,onCheckInManualSuccess } = this.props;
+    const { checkInManual,onCheckInManualSuccess,onCloseCheckInManual } = this.props;
     return (
       <div>
-        <Modal title="Giám sát thủ công" visible={checkInManual} footer={null}>
+        <Modal onCancel={onCloseCheckInManual} title="Giám sát thủ công" visible={checkInManual} footer={null}>
           <StepFormWrapper onCheckInSuccess={this.onCheckInSuccess}/>
         </Modal>
       </div>

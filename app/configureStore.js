@@ -4,17 +4,28 @@
 
 import { createStore, applyMiddleware, compose } from 'redux';
 import { fromJS } from 'immutable';
+import createSocketIoMiddleware from 'redux-socket.io';
+import io from 'socket.io-client';
 import { routerMiddleware } from 'connected-react-router/immutable';
 import createSagaMiddleware from 'redux-saga';
 import createReducer from './reducers';
-
+const socket = io(window.location.origin, {
+  query: {
+    token: localStorage.getItem('token'),
+  },
+});
+const socketIoMiddleware = createSocketIoMiddleware(socket, 'server/');
 const sagaMiddleware = createSagaMiddleware();
 
 export default function configureStore(initialState = {}, history) {
   // Create the store with two middlewares
   // 1. sagaMiddleware: Makes redux-sagas work
   // 2. routerMiddleware: Syncs the location/URL path to the state
-  const middlewares = [sagaMiddleware, routerMiddleware(history)];
+  const middlewares = [
+    sagaMiddleware,
+    routerMiddleware(history),
+    socketIoMiddleware,
+  ];
 
   const enhancers = [applyMiddleware(...middlewares)];
 
@@ -38,7 +49,7 @@ export default function configureStore(initialState = {}, history) {
   store.runSaga = sagaMiddleware.run;
   store.injectedReducers = {}; // Reducer registry
   store.injectedSagas = {}; // Saga registry
-
+  store.dispatch({ type: 'server/hello', data: 'Hello!' });
   // Make reducers hot reloadable, see http://mxs.is/googmo
   /* istanbul ignore next */
   if (module.hot) {

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { database } from 'containers/commons/firebase';
 import { Can } from '@casl/react';
-import CanWrapper  from './Can';
 
 import { AbilityBuilder } from '@casl/ability';
 import Button from 'antd/es/button/button';
@@ -11,9 +10,15 @@ import WrapperFormSearch from 'components/WrappedAdvancedSearchForm';
 import Row from 'antd/es/grid/row';
 import Col from 'antd/es/grid/col';
 import request from 'utils/request';
+import { createStructuredSelector } from 'reselect';
+import connect from 'react-redux/es/connect/connect';
+import { withRouter } from 'react-router-dom';
+import { compose } from 'redux';
 import FromNew from './Form/New';
 import FormSearch from './Search/Form';
 import Result from './Search/Result';
+import { makeSelectCurrentUser } from '../../../App/selectors';
+import CanWrapper from './Can';
 class RequestManagement extends Component {
   constructor(props) {
     super(props);
@@ -25,21 +30,17 @@ class RequestManagement extends Component {
 
   componentWillMount() {
     request('/api/request').then(data => {
-
       this.setState({ resultSearch: data.payload });
     });
   }
 
   componentDidMount() {
-    database.ref('/').on('value', snapshot => {
-
-    });
+    database.ref('/').on('value', snapshot => {});
   }
 
   onNewSuccess = () => {
     this.setState({ visible: false });
     request('/api/request').then(data => {
-
       this.setState({ resultSearch: data.payload });
     });
   };
@@ -47,11 +48,11 @@ class RequestManagement extends Component {
   handleSearch = value => {
     try {
       const json = JSON.stringify(value);
-      const apiUrl = `/api/employee?value=${json}`;
+      const apiUrl = `/api/request?value=${json}`;
       request(apiUrl)
         .then(data => {
-
-          this.setState({ resultSearch: data });
+          console.log(data);
+          this.setState({ resultSearch: data.payload });
         })
         .catch(err => alert(err));
     } catch (e) {
@@ -64,14 +65,12 @@ class RequestManagement extends Component {
   };
 
   handleOk = e => {
-
     this.setState({
       visible: false,
     });
   };
 
   handleCancel = e => {
-
     this.setState({
       visible: false,
     });
@@ -106,7 +105,7 @@ class RequestManagement extends Component {
         if (el.iid == item.iid) {
           return {
             ...item,
-            status: tmp,
+            status
           };
         }
         return el;
@@ -119,12 +118,10 @@ class RequestManagement extends Component {
   };
 
   render() {
-    const user = {
-      role: 1000,
-    };
+
     return (
       <div>
-        <CanWrapper I="create" a="Request" user={user}>
+        <CanWrapper I="create" a="Request" user={this.props.currentUser}>
           <Modal
             title="New Request"
             visible={this.state.visible}
@@ -149,6 +146,7 @@ class RequestManagement extends Component {
           items={this.state.resultSearch}
           handleDelete={this.handleDelete}
           handleChangeActive={this.handleChangeActive}
+          user={this.props.currentUser}
         />
       </div>
     );
@@ -157,5 +155,9 @@ class RequestManagement extends Component {
 
 RequestManagement.defaultProps = {};
 RequestManagement.propTypes = {};
-
-export default RequestManagement;
+const mapStateToProps = createStructuredSelector({
+  currentUser: makeSelectCurrentUser(),
+});
+const withConnect = connect(mapStateToProps);
+export default withRouter(compose(withConnect)(RequestManagement));
+// export default RequestManagement;

@@ -75,8 +75,11 @@ class New extends Component {
           <Form.Item>
             {getFieldDecorator('title', {
               rules: [{ required: true, message: 'Please input title!' }],
+              valuePropName: 'value',
+              initialValue: 'Đơn xin nghỉ làm',
             })(
               <Input
+                disabled
                 prefix={
                   <Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />
                 }
@@ -86,8 +89,8 @@ class New extends Component {
           </Form.Item>
           <Form.Item>
             {getFieldDecorator('descriptions', {
-              rules: [{ required: true, message: 'Please input description!' }],
-            })(<TextArea placeholder="Enter descriptions" rows={4} />)}
+              rules: [{ required: true, message: 'Please input reason!' }],
+            })(<TextArea placeholder="Enter reason" rows={4} />)}
           </Form.Item>
           <Form.Item label="Chọn loại yêu cầu" hasFeedback>
             {getFieldDecorator('select', {

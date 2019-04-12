@@ -1,19 +1,23 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { database } from 'containers/commons/firebase';
-import { Can } from '@casl/react';
-import CanWrapper  from './Can';
-
-import { AbilityBuilder } from '@casl/ability';
+import injectReducer from 'utils/injectReducer';
 import Button from 'antd/es/button/button';
 import Modal from 'antd/es/modal/Modal';
 import WrapperFormSearch from 'components/WrappedAdvancedSearchForm';
 import Row from 'antd/es/grid/row';
 import Col from 'antd/es/grid/col';
 import request from 'utils/request';
+import { withRouter } from 'react-router-dom';
+import { compose } from 'redux';
+import CanWrapper from './Can';
 import FromNew from './Form/New';
 import FormSearch from './Search/Form';
 import Result from './Search/Result';
+import { createStructuredSelector } from 'reselect';
+import { makeSelectCurrentUser } from '../../../App/selectors';
+import connect from 'react-redux/es/connect/connect';
+import { Form } from 'antd';
 class RequestManagement extends Component {
   constructor(props) {
     super(props);
@@ -25,14 +29,12 @@ class RequestManagement extends Component {
 
   componentWillMount() {
     request('/api/notification').then(data => {
-
       this.setState({ resultSearch: data.payload });
     });
   }
 
   componentDidMount() {
-    database.ref('/').on('value', snapshot => {
-    });
+    database.ref('/').on('value', snapshot => {});
   }
 
   onNewSuccess = () => {
@@ -45,10 +47,10 @@ class RequestManagement extends Component {
   handleSearch = value => {
     try {
       const json = JSON.stringify(value);
-      const apiUrl = `/api/employee?value=${json}`;
+      const apiUrl = `/api/notification?value=${json}`;
       request(apiUrl)
         .then(data => {
-          this.setState({ resultSearch: data });
+          this.setState({ resultSearch: data.payload });
         })
         .catch(err => alert(err));
     } catch (e) {
@@ -118,7 +120,7 @@ class RequestManagement extends Component {
     };
     return (
       <div>
-        <CanWrapper I="create" a="Request" user={user}>
+        <CanWrapper I="create" a="Notification" user={this.props.currentUser}>
           <Modal
             width={1200}
             title="Tạo thông báo"
@@ -152,5 +154,10 @@ class RequestManagement extends Component {
 
 RequestManagement.defaultProps = {};
 RequestManagement.propTypes = {};
+const mapStateToProps = createStructuredSelector({
+  currentUser: makeSelectCurrentUser(),
+});
 
-export default RequestManagement;
+const withConnect = connect(mapStateToProps);
+
+export default withRouter(compose(withConnect)(RequestManagement));

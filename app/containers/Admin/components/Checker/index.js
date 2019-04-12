@@ -7,6 +7,11 @@ import Divider from 'antd/es/divider';
 import Camera from './component/Camera';
 import Result from './component/Result';
 import CheckInManual from './component/CheckInManual/index';
+import injectReducer from '../../../../utils/injectReducer';
+import reducer from './reducer';
+import { withRouter } from 'react-router-dom';
+import { compose } from 'redux';
+import Button from 'antd/es/button/button';
 
 class LayoutChecker extends Component {
   constructor(props) {
@@ -29,31 +34,42 @@ class LayoutChecker extends Component {
       checkInManual: false,
     })
   }
+  onOpenCheckInManual = ()=>{
+    this.setState({
+      checkInManual: true,
+    })
+  }
+  onCloseCheckInManual = ()=>{
+    this.setState({
+      checkInManual: false,
+    })
+  }
   render() {
     const { listCheckIn, checkInManual } = this.state;
-    return checkInManual ? (
-      <CheckInManual checkInManual={checkInManual} onCheckInManualSuccess={this.onCheckInManualSuccess} />
-    ) : (
-      <Row>
-        <Col
-          style={{ borderRight: '1px solid', height: '-webkit-fill-available' }}
-          span={13}
-        >
-          <h2 className="text-center">Camera</h2>
-          <Divider />
-          <Camera />
-        </Col>
-        <Col style={{ height: '-webkit-fill-available' }} span={11}>
-          <h2 className="text-center">Thông tin giám sát ngày 4/3/2019</h2>
-          <Divider />
-          <Result listCheckIn={listCheckIn} />
-        </Col>
-      </Row>
-    );
+    return <Row>
+      <CheckInManual onCloseCheckInManual={this.onCloseCheckInManual} checkInManual={checkInManual} onCheckInManualSuccess={this.onCheckInManualSuccess} />
+      <Col
+        style={{ borderRight: '1px solid', height: '-webkit-fill-available' }}
+        span={13}
+      >
+        <h2 className="text-center">Camera</h2>
+        <Divider />
+        <div>
+          <Button onClick={this.onOpenCheckInManual}>CheckInManual</Button>
+        </div>
+        <Camera />
+
+      </Col>
+      <Col style={{ height: '-webkit-fill-available' }} span={11}>
+        <h2 className="text-center">Thông tin giám sát ngày 4/3/2019</h2>
+        <Divider />
+        <Result listCheckIn={listCheckIn} />
+      </Col>
+    </Row>;
   }
 }
 
 LayoutChecker.defaultProps = {};
 LayoutChecker.propTypes = {};
-
-export default LayoutChecker;
+const withReducer = injectReducer({ key: 'checker', reducer });
+export default withRouter(compose(withReducer)(LayoutChecker));

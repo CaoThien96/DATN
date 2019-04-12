@@ -33,10 +33,17 @@ class NormalLoginForm extends Component {
           },
         })
           .then(res => {
-            localStorage.setItem('token', res.token);
-            history.replace('/admin')
+            if(res.success){
+              localStorage.setItem('token', res.token);
+              history.replace('/admin')
+            }else{
+              this.setState({err:res.err})
+            }
           })
-          .catch(err => {});
+          .catch(err => {
+            console.log({err})
+            console.log(err.toString() )
+          });
       }
     });
   };
@@ -80,14 +87,23 @@ class NormalLoginForm extends Component {
           {this.state.error && (
             <Error>Username or password not correct!!</Error>
           )}
-          <FormItem>
-            {getFieldDecorator('remember', {
-              valuePropName: 'checked',
-              initialValue: true,
-            })(<Checkbox>Remember me</Checkbox>)}
-            <a className="login-form-forgot" href="">
-              Forgot password
-            </a>
+          {/*<FormItem>*/}
+            {/*{getFieldDecorator('remember', {*/}
+              {/*valuePropName: 'checked',*/}
+              {/*initialValue: true,*/}
+            {/*})(<Checkbox>Remember me</Checkbox>)}*/}
+            {/*<a className="login-form-forgot" href="">*/}
+              {/*Forgot password*/}
+            {/*</a>*/}
+          {/*</FormItem>*/}
+          <div>
+            {
+              this.state.err?(
+                <div style={{color:'red'}}>
+                  {this.state.err}
+                </div>
+              ):null
+            }
             <Button
               type="primary"
               htmlType="submit"
@@ -95,8 +111,8 @@ class NormalLoginForm extends Component {
             >
               Log in
             </Button>
-            <Link to="/sign-up">Or register now!</Link>
-          </FormItem>
+            {/*<Link to="/sign-up">Or register now!</Link>*/}
+          </div>
         </Form>
       </div>
     );

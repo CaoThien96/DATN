@@ -2,19 +2,18 @@ import React from 'react';
 import {
   Checker,
   Dashboard,
+  DashboardEmployee,
   EmployeeLayout,
-  Employee,
-  EmployeeTraining,
-  Manager,
   Attendance,
   RequestLayoutManagement,
   NotificationLayoutManagement,
   Configuration,
-  Test
+  Test,
+  ConfigurationModel,
+  Information,
 } from 'routes/loadModule';
 // import subRoutes from 'containers/Admin/Routes';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
-import Employ from 'containers/Admin/components/Employee/index';
 import Icon from 'antd/es/icon';
 // import Auth from 'containers/Auth';
 const routes = [
@@ -23,6 +22,14 @@ const routes = [
     key: 'admin-dashboard',
     exact: true,
     component: Dashboard,
+    label: 'Dashboard',
+    icon: <Icon type="dashboard" />,
+  },
+  {
+    path: '/admin/dashboard-employee',
+    key: 'admin-dashboard-employee',
+    exact: true,
+    component: DashboardEmployee,
     label: 'Dashboard',
     icon: <Icon type="dashboard" />,
   },
@@ -79,6 +86,14 @@ const routes = [
     exact: true,
     component: Configuration,
     label: 'Configuration',
+    icon: <Icon type="setting" />,
+  },
+  {
+    path: '/admin/configuration-model',
+    key: 'admin-configuration-model',
+    exact: true,
+    component: ConfigurationModel,
+    label: 'Configuration Model',
     icon: <Icon type="setting" />,
   },
   {

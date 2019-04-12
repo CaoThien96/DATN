@@ -12,8 +12,12 @@ const RequestSchema = new Schema({
     type: String,
   },
   userIid: {},
+  /**
+   * Type 1 Don xin nghi viec
+   */
   type: {
     type: Number,
+    default:1
   },
   descriptions: {
     type: String,
@@ -27,9 +31,12 @@ const RequestSchema = new Schema({
       },
     },
   ],
+  u:{
+    type:Schema.Types.Mixed
+  },
   status: {
     type: Number,
-    default: 0,
+    default: 0,//0 la dang cho, 1 la chap nhan, 2 la khong chap nhan, 3 huy bo yeu cau
   },
 });
 RequestSchema.plugin(autoIncrement.plugin, {

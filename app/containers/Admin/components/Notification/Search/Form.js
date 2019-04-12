@@ -6,24 +6,15 @@ export default ({ getFieldDecorator }) => (
     <Row>
       <Col span={6}>
         <Form.Item>
-          {getFieldDecorator('iid')(
+          {getFieldDecorator('title')(
             <Input
               prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
-              placeholder="Tìm kiếm bằng mã nhân viên"
+              placeholder="Tìm kiếm tiêu đề"
             />,
           )}
         </Form.Item>
       </Col>
-      <Col span={6}>
-        <Form.Item>
-          {getFieldDecorator('email')(
-            <Input
-              prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
-              placeholder="enter email"
-            />,
-          )}
-        </Form.Item>
-      </Col>
+
       <Col span={12}>
         <Form.Item>
           {getFieldDecorator('status',{
@@ -31,9 +22,8 @@ export default ({ getFieldDecorator }) => (
           })(
             <Checkbox.Group style={{ width: "100%" }}>
               <Row>
-                <Col span={4}><Checkbox value={1}>Active</Checkbox></Col>
-                <Col span={4}><Checkbox value={2}>Block</Checkbox></Col>
-                <Col span={4}><Checkbox value={0}>Delete</Checkbox></Col>
+                <Col span={4}><Checkbox value={0}>Đã xóa</Checkbox></Col>
+                <Col span={8}><Checkbox value={1}>Đang hoạt động</Checkbox></Col>
               </Row>
             </Checkbox.Group>
           )}

@@ -24,12 +24,13 @@ export default function defineAbilitiesFor(user) {
           'admin-checker',
           'admin-configuration',
           'admin-test',
+          'admin-configuration-model',
         ],
         'Menu',
       );
     } else if (user.role === 1000) {
       // Nhan vien
-      can(['admin-notification', 'admin-request'], 'Menu');
+      can(['admin-notification', 'admin-request','admin-dashboard-employee'], 'Menu');
     } else if (user.role === 1002) {
       // Giam sat vien
       can(['admin-config', 'admin-checker'], 'Menu');

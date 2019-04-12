@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const moment = require('moment');
 const autoIncrement = require('../../configs/auto-increment');
 
 const { Schema } = mongoose;
@@ -9,7 +10,7 @@ const CheckInSchema = new Schema(
       type: Number,
     },
     date: {
-      type: Date,
+      type: Number,
     },
     status: {
       type: Number,
@@ -24,5 +25,37 @@ CheckInSchema.plugin(autoIncrement.plugin, {
   startAt: 1000,
   incrementBy: 1,
 });
-
+CheckInSchema.statics.searchCheckIn = function search(date = new Date(), cb) {
+  const y = date.getFullYear();
+  const m = date.getMonth();
+  const d = date.getDate();
+  console.log({ y, m, d });
+  const startTime = moment()
+    .year(y)
+    .month(m)
+    .date(d)
+    .hour(0)
+    .minute(0)
+    .second(0)
+    .valueOf();
+  const endTime = moment()
+    .year(y)
+    .month(m)
+    .date(d)
+    .hour(23)
+    .minute(0)
+    .second(0)
+    .valueOf();
+  return this.where('date')
+    .gte(startTime)
+    .lte(endTime)
+    .exec(cb);
+};
+CheckInSchema.statics.searchCheckInByRange = function search(start, end, cb) {
+  console.log({start,end})
+  return this.where('date')
+    .gte(start)
+    .lte(end)
+    .exec(cb);
+};
 module.exports = mongoose.model('CheckIn', CheckInSchema);

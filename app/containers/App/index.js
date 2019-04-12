@@ -22,15 +22,14 @@ import GlobalStyle from '../../global-styles';
 import { makeSelectShowLoading } from './selectors';
 // import { mapDispatchToProps } from '../HomePage';
 import injectReducer from '../../utils/injectReducer';
-import reducer from '../HomePage/reducer';
-import { showLoading, hiddenLoading } from './actions';
-import { loadUserLogin } from './actions';
+import reducer from '../Admin/components/Notification/reducer';
+import { showLoading, hiddenLoading, loadUserLogin } from './actions';
 import injectSaga from '../../utils/injectSaga';
 import saga from './saga';
 const AppWrapper = styled.div`
   margin: 0 auto;
   display: flex;
-  min-height: 100%;
+  min-height: 757px;
   // padding: 0 16px;
   flex-direction: column;
 `;
@@ -41,7 +40,7 @@ const SpinWrapper = styled.div`
   margin-bottom: 20px;
   padding: 30px 50px;
   margin: 20px 0;
-  position: absolute;
+  position: fixed;
   z-index: 9999;
   height: 100%;
   width: 100%;
@@ -49,10 +48,11 @@ const SpinWrapper = styled.div`
 class Index extends Component {
   componentDidMount() {
     const token = localStorage.getItem('token');
-    if(token !== null){
+    if (token !== null) {
       this.props.getCurrentUser();
     }
   }
+
   render() {
     const { showLoading } = this.props;
     return (
@@ -69,7 +69,7 @@ class Index extends Component {
         {/* <Link to="/">Home</Link><br/> */}
         {/* <Link to="/y">Employee</Link><br/> */}
         {/* <Link to="/z">Checker</Link><br/> */}
-        {/*<Button onClick={this.props.onShowLoading}>Show loading</Button>*/}
+        {/* <Button onClick={this.props.onShowLoading}>Show loading</Button> */}
         {showLoading && (
           <SpinWrapper>
             <Button onClick={this.props.onHiddenLoading}>Hidden loading</Button>
@@ -98,11 +98,9 @@ const withConnect = connect(
   mapStateToProps,
   mapDispatchToProps,
 );
-const withReducer = injectReducer({ key: 'home', reducer });
 const withSaga = injectSaga({ key: 'home', saga });
 export default withRouter(
   compose(
-    withReducer,
     withSaga,
     withConnect,
   )(Index),

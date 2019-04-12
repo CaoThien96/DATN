@@ -25,7 +25,13 @@ class RequestDetail extends Component {
       this.setState({ requestDetail: data.payload });
     });
   }
-
+  handleGetDetail=()=>{
+    const { match } = this.props;
+    const id = match.params.id;
+    request(`/api/request/${id}`).then(data => {
+      this.setState({ requestDetail: data.payload });
+    });
+}
   handeSendComment = e => {
     e.preventDefault();
     const { match } = this.props;
@@ -48,6 +54,8 @@ class RequestDetail extends Component {
           },
         })
           .then(res => {
+            this.props.form.resetFields();
+            this.handleGetDetail();
             // this.handleReset();
             // this.props.onSuccess();
           })
@@ -71,19 +79,19 @@ class RequestDetail extends Component {
           <Col span={6}>
             Trạng thái xử lý:{' '}
             {requestDetail.status == 0
-              ? 'Đang chờ'
-              : requestDetail.status == 1
-                ? 'Đã chấp nhân'
-                : 'Không chấp nhận'}
+              ? 'Đang chờ':
+              requestDetail.status==1? 'Chấp nhận':requestDetail.status==2?'Không chấp nhận':'Hủy bỏ'}
           </Col>
-          <Col span={6}>
-            <Switch
-              // onChange={status => handleChangeActive(record, status)}
-              checkedChildren="Approve"
-              unCheckedChildren="Reject"
-              // checked={record.status == 1?true:false}
-            />
-          </Col>
+          {/*<Col span={6}>*/}
+            {/*{requestDetail.status == 1 || requestDetail.status == 2 ? (*/}
+              {/*<Switch*/}
+                {/*// onChange={status => handleChangeActive(record, status)}*/}
+                {/*checkedChildren="Approve"*/}
+                {/*unCheckedChildren="Reject"*/}
+                {/*checked={requestDetail.status == 1?true:false}*/}
+              {/*/>*/}
+            {/*) : null}*/}
+          {/*</Col>*/}
         </Row>
         <Divider />
         <Row>
