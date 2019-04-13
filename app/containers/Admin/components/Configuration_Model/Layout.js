@@ -3,7 +3,7 @@ import Button from 'antd/es/button/button';
 import request from 'utils/request';
 import Row from 'antd/es/grid/row';
 import Col from 'antd/es/grid/col';
-
+import message from 'antd/es/message';
 import { createStructuredSelector } from 'reselect';
 import connect from 'react-redux/es/connect/connect';
 import { withRouter } from 'react-router-dom';
@@ -151,9 +151,14 @@ class LayoutConfigurationModel extends Component {
     });
   };
 
-  componentWillMount() {
-    // this.startTraining();
-  }
+  handleSaveAndUpdate = async () => {
+    try {
+      await this.state.model.save('http://localhost:3000/api/ai/save');
+      message.success('Mô hình đã lưu và cập nhật');
+    } catch (e) {
+      message.error('Có lỗi khi lưu model');
+    }
+  };
 
   handleShowMatrixConfusionMatrix = async () => {
     const { xTestFull, yTestFull, model } = this.state;
@@ -187,48 +192,9 @@ class LayoutConfigurationModel extends Component {
     );
   };
 
-  startTraining = () => {
-    request('/api/ai', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then(
-      ({
-        labels,
-        trueLabels,
-        predictedLabels,
-        reportTraining,
-        reportDataTest,
-      }) => {
-        this.setState({
-          labels,
-          trueLabels,
-          predictedLabels,
-          reportTraining,
-          reportDataTest,
-        });
-      },
-    );
-  };
 
   showEvaluation = data => {};
 
-  onSaveModel = () => {
-    request('/api/ai/save', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }).then(data => {
-      if (data.success) {
-        alert(data.message);
-        this.props.onUpdateModel();
-      } else {
-        alert('co loi');
-      }
-    });
-  };
 
   render() {
     const {
@@ -237,16 +203,19 @@ class LayoutConfigurationModel extends Component {
       predictedLabels,
       reportTraining,
       reportDataTest,
+      model,
     } = this.state;
+    console.log({ model });
+    if (model == null) {
+      console.log('dasd');
+    }
     return (
       <div>
-        <Button onClick={this.startTraining}>Chạy đạo tạo mô hình ngay!</Button>
-        <Button onClick={this.onSaveModel}>Save and update model!</Button>
         <Button onClick={this.handleTrain} disabled={this.state.statusTraining}>
-          Show progress train
+          Start train
         </Button>
-        <Button onClick={this.handleTrain} disabled={this.state.statusTraining}>
-          Train and save model
+        <Button disabled={model == null} onClick={this.handleSaveAndUpdate}>
+          Save model
         </Button>
         <Button
           onClick={this.handleShowMatrixConfusionMatrix}

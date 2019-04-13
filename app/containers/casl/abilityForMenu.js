@@ -25,6 +25,8 @@ export default function defineAbilitiesFor(user) {
           'admin-configuration',
           'admin-test',
           'admin-configuration-model',
+          'admin-user',
+          'admin-user-change-password'
         ],
         'Menu',
       );

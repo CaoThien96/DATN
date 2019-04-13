@@ -10,9 +10,10 @@ import { createStructuredSelector } from 'reselect';
 import connect from 'react-redux/es/connect/connect';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
-import { makeSelectCurrentUser } from '../../App/selectors';
+import { makeSelectCurrentUser } from '../../../App/selectors';
 class FormChangePassWord extends Component {
   constructor(props) {
+    console.log('dasdasd')
     super(props);
     this.state = {
       err: false,
@@ -54,10 +55,6 @@ class FormChangePassWord extends Component {
 
   render() {
     const { getFieldDecorator } = this.props.form;
-    const formItemLayout = {
-      // labelCol: { span: 6 },
-      wrapperCol: { span: 12 },
-    };
     return (
       <div>
         <Form layout="vertical" onSubmit={this.submit} className="login-form">
@@ -93,6 +90,7 @@ class FormChangePassWord extends Component {
                 prefix={
                   <Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />
                 }
+                type="password"
                 placeholder="enter your new password"
               />,
             )}
