@@ -133,7 +133,7 @@ app.io = io.on('connection', async socket => {
           }
           return false;
         });
-        if (isUser) {
+        if (isUser == -1) {
           usersConnected.push(user);
         }
         console.log(`Danh sach nguoi dung da dang nhap`);
@@ -143,10 +143,14 @@ app.io = io.on('connection', async socket => {
       });
     }
   });
-  const check = 0;
+  socket.on('disconnect', function () {
+    console.log(`Socket disconnect ${socket.id}`)
+  });
   socket.on('action', async action => {
     if (action.type === 'server/hello') {
-      socket.emit('action', { type: 'message', data: 'good day!' });
+      socket.broadcast.emit('action', { type: 'message', data: 'good day!' });
+      // socket.broadcast.emit('broadcast', 'hello friends!');
+      // io.emit('action', { type: 'message2', data: 'good day!' });
     }
     if (action.type === 'server/boilerplate/Model/OnUpdateModel') {
       const modelSave = JSON.parse(fs.readFileSync(commonPath.model));

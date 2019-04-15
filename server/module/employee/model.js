@@ -51,30 +51,32 @@ UserSchema.pre('save', function(next) {
   /**
    * Tao phien giam sat cho nhan vien moi tao
    */
-  CheckIn.searchCheckIn(new Date(), (err, doc) => {
-    console.log({ err, doc });
-    if (err) {
-      console.log(err);
+  if(this.role === 1000){
+    CheckIn.searchCheckIn(new Date(), (err, doc) => {
+      console.log({ err, doc });
+      if (err) {
+        console.log(err);
+      } else {
+        const checkIn = doc[0];
+        const newCheckInDetail = [
+          {
+            user,
+            pid: checkIn.iid,
+          },
+        ];
+        CheckInDetail.insertMany(newCheckInDetail, (error, docs) => {
+          if (err) {
+            return next(err);
+          }
+          console.log({ docs });
+        });
+      }
+    });
+    if (user && user.role === 1000) {
+      user.status = 1;
     } else {
-      const checkIn = doc[0];
-      const newCheckInDetail = [
-        {
-          user,
-          pid: checkIn.iid,
-        },
-      ];
-      CheckInDetail.insertMany(newCheckInDetail, (error, docs) => {
-        if (err) {
-          return next(err);
-        }
-        console.log({ docs });
-      });
+      user.status = 0;
     }
-  });
-  if (user && user.role === 1000) {
-    user.status = 1;
-  } else {
-    user.status = 0;
   }
   if (this.isModified('password') || this.isNew) {
     bcrypt.genSalt(10, (err, salt) => {

@@ -19,11 +19,21 @@ const makeSelectShowLoading = () =>
   createSelector(selectGlobal, globalState => globalState.get('showLoading'));
 const makeSelectError = () =>
   createSelector(selectGlobal, globalState => globalState.get('error'));
-
+const makeSelectModel = () =>
+  createSelector(selectGlobal, globalState => globalState.get('model'));
+const makeSelectUsersOfModel = () =>
+  createSelector(selectGlobal, globalState => globalState.get('usersOfModel'));
+const makeSelectShouldUpdateModel = () =>
+  createSelector(selectGlobal, globalState =>
+    globalState.get('shouldUpdateModel'),
+  );
 export {
   selectGlobal,
   makeSelectCurrentUser,
   makeSelectShowLoading,
   makeSelectLoading,
   makeSelectError,
+  makeSelectModel,
+  makeSelectShouldUpdateModel,
+  makeSelectUsersOfModel
 };

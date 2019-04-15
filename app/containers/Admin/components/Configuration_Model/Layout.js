@@ -90,7 +90,7 @@ class LayoutConfigurationModel extends Component {
         });
         // const callbacks = tfvis.show.fitCallbacks(container, metrics);
         const history = await model.fit(xTrainFull, yTrainFull, {
-          epochs: 100,
+          epochs: 10,
           shuffle: true,
           callbacks: {
             onBatchEnd: (onBatch, logBatch) => {
@@ -219,7 +219,7 @@ class LayoutConfigurationModel extends Component {
         </Button>
         <Button
           onClick={this.handleShowMatrixConfusionMatrix}
-          disabled={this.state.statusTraining}
+          disabled={this.state.statusTraining||model == null}
         >
           ShowMatrixConfusionMatrix
         </Button>

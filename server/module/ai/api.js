@@ -1,5 +1,6 @@
 const routes = require('express').Router();
 const passport = require('passport');
+global.fetch = require('node-fetch');
 // const svm = require('node-svm');
 const jwt = require('jsonwebtoken');
 const tf = require('@tensorflow/tfjs');
@@ -9,6 +10,7 @@ const User = require('../employee/model');
 const config = require('../../configs/index');
 const commonPath = require('../../common/path');
 const commonControll = require('./common');
+
 async function training() {
   return new Promise(async (resolve, reject) => {
     User.find(
@@ -250,53 +252,10 @@ routes.get('/dataset', async (req, res) => {
   }
 });
 routes.post('/save', async (req, res) => {
-  // try {
-  //   const { dataTraining, dataTest } = await training();
-  //   const clf = new svm.SVM({
-  //     svmType: 'C_SVC',
-  //     gamma: 10,
-  //     c: 4, // allow you to evaluate several values during training
-  //     normalize: false,
-  //     reduce: false,
-  //     kFold: 1, // disable k-fold cross-validation
-  //     probability: true,
-  //   });
-  //   const labels = [];
-  //   const trueLabels = [];
-  //   const predictedLabels = [];
-  //   const accurancy = 0;
-  //   const f1Score = 0;
-  //   const recall = 0;
-  //   const precision = 0;
-  //   clf
-  //     .train(dataTraining)
-  //     .progress(progress => {
-  //       console.log('training progress: %d%', Math.round(progress * 100));
-  //     })
-  //     .spread((model, reportTraining) => {
-  //       try {
-  //         fs.writeFileSync(commonPath.model, JSON.stringify(model), 'utf8');
-  //         res.status(200).send({
-  //           success: true,
-  //           message: 'Luu thanh cong ',
-  //         });
-  //       } catch (error) {
-  //         console.log(error);
-  //         res.status(200).send({
-  //           success: false,
-  //           message: 'Co loi khi luu model',
-  //           err: error,
-  //         });
-  //       }
-  //     });
-  // } catch (e) {
-  //   console.log({ e });
-  //   res.status(200).send({
-  //     success: false,
-  //     message: 'Co loi khi luu model',
-  //     err: e,
-  //   });
-  // }
+  req.app.io.emit('action', {
+    type: 'boilerplate/App/Should_Update_Model',
+    payload: 'dasdasda',
+  });
   if (Object.keys(req.files).length == 0) {
     return res.status(400).send('No files were uploaded.');
   }

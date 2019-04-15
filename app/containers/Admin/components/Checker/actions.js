@@ -1,4 +1,9 @@
-import { ON_PREDICT, ON_PREDICT_RESULT,ON_UPDATE_LIST_CHECKIN} from './constans';
+import {
+  ON_PREDICT,
+  ON_PREDICT_RESULT,
+  ON_UPDATE_LIST_CHECKIN,
+  ON_UPDATE_MODEL,
+} from './constans';
 
 export function onPredict(payload) {
   return {
@@ -16,5 +21,11 @@ export function onUpdateListCheckIn(payload) {
   return {
     type: ON_UPDATE_LIST_CHECKIN,
     payload,
+  };
+}
+export function onUpdateModel(model) {
+  return {
+    type: ON_UPDATE_MODEL,
+    payload: model,
   };
 }

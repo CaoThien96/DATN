@@ -16,24 +16,15 @@ import Result from './component/Result';
 import CheckInManual from './component/CheckInManual/index';
 import injectReducer from '../../../../utils/injectReducer';
 import reducer from './reducer';
-import { makeSelectCurrentUser } from '../../../App/selectors';
-import {
-  makeSelectObject,
-  makeSelectPending,
-  makeSelectPredict,
-} from './seclectors';
+import { makeSelectCurrentUser, makeSelectModel,makeSelectShouldUpdateModel } from '../../../App/selectors';
+import { makeSelectObject, makeSelectPending } from './seclectors';
 import { onPredict, onPredictResult } from './actions';
+import {updateModel} from 'containers/App/actions'
+import * as lodash from 'lodash';
 class LayoutChecker extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      listCheckIn: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(el => ({
-        id: el,
-        user: {
-          fullName: 'Cao Van Thien',
-        },
-        time: `${new Date().getHours()}:${new Date().getMinutes()}:${new Date().getSeconds()} ${new Date().getDate()}-${new Date().getMonth()}-${new Date().getFullYear()}`,
-      })),
       checkInManual: false,
       model: false,
       users: [],
@@ -45,20 +36,33 @@ class LayoutChecker extends Component {
       const model = await tf.loadModel(
         'http://localhost:3000/model/model.json',
       );
+      console.log(model);
       const params = JSON.stringify({
         training: 1,
       });
       const users = await request(`/api/employee?value=${params}`);
       console.log({ users });
       this.setState({ model, users });
-
+      this.props.updateModel({model,users})
       message.success('Tải mô hình thành công');
     } catch (e) {
       console.log(e);
       message.error('Tải mô hình thất bại');
     }
   }
-
+  async componentWillReceiveProps(nextProps){
+    console.log({shouldUpdateModel:nextProps.shouldUpdateModel})
+    if(nextProps.shouldUpdateModel){
+      const model = await tf.loadModel(
+        'http://localhost:3000/model/model.json',
+      );
+      const params = JSON.stringify({
+        training: 1,
+      });
+      const users = await request(`/api/employee?value=${params}`);
+      this.props.updateModel({model,users})
+    }
+  }
   onSuccessFindObject = infor => {};
 
   onCheckInManualSuccess = () => {
@@ -82,13 +86,14 @@ class LayoutChecker extends Component {
   handleCheckInAutoSuccess = indices => {
     const userPredict = this.state.users[indices];
     console.log({ userPredict });
-    this.props.onPredict(userPredict)
+    this.props.onPredict(userPredict);
   };
 
   render() {
-    const { listCheckIn, checkInManual } = this.state;
+    const { checkInManual } = this.state;
+    console.log(this.props.model)
     const currentDate = new Date();
-    const stringDate= `${currentDate.getDate()}/${currentDate.getMonth()}/${currentDate.getFullYear()}`
+    const stringDate = `${currentDate.getDate()}/${currentDate.getMonth()}/${currentDate.getFullYear()}`;
     return (
       <Row>
         <CheckInManual
@@ -102,8 +107,10 @@ class LayoutChecker extends Component {
         >
           <h2 className="text-center">Camera</h2>
           <Divider />
-          <div className='text-center'>
-            <Button type={'danger'} onClick={this.onOpenCheckInManual}>{'Giám sát thủ công'}</Button>
+          <div className="text-center">
+            <Button type="danger" onClick={this.onOpenCheckInManual}>
+              Giám sát thủ công
+            </Button>
           </div>
           <Camera
             checkInManual={checkInManual}
@@ -115,7 +122,7 @@ class LayoutChecker extends Component {
         <Col style={{ height: '-webkit-fill-available' }} span={12}>
           <h2 className="text-center">Thông tin giám sát: {stringDate}</h2>
           <Divider />
-          <Result listCheckIn={listCheckIn} />
+          <Result />
         </Col>
       </Row>
     );
@@ -126,9 +133,12 @@ LayoutChecker.defaultProps = {};
 LayoutChecker.propTypes = {};
 const mapStateToProps = createStructuredSelector({
   currentUser: makeSelectCurrentUser(),
+  model: makeSelectModel(),
+  shouldUpdateModel: makeSelectShouldUpdateModel()
 });
 const mapDispatchToProps = dispatch => ({
   onPredict: payload => dispatch(onPredict(payload)),
+  updateModel: payload => dispatch(updateModel(payload)),
 });
 const withConnect = connect(
   mapStateToProps,

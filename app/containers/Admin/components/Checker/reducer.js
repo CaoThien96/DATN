@@ -4,6 +4,7 @@ import {
   ON_PREDICT_UNKNOWN,
   ON_UPDATE_LIST_CHECKIN,
   ON_PREDICT,
+  ON_UPDATE_MODEL
 } from './constans';
 export const initialState = fromJS({
   object: false,

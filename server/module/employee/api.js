@@ -97,7 +97,7 @@ routes.get('/:id/check-in-detail', async (req, res) => {
               err: 'Khong tim thay phien giam giat',
             });
           }
-          if(check_in_detail.status !== 0){
+          if (check_in_detail.status !== 0) {
             return res.send({
               success: false,
               err: 'Nhân viên đã điểm danh',
@@ -196,7 +196,7 @@ routes.put('/', async (req, res) => {
 });
 
 routes.post('/', async (req, res) => {
-  const { email, password, full_name, phone } = req.body;
+  const { email, password, full_name, phone, role } = req.body;
   const randomPass =
     Math.random()
       .toString(36)
@@ -209,6 +209,7 @@ routes.post('/', async (req, res) => {
   newUser.password = randomPass;
   newUser.full_name = full_name;
   newUser.phone = phone;
+  newUser.role = role;
   // Check email
   const check = await User.findOne({ email, status: { $ne: 0 } });
   if (check) {
