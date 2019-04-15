@@ -16,7 +16,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
+  Legend, Label,
 } from 'recharts';
 
 import ShowConfusion from './components/ShowConfusion';
@@ -30,6 +30,7 @@ class LayoutConfigurationModel extends Component {
     super(props);
     this.state = {
       statusTraining: false,
+      status:'un-train',// status: un-train, training, trained
       xTestFull: null,
       yTestFull: null,
       model: null,
@@ -46,6 +47,22 @@ class LayoutConfigurationModel extends Component {
 
   handleTrain = async () => {
     this.setState({ statusTraining: true });
+    if(this.state.status == 'trained'){
+      this.setState({
+        epoch: 0,
+        dataAcc:[
+          {
+            epoch: 0,
+            acc: 0,
+          }
+        ],
+        dataLoss: [
+
+        ],
+        model:null
+      })
+    }
+    this.setState({status:'training'})
     request('/api/ai/dataset').then(async data => {
       if (data.success) {
         let {
@@ -90,7 +107,7 @@ class LayoutConfigurationModel extends Component {
         });
         // const callbacks = tfvis.show.fitCallbacks(container, metrics);
         const history = await model.fit(xTrainFull, yTrainFull, {
-          epochs: 10,
+          epochs: 100,
           shuffle: true,
           callbacks: {
             onBatchEnd: (onBatch, logBatch) => {
@@ -133,20 +150,21 @@ class LayoutConfigurationModel extends Component {
           // callbacks,
         });
         this.setState({ model });
-        const yPredict = model.predict(xTestFull);
-        yPredict.print(true);
-        yPredict.argMax(1).print();
-        yTestFull.print(true);
-        console.log(history.history.loss[0]);
-        const testResult = model.evaluate(xTestFull, yTestFull);
-        const testAccPercent = testResult[1].dataSync()[0] * 100;
-        const finalValAccPercent = valAcc * 100;
-        console.log(
-          `Final validation accuracy: ${finalValAccPercent.toFixed(1)}%; ` +
-            `Final test accuracy: ${testAccPercent.toFixed(1)}%
-                `,
-        );
+        // const yPredict = model.predict(xTestFull);
+        // yPredict.print(true);
+        // yPredict.argMax(1).print();
+        // yTestFull.print(true);
+        // console.log(history.history.loss[0]);
+        // const testResult = model.evaluate(xTestFull, yTestFull);
+        // const testAccPercent = testResult[1].dataSync()[0] * 100;
+        // const finalValAccPercent = valAcc * 100;
+        // console.log(
+        //   `Final validation accuracy: ${finalValAccPercent.toFixed(1)}%; ` +
+        //     `Final test accuracy: ${testAccPercent.toFixed(1)}%
+        //         `,
+        // );
         this.setState({ statusTraining: false });
+        this.setState({status:'trained'})
       }
     });
   };
@@ -201,9 +219,9 @@ class LayoutConfigurationModel extends Component {
       labels,
       trueLabels,
       predictedLabels,
-      reportTraining,
       reportDataTest,
       model,
+      status,
     } = this.state;
     console.log({ model });
     if (model == null) {
@@ -212,16 +230,18 @@ class LayoutConfigurationModel extends Component {
     return (
       <div>
         <Button onClick={this.handleTrain} disabled={this.state.statusTraining}>
-          Start train
+          {
+            status == 'un-train' ? 'Bắt đầu huấn luyện' : status=='training'? 'Đang huấn luyện': 'Huấn luyện lại'
+          }
         </Button>
         <Button disabled={model == null} onClick={this.handleSaveAndUpdate}>
-          Save model
+          {'Lưu và cập nhật mô hình'}
         </Button>
         <Button
           onClick={this.handleShowMatrixConfusionMatrix}
           disabled={this.state.statusTraining||model == null}
         >
-          ShowMatrixConfusionMatrix
+          {'Hiển thị ma trận đánh giá'}
         </Button>
         <Progress
           strokeColor={{
@@ -244,8 +264,10 @@ class LayoutConfigurationModel extends Component {
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="epoch" />
-          <YAxis />
+          <XAxis dataKey="epoch">
+            <Label value="Kỷ nguyên" offset={0} position="insideBottom" />
+          </XAxis>
+          <YAxis label={{ value: 'Độ mất mát', angle: -90, position: 'insideLeft' }} />
           <Tooltip />
           <Legend />
           <Line type="monotone" dataKey="loss" stroke="#82ca9d" />
@@ -263,8 +285,10 @@ class LayoutConfigurationModel extends Component {
           }}
         >
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="epoch" />
-          <YAxis type="number" domain={[0, 1]} />
+          <XAxis dataKey="epoch">
+            <Label value="Kỷ nguyên" offset={0} position="insideBottom" />
+          </XAxis>
+          <YAxis label={{ value: 'Độ chính xác', angle: -90, position: 'insideLeft' }} type="number" domain={[0, 1]} />
           <Tooltip />
           <Legend />
           <Line type="monotone" dataKey="acc" stroke="#82ca9d" />

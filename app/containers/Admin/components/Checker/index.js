@@ -11,16 +11,21 @@ import Button from 'antd/es/button/button';
 import request from 'utils/request';
 import { createStructuredSelector } from 'reselect';
 import connect from 'react-redux/es/connect/connect';
+import { updateModel } from 'containers/App/actions';
+import * as lodash from 'lodash';
 import Camera from './component/Camera';
 import Result from './component/Result';
 import CheckInManual from './component/CheckInManual/index';
 import injectReducer from '../../../../utils/injectReducer';
 import reducer from './reducer';
-import { makeSelectCurrentUser, makeSelectModel,makeSelectShouldUpdateModel } from '../../../App/selectors';
+import {
+  makeSelectCurrentUser,
+  makeSelectModel,
+  makeSelectShouldUpdateModel,
+  makeSelectUsersOfModel,
+} from '../../../App/selectors';
 import { makeSelectObject, makeSelectPending } from './seclectors';
 import { onPredict, onPredictResult } from './actions';
-import {updateModel} from 'containers/App/actions'
-import * as lodash from 'lodash';
 class LayoutChecker extends Component {
   constructor(props) {
     super(props);
@@ -36,23 +41,21 @@ class LayoutChecker extends Component {
       const model = await tf.loadModel(
         'http://localhost:3000/model/model.json',
       );
-      console.log(model);
       const params = JSON.stringify({
         training: 1,
       });
       const users = await request(`/api/employee?value=${params}`);
-      console.log({ users });
       this.setState({ model, users });
-      this.props.updateModel({model,users})
+      this.props.updateModel({ model, users });
       message.success('Tải mô hình thành công');
     } catch (e) {
       console.log(e);
       message.error('Tải mô hình thất bại');
     }
   }
-  async componentWillReceiveProps(nextProps){
-    console.log({shouldUpdateModel:nextProps.shouldUpdateModel})
-    if(nextProps.shouldUpdateModel){
+
+  async componentWillReceiveProps(nextProps) {
+    if (nextProps.shouldUpdateModel) {
       const model = await tf.loadModel(
         'http://localhost:3000/model/model.json',
       );
@@ -60,9 +63,11 @@ class LayoutChecker extends Component {
         training: 1,
       });
       const users = await request(`/api/employee?value=${params}`);
-      this.props.updateModel({model,users})
+      console.log('Da cap nhat model')
+      this.props.updateModel({ model, users });
     }
   }
+
   onSuccessFindObject = infor => {};
 
   onCheckInManualSuccess = () => {
@@ -84,14 +89,19 @@ class LayoutChecker extends Component {
   };
 
   handleCheckInAutoSuccess = indices => {
-    const userPredict = this.state.users[indices];
-    console.log({ userPredict });
-    this.props.onPredict(userPredict);
+    if(this.props.usersOfModel){
+      // console.log(this.props.usersOfModel)
+      const userPredict = this.props.usersOfModel[indices];
+      console.log({ userPredict });
+      /**
+       * Gui event bao da tim thay mot doi tuong moi co xac suat okie! Va hay cap nhat trang thai checkin cho doi tuong nay di!!!
+       */
+      // this.props.onPredict(userPredict);
+    }
   };
 
   render() {
     const { checkInManual } = this.state;
-    console.log(this.props.model)
     const currentDate = new Date();
     const stringDate = `${currentDate.getDate()}/${currentDate.getMonth()}/${currentDate.getFullYear()}`;
     return (
@@ -114,7 +124,7 @@ class LayoutChecker extends Component {
           </div>
           <Camera
             checkInManual={checkInManual}
-            model={this.state.model}
+            model={this.props.model}
             handleCheckInAutoSuccess={this.handleCheckInAutoSuccess}
             handleOpenCheckInManually={this.onOpenCheckInManual}
           />
@@ -134,10 +144,12 @@ LayoutChecker.propTypes = {};
 const mapStateToProps = createStructuredSelector({
   currentUser: makeSelectCurrentUser(),
   model: makeSelectModel(),
-  shouldUpdateModel: makeSelectShouldUpdateModel()
+  shouldUpdateModel: makeSelectShouldUpdateModel(),
+  usersOfModel: makeSelectUsersOfModel(),
 });
 const mapDispatchToProps = dispatch => ({
   onPredict: payload => dispatch(onPredict(payload)),
+  updateModel: payload => dispatch(updateModel(payload)),
   updateModel: payload => dispatch(updateModel(payload)),
 });
 const withConnect = connect(

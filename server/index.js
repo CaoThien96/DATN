@@ -154,7 +154,7 @@ app.io = io.on('connection', async socket => {
     }
     if (action.type === 'server/boilerplate/Model/OnUpdateModel') {
       const modelSave = JSON.parse(fs.readFileSync(commonPath.model));
-      app.newClf = svm.restore(modelSave);
+      // app.newClf = svm.restore(modelSave);
       socket.emit('action', { type: 'message', data: 'good day!' });
     }
     /**
@@ -175,7 +175,7 @@ app.io = io.on('connection', async socket => {
     if (action.type === 'server/boilerplate/Checker/OnPredict') {
       const userPredict = action.payload;
       CheckIn.searchCheckIn(new Date(), (err, doc) => {
-        console.log({ err, doc });
+        // console.log({ err, doc });
         if (err) {
           console.log(err);
         } else {

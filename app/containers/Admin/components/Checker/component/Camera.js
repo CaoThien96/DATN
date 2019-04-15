@@ -75,7 +75,7 @@ class CameraWrapper extends Component {
 
     if (result) {
       const alignedRect = result.alignedRect;
-      console.log({pendding:this.pendding,checkInManual:this.props.checkInManual})
+      // console.log({pendding:this.pendding,checkInManual:this.props.checkInManual})
       if (!this.pendding && !this.props.checkInManual) {
         this.pendding = true;
         this.onRecognition(result);
@@ -92,16 +92,14 @@ class CameraWrapper extends Component {
 
   onRecognition(result) {
     const descriptor = result.descriptor;
-    console.log(descriptor);
-    this.props.model.summary();
+    // this.props.model.summary();
     const tfDescriptor = tf.tensor2d(result.descriptor, [1, 128]);
     const yPredict = this.props.model.predict(tfDescriptor);
     let { values, indices } = tf.topk(yPredict);
-    console.log({ values, indices });
     values = values.as1D().dataSync();
     indices = indices.as1D().dataSync();
-    console.log(values);
-    console.log(indices);
+    // console.log(values);
+    // console.log(indices);
 
     if (values < 0.75) {
       // alert(`Không tim thay đối tượng`);
