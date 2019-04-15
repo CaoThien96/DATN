@@ -21,7 +21,8 @@ import {
   LOAD_USER_LOGIN_FAIL,
   SHOW_LOADING,
   HIDDEN_LOADING,
-  REMOVE_USER
+  REMOVE_USER,
+  UPDATE_MODEL
 } from './constants';
 
 /**
@@ -69,4 +70,11 @@ export function hiddenLoading() {
   return {
     type: HIDDEN_LOADING,
   };
+}
+
+export function updateModel(payload) {
+  return {
+    type:UPDATE_MODEL,
+    payload
+  }
 }

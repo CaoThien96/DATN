@@ -1,6 +1,8 @@
 const routes = require('express').Router();
 const lodash = require('lodash');
 const User = require('./model');
+const CheckIn = require('../checkin/model');
+const CheckInDetail = require('../checkin/model/check_in_detail');
 const mail = require('../../configs/mail');
 routes.get('/', async (req, res) => {
   try {
@@ -11,13 +13,18 @@ routes.get('/', async (req, res) => {
       const status = query.status;
       const iid = parseInt(query.iid);
       const email = query.email;
+      const training = query.training;
+      console.log(req.query);
       if (iid) {
         condition = { ...condition, iid };
       }
       if (email) {
         condition = { ...condition, email: { $regex: email, $options: 'i' } };
       }
-      if (status.length) {
+      if (training) {
+        condition = { ...condition, training: { $exists: true }, status: 1 };
+      }
+      if (status && status.length) {
         let or = [];
         for (let i = 0; i < status.length; i++) {
           or = [...or, { status: status[i] }];
@@ -25,7 +32,7 @@ routes.get('/', async (req, res) => {
         condition = { ...condition, $or: or };
       }
     }
-
+    console.log({ condition });
     const allUser = await User.find(condition);
     res.send(allUser);
   } catch (e) {
@@ -55,6 +62,58 @@ routes.get('/:id', async (req, res) => {
       success: false,
     });
   }
+});
+/**
+ * Get check in detail of employee
+ */
+routes.get('/:id/check-in-detail', async (req, res) => {
+  const iid = parseInt(req.params.id);
+  const user = await User.findOne({ iid });
+  if (user === null) {
+    return res.send({
+      success: false,
+      err: 'Không tìm thấy nhân viên',
+    });
+  }
+  CheckIn.searchCheckIn(new Date(), (err, doc) => {
+    console.log({ err, doc });
+    if (err) {
+      console.log(err);
+      res.status(500).send(err);
+    } else {
+      const checkIn = doc[0];
+      CheckInDetail.findOne(
+        { pid: checkIn.iid, 'user.iid': iid },
+        (err, check_in_detail) => {
+          if (err) {
+            return res.send({
+              success: false,
+              err,
+            });
+          }
+          if (check_in_detail === null) {
+            return res.send({
+              success: false,
+              err: 'Khong tim thay phien giam giat',
+            });
+          }
+          if (check_in_detail.status !== 0) {
+            return res.send({
+              success: false,
+              err: 'Nhân viên đã điểm danh',
+            });
+          }
+          return res.send({
+            success: true,
+            payload: {
+              user,
+              check_in_detail,
+            },
+          });
+        },
+      );
+    }
+  });
 });
 routes.put('/:id', async (req, res) => {
   // res.status(200).send('oke');
@@ -137,7 +196,7 @@ routes.put('/', async (req, res) => {
 });
 
 routes.post('/', async (req, res) => {
-  const { email, password, full_name, phone } = req.body;
+  const { email, password, full_name, phone, role } = req.body;
   const randomPass =
     Math.random()
       .toString(36)
@@ -150,6 +209,7 @@ routes.post('/', async (req, res) => {
   newUser.password = randomPass;
   newUser.full_name = full_name;
   newUser.phone = phone;
+  newUser.role = role;
   // Check email
   const check = await User.findOne({ email, status: { $ne: 0 } });
   if (check) {

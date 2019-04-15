@@ -97,6 +97,7 @@
     "moment": "^2.24.0",
     "mongoose": "^5.4.3",
     "mongoose-auto-increment": "^5.0.1",
+    "node-fetch": "^2.3.0",
     "node-svm": "^2.1.9",
     "nodemailer": "^6.1.0",
     "nodemon": "^1.18.9",
@@ -133,6 +134,7 @@
     "socket.io-client": "^2.2.0",
     "stringify-object": "^3.3.0",
     "styled-components": "4.0.2",
+    "tfjs-node-save": "0.0.2",
     "warning": "4.0.2"
   },
   "devDependencies": {

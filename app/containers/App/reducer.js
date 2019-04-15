@@ -19,6 +19,8 @@ import {
   SHOW_LOADING,
   HIDDEN_LOADING,
   REMOVE_USER,
+  UPDATE_MODEL,
+  SHOULD_UPDATE_MODEL
 } from './constants';
 
 // The initial state of the App
@@ -26,7 +28,10 @@ const initialState = fromJS({
   loading: false,
   showLoading: false,
   error: false,
+  model: false,
+  usersOfModel:false,
   currentUser: false,
+  shouldUpdateModel: false
 });
 
 function appReducer(state = initialState, action) {
@@ -43,6 +48,10 @@ function appReducer(state = initialState, action) {
       return state.set('error', action.error).set('loading', false);
     case REMOVE_USER:
       return state.set('currentUser', false);
+    case SHOULD_UPDATE_MODEL:
+      return state.set('shouldUpdateModel', true);
+    case UPDATE_MODEL:
+      return state.set('model', action.payload.model).set('usersOfModel',action.payload.users).set('shouldUpdateModel',false);
     default:
       return state;
   }

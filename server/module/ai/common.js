@@ -1,5 +1,7 @@
 const fs = require('fs');
+const path = require('path')
 const tf = require('@tensorflow/tfjs');
+require('tfjs-node-save');
 module.exports.getDataSetTfModel = (numberClass, users) => {
   users = users.slice(0, numberClass);
   let xTrainFull = [];
@@ -69,4 +71,66 @@ module.exports.getModel = numberClass => {
     metrics: ['accuracy'],
   });
   return model;
+};
+
+module.exports.saveModel = async model => {
+  const pathSave= path.resolve(__dirname, '../../../public/model2')
+  try {
+    await model.save(`file://${pathSave}`);
+    return true;
+  } catch (e) {
+    return e;
+  }
+};
+module.exports.trainModel = async ({
+  xTrainFull,
+  yTrainFull,
+  xTestFull,
+  yTestFull,
+  numberClass,
+}) => {
+  const model = this.getModel(numberClass);
+  const history = await model.fit(xTrainFull, yTrainFull, {
+    epochs: 100,
+    // validationData: [xTestFull, yTestFull],
+    // validationSplit:0.4,
+    shuffle: true,
+    callbacks: {
+      onBatchEnd: (onBatch, x) => {
+        // console.log(onBatch)
+      },
+      onEpochEnd: async (epoch, logs) => {
+        console.log(logs);
+        valAcc = logs.val_acc;
+        // console.log(`Epoch ${epoch} Accuracy:${valAcc}`)
+        if (logs.acc * 100 > 99) {
+          model.stopTraining = true;
+        } else {
+          await tf.nextFrame();
+        }
+        // await tf.nextFrame();
+      },
+    },
+  });
+  console.log(history);
+  return model;
+  // const yPredict = model.predict(xTestFull);
+  // yPredict.print(true);
+  // yPredict.argMax(1).print();
+  // yTestFull.print(true);
+  // console.log(history.history.loss[0]);
+  // const testResult = model.evaluate(xTestFull, yTestFull);
+  // const testAccPercent = testResult[1].dataSync()[0] * 100;
+  // const finalValAccPercent = valAcc * 100;
+  // console.log(
+  //   `Final validation accuracy: ${finalValAccPercent.toFixed(1)}%; ` +
+  //     `Final test accuracy: ${testAccPercent.toFixed(1)}%
+  //         `,
+  // );
+  // const out = tf.math.confusionMatrix(
+  //   yTestFull.argMax(1),
+  //   yPredict.argMax(1),
+  //   numberClass,
+  // );
+  // out.print();
 };

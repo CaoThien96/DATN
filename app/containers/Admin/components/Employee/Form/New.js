@@ -126,7 +126,7 @@ class New extends Component {
             })(
               <Radio.Group defaultValue="a" buttonStyle="solid">
                 <Radio value={1001}>Nhân Viên</Radio>
-                {/*<Radio value={1002}>Giám Sát Viên</Radio>*/}
+                <Radio value={1002}>Giám Sát Viên</Radio>
               </Radio.Group>,
             )}
           </Form.Item>

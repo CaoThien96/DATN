@@ -22,3 +22,7 @@ export const REMOVE_USER = 'boilerplate/App/REMOVE_USER';
 
 export const SHOW_LOADING = 'boilerplate/App/SHOW_LOADING';
 export const HIDDEN_LOADING = 'boilerplate/App/HIDDEN_LOADING';
+
+export const UPDATE_MODEL = 'boilerplate/App/Update_Model';
+export const SHOULD_UPDATE_MODEL = 'boilerplate/App/Should_Update_Model';
+
