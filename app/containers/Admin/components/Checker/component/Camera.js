@@ -35,6 +35,8 @@ class CameraWrapper extends Component {
     this.videoTag = React.createRef();
     this.imageTag = React.createRef();
     this.canvasRef = React.createRef();
+    this.pendding = false;
+    this.miss = 0;
     this.state = {
       object: false,
       pending: 0,
@@ -73,8 +75,11 @@ class CameraWrapper extends Component {
 
     if (result) {
       const alignedRect = result.alignedRect;
-      if (!this.props.pending) {
+      console.log({pendding:this.pendding,checkInManual:this.props.checkInManual})
+      if (!this.pendding && !this.props.checkInManual) {
+        this.pendding = true;
         this.onRecognition(result);
+
       }
       drawDetections(this.imageTag.current, this.canvasRef.current, [
         alignedRect,
@@ -86,7 +91,36 @@ class CameraWrapper extends Component {
   };
 
   onRecognition(result) {
-    this.props.onPredict(result.descriptor);
+    const descriptor = result.descriptor;
+    console.log(descriptor);
+    this.props.model.summary();
+    const tfDescriptor = tf.tensor2d(result.descriptor, [1, 128]);
+    const yPredict = this.props.model.predict(tfDescriptor);
+    let { values, indices } = tf.topk(yPredict);
+    console.log({ values, indices });
+    values = values.as1D().dataSync();
+    indices = indices.as1D().dataSync();
+    console.log(values);
+    console.log(indices);
+
+    if (values < 0.75) {
+      // alert(`Không tim thay đối tượng`);
+      // this.pendding = false;
+      this.miss = this.miss+1;
+      if(this.miss>2){
+        this.props.handleOpenCheckInManually();
+        this.pendding = false
+      }else{
+        console.log('thu lai')
+        this.pendding = false
+      }
+
+
+    } else {
+      // alert(`Tim thay doi tuong ${indices} voi probability ${values}`);
+      this.props.handleCheckInAutoSuccess(indices);
+      this.pendding = false;
+    }
   }
 
   onStop = () => {

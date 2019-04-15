@@ -6,14 +6,14 @@ import Button from 'antd/es/button/button';
 import List from 'antd/es/list';
 import Avatar from 'antd/es/avatar';
 import request from 'utils/request';
-import FormSearch from './FormSearch';
-import FormCheckIn from './FormCheckIn';
 import { createStructuredSelector } from 'reselect';
-import { makeSelectCurrentUser } from '../../../../../App/selectors';
-import { onUpdateListCheckIn } from '../../actions';
 import connect from 'react-redux/es/connect/connect';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
+import FormSearch from './FormSearch';
+import FormCheckIn from './FormCheckIn';
+import { makeSelectCurrentUser } from '../../../../../App/selectors';
+import { onUpdateListCheckIn } from '../../actions';
 
 const Error = styled.div`
   text-align: center;
@@ -38,6 +38,7 @@ class StepFormWrapper extends Component {
       message: false,
       user: null,
       statusCheckIn: 1,
+      check_in_detail: false,
     };
   }
 
@@ -47,8 +48,18 @@ class StepFormWrapper extends Component {
     });
   };
 
-  onSearchSuccess = user => {
-    this.setState({ user });
+  onSearchSuccess = data => {
+    if (data.success) {
+      this.setState({
+        user: data.payload.user,
+        check_in_detail: data.payload.check_in_detail,
+        error: false,
+        message: false,
+      });
+    } else {
+      // this.setState({ message: data.err, error: true });
+      this.onError(data.err);
+    }
   };
 
   onError = message => {
@@ -59,11 +70,11 @@ class StepFormWrapper extends Component {
   };
 
   onNext = () => {
-    if (this.state.user != null) {
+    if (this.state.user != null && !this.state.error) {
       const step = this.state.step + 1;
       this.setState({ step });
     } else {
-      this.onError('Chua co nhan vien');
+      this.onError(this.state.message);
     }
   };
 
@@ -86,8 +97,8 @@ class StepFormWrapper extends Component {
       },
     })
       .then(data => {
-        alert(data)
-        this.props.onUpdateListCheckIn(data.listCheckSuccess)
+        alert(data);
+        this.props.onUpdateListCheckIn(data.listCheckSuccess);
         this.props.onCheckInSuccess();
       })
       .catch(e => console.log(e));
@@ -114,11 +125,8 @@ class StepFormWrapper extends Component {
           )}
         </div>
         <div>
-          {this.state.user ? (
-            <User user={this.state.user} />
-          ) : (
-            <Error>Chua co nhan vien</Error>
-          )}
+          {this.state.user ? <User user={this.state.user} /> : null}
+          {/* {this.state.user} */}
         </div>
         <Divider />
         <div className="text-center">
@@ -155,4 +163,3 @@ const withConnect = connect(
   mapDispatchToProps,
 );
 export default withRouter(compose(withConnect)(StepFormWrapper));
-

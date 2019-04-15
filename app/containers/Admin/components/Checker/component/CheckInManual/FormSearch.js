@@ -11,9 +11,9 @@ class FormSearch extends Component {
     this.props.form.validateFields((err, values) => {
       if (!err) {
         console.log('Received values of form: ', values);
-        request(`/api/employee/${values.iid}`)
+        request(`/api/employee/${values.iid}/check-in-detail`)
           .then(data => {
-            this.props.onSearchSuccess(data.payload);
+            this.props.onSearchSuccess(data);
           })
           .catch(e => console.log(e));
       }

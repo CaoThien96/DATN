@@ -3,7 +3,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
-const cors = require('cors')
+const cors = require('cors');
 const fileUpload = require('express-fileupload');
 const socket_io = require('socket.io');
 const logger = require('./logger');
@@ -39,7 +39,7 @@ app.jobs = jobs;
  * Implement passport
  */
 app.use(fileUpload());
-app.use(cors())
+app.use(cors());
 app.use(express.static('public'));
 // If you need a backend, e.g. an API, add your custom backend-specific middleware here
 // app.use('/api', myApi);
@@ -91,9 +91,7 @@ io.listen(
      * Load model
      * @type {any}
      */
-    const modelSave = JSON.parse(fs.readFileSync(commonPath.model));
     // app.newClf = svm.restore(modelSave);
-    console.error(`load model succession`);
     console.error(
       `Node cluster worker ${process.pid}: listening on port ${port}`,
     );
@@ -113,9 +111,8 @@ io.listen(
   }),
 );
 
-
 app.io = io.on('connection', async socket => {
-  app.socket = socket
+  app.socket = socket;
   const id = socket.id;
   console.log(`Socket connected: ${socket.id}`);
   jwt.verify(socket.handshake.query.token, config.jwtSecret, (err, decoded) => {
@@ -146,7 +143,7 @@ app.io = io.on('connection', async socket => {
       });
     }
   });
-  let check = 0;
+  const check = 0;
   socket.on('action', async action => {
     if (action.type === 'server/hello') {
       socket.emit('action', { type: 'message', data: 'good day!' });
@@ -172,75 +169,115 @@ app.io = io.on('connection', async socket => {
      * Con neu du doan co xac xuat nho hon 0.3 10 lan thi ping ra mot thong bao khong nhan dang duoc doi tuong
      */
     if (action.type === 'server/boilerplate/Checker/OnPredict') {
-      console.log('emit');
-      const descriptor = Object.values(action.payload);
-      try {
-        const prediction = app.newClf.predictSync(descriptor);
-        const predictProbabilitiesSync = app.newClf.predictProbabilitiesSync(
-          descriptor,
-        );
-        const probabilities = predictProbabilitiesSync[prediction];
-        console.log({ prediction, probabilities });
-        if (probabilities > 0.3) {
-          const time = new Date();
-          console.log(
-            `Nhan dang duoc doi tuong ${prediction} vao luc ${time.toTimeString()}`,
-          );
-          const st = new Date();
-          console.log('start update');
-          CheckIn.searchCheckIn(new Date(), (err, doc) => {
-            console.log({ err, doc });
-            if (err) {
-              console.log(err);
-            } else {
-              const checkIn = doc[0];
-              CheckInDetail.findOne(
-                { pid: checkIn.iid, 'user.iid': parseInt(prediction) },
-                (err, check_in_detail) => {
-                  if (check_in_detail.status === 0) {
-                    check_in_detail.updateStatus((err, res) => {
-                      const end = new Date();
-                      console.log((end - st) / 1000);
-                      CheckInDetail.findCheckInSuccess(
-                        checkIn,
-                        (err, listCheckSuccess) => {
-                          console.log({ listCheckSuccess });
-                          socket.emit('action', {
-                            type: 'boilerplate/Check/OnUpdateListCheckIn',
-                            payload: listCheckSuccess,
-                          });
-                        },
-                      );
-                    });
-                  } else {
-                    const end = new Date();
-                    console.log('bo qua doi tuong da duoc check_in_detail');
-                    console.log((end - st) / 1000);
-                    CheckInDetail.findCheckInSuccess(
-                      checkIn,
-                      (err, listCheckSuccess) => {
-                        console.log({ listCheckSuccess });
-                        socket.emit('action', {
-                          type: 'boilerplate/Check/OnUpdateListCheckIn',
-                          payload: listCheckSuccess,
-                        });
-                      },
-                    );
-                  }
-                },
-              );
-            }
-          });
+      const userPredict = action.payload;
+      CheckIn.searchCheckIn(new Date(), (err, doc) => {
+        console.log({ err, doc });
+        if (err) {
+          console.log(err);
         } else {
-          console.log('Unknown')
-          socket.emit('action', {
-            type: 'boilerplate/Check/OnPredictUnknown',
-            payload: false,
-          });
+          const checkIn = doc[0];
+          CheckInDetail.findOne(
+            { pid: checkIn.iid, 'user.iid': parseInt(userPredict.iid) },
+            (err, check_in_detail) => {
+              if (check_in_detail.status === 0) {
+                check_in_detail.updateStatus((err, res) => {
+                  CheckInDetail.findCheckInSuccess(
+                    checkIn,
+                    (err, listCheckSuccess) => {
+                      console.log({ listCheckSuccess });
+                      socket.emit('action', {
+                        type: 'boilerplate/Check/OnUpdateListCheckIn',
+                        payload: listCheckSuccess,
+                      });
+                    },
+                  );
+                });
+              } else {
+                console.log('bo qua doi tuong da duoc check_in_detail');
+                CheckInDetail.findCheckInSuccess(
+                  checkIn,
+                  (err, listCheckSuccess) => {
+                    console.log({ listCheckSuccess });
+                    socket.emit('action', {
+                      type: 'boilerplate/Check/OnUpdateListCheckIn',
+                      payload: listCheckSuccess,
+                    });
+                  },
+                );
+              }
+            },
+          );
         }
-      } catch (e) {
-        console.log(e);
-      }
+      });
+      // console.log('emit');
+      // const descriptor = Object.values(action.payload);
+      // try {
+      //   const prediction = app.newClf.predictSync(descriptor);
+      //   const predictProbabilitiesSync = app.newClf.predictProbabilitiesSync(
+      //     descriptor,
+      //   );
+      //   const probabilities = predictProbabilitiesSync[prediction];
+      //   console.log({ prediction, probabilities });
+      //   if (probabilities > 0.3) {
+      //     const time = new Date();
+      //     console.log(
+      //       `Nhan dang duoc doi tuong ${prediction} vao luc ${time.toTimeString()}`,
+      //     );
+      //     const st = new Date();
+      //     console.log('start update');
+      //     CheckIn.searchCheckIn(new Date(), (err, doc) => {
+      //       console.log({ err, doc });
+      //       if (err) {
+      //         console.log(err);
+      //       } else {
+      //         const checkIn = doc[0];
+      //         CheckInDetail.findOne(
+      //           { pid: checkIn.iid, 'user.iid': parseInt(prediction) },
+      //           (err, check_in_detail) => {
+      //             if (check_in_detail.status === 0) {
+      //               check_in_detail.updateStatus((err, res) => {
+      //                 const end = new Date();
+      //                 console.log((end - st) / 1000);
+      //                 CheckInDetail.findCheckInSuccess(
+      //                   checkIn,
+      //                   (err, listCheckSuccess) => {
+      //                     console.log({ listCheckSuccess });
+      //                     socket.emit('action', {
+      //                       type: 'boilerplate/Check/OnUpdateListCheckIn',
+      //                       payload: listCheckSuccess,
+      //                     });
+      //                   },
+      //                 );
+      //               });
+      //             } else {
+      //               const end = new Date();
+      //               console.log('bo qua doi tuong da duoc check_in_detail');
+      //               console.log((end - st) / 1000);
+      //               CheckInDetail.findCheckInSuccess(
+      //                 checkIn,
+      //                 (err, listCheckSuccess) => {
+      //                   console.log({ listCheckSuccess });
+      //                   socket.emit('action', {
+      //                     type: 'boilerplate/Check/OnUpdateListCheckIn',
+      //                     payload: listCheckSuccess,
+      //                   });
+      //                 },
+      //               );
+      //             }
+      //           },
+      //         );
+      //       }
+      //     });
+      //   } else {
+      //     console.log('Unknown')
+      //     socket.emit('action', {
+      //       type: 'boilerplate/Check/OnPredictUnknown',
+      //       payload: false,
+      //     });
+      //   }
+      // } catch (e) {
+      //   console.log(e);
+      // }
     }
   });
 });
