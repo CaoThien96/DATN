@@ -12,27 +12,23 @@ import request from 'utils/request';
 import { createStructuredSelector } from 'reselect';
 import connect from 'react-redux/es/connect/connect';
 import { updateModel } from 'containers/App/actions';
-import * as lodash from 'lodash';
 import Camera from './component/Camera';
 import Result from './component/Result';
 import CheckInManual from './component/CheckInManual/index';
 import injectReducer from '../../../../utils/injectReducer';
 import reducer from './reducer';
+import { onPredict } from './actions';
 import {
   makeSelectCurrentUser,
   makeSelectModel,
   makeSelectShouldUpdateModel,
   makeSelectUsersOfModel,
 } from '../../../App/selectors';
-import { makeSelectObject, makeSelectPending } from './seclectors';
-import { onPredict, onPredictResult } from './actions';
 class LayoutChecker extends Component {
   constructor(props) {
     super(props);
     this.state = {
       checkInManual: false,
-      model: false,
-      users: [],
     };
   }
 
@@ -63,12 +59,10 @@ class LayoutChecker extends Component {
         training: 1,
       });
       const users = await request(`/api/employee?value=${params}`);
-      console.log('Da cap nhat model')
+      console.log('Da cap nhat model');
       this.props.updateModel({ model, users });
     }
   }
-
-  onSuccessFindObject = infor => {};
 
   onCheckInManualSuccess = () => {
     this.setState({
@@ -89,14 +83,14 @@ class LayoutChecker extends Component {
   };
 
   handleCheckInAutoSuccess = indices => {
-    if(this.props.usersOfModel){
+    if (this.props.usersOfModel) {
       // console.log(this.props.usersOfModel)
       const userPredict = this.props.usersOfModel[indices];
       console.log({ userPredict });
       /**
        * Gui event bao da tim thay mot doi tuong moi co xac suat okie! Va hay cap nhat trang thai checkin cho doi tuong nay di!!!
        */
-      // this.props.onPredict(userPredict);
+      this.props.onPredict(userPredict);
     }
   };
 
@@ -149,7 +143,6 @@ const mapStateToProps = createStructuredSelector({
 });
 const mapDispatchToProps = dispatch => ({
   onPredict: payload => dispatch(onPredict(payload)),
-  updateModel: payload => dispatch(updateModel(payload)),
   updateModel: payload => dispatch(updateModel(payload)),
 });
 const withConnect = connect(

@@ -4,15 +4,11 @@ import { createStructuredSelector } from 'reselect';
 import connect from 'react-redux/es/connect/connect';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
-import Button from 'antd/es/button/button';
 import TrainingImage from '../../Attendance/components/bbt3.jpg';
 import { getFaceDetectorOptions } from '../common/faceDetectionControls';
 import { drawDetections } from '../common/drawing';
-import { onPredict, onPredictResult } from '../actions';
-import {
-  makeSelectCurrentUser,
-  makeSelectError,
-} from '../../../../App/selectors';
+import { onPredict } from '../actions';
+import { makeSelectCurrentUser } from '../../../../App/selectors';
 import {
   makeSelectObject,
   makeSelectPredict,
@@ -79,7 +75,6 @@ class CameraWrapper extends Component {
       if (!this.pendding && !this.props.checkInManual) {
         this.pendding = true;
         this.onRecognition(result);
-
       }
       drawDetections(this.imageTag.current, this.canvasRef.current, [
         alignedRect,
@@ -91,31 +86,24 @@ class CameraWrapper extends Component {
   };
 
   onRecognition(result) {
-    const descriptor = result.descriptor;
-    // this.props.model.summary();
     const tfDescriptor = tf.tensor2d(result.descriptor, [1, 128]);
     const yPredict = this.props.model.predict(tfDescriptor);
     let { values, indices } = tf.topk(yPredict);
     values = values.as1D().dataSync();
     indices = indices.as1D().dataSync();
-    // console.log(values);
+    console.log({val:values[0],indices:indices[0]});
     // console.log(indices);
 
     if (values < 0.75) {
-      // alert(`Không tim thay đối tượng`);
-      // this.pendding = false;
-      this.miss = this.miss+1;
-      if(this.miss>2){
+      this.miss = this.miss + 1;
+      if (this.miss > 2) {
         this.props.handleOpenCheckInManually();
-        this.pendding = false
-      }else{
-        console.log('thu lai')
-        this.pendding = false
+        this.pendding = false;
+      } else {
+        console.log('thu lai');
+        this.pendding = false;
       }
-
-
     } else {
-      // alert(`Tim thay doi tuong ${indices} voi probability ${values}`);
       this.props.handleCheckInAutoSuccess(indices);
       this.pendding = false;
     }
@@ -165,7 +153,6 @@ const mapStateToProps = createStructuredSelector({
 });
 const mapDispatchToProps = dispatch => ({
   onPredict: payload => dispatch(onPredict(payload)),
-  onPredictResult: payload => dispatch(onPredictResult(payload)),
 });
 const withConnect = connect(
   mapStateToProps,
