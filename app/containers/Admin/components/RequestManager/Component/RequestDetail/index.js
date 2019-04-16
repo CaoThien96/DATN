@@ -8,7 +8,15 @@ import Switch from 'antd/es/switch';
 import Button from 'antd/es/button/button';
 import Form from 'antd/es/form/Form';
 import Divider from 'antd/es/divider';
+import { createStructuredSelector } from 'reselect';
+import connect from 'react-redux/es/connect/connect';
+import { withRouter } from 'react-router-dom';
+import { compose } from 'redux';
+import CommentWrapper from 'components/Comment';
 import Comment from './Comment';
+import { updateRequestDetail, addComment,addReply } from '../../actions';
+import { makeSelectCurrentUser } from '../../../../../App/selectors';
+import { makeSelectRequestDetail } from '../../selectors';
 const { TextArea } = Input;
 class RequestDetail extends Component {
   constructor(props) {
@@ -20,18 +28,22 @@ class RequestDetail extends Component {
 
   componentWillMount() {
     const { match } = this.props;
+    console.log('componentWillMount')
     const id = match.params.id;
     request(`/api/request/${id}`).then(data => {
       this.setState({ requestDetail: data.payload });
+      this.props.updateRequestDetail(data.payload);
     });
   }
-  handleGetDetail=()=>{
+
+  handleGetDetail = () => {
     const { match } = this.props;
     const id = match.params.id;
     request(`/api/request/${id}`).then(data => {
       this.setState({ requestDetail: data.payload });
     });
-}
+  };
+
   handeSendComment = e => {
     e.preventDefault();
     const { match } = this.props;
@@ -65,59 +77,45 @@ class RequestDetail extends Component {
   };
 
   render() {
-    const { match } = this.props;
-    const { requestDetail } = this.state;
+    const { requestDetail } = this.props;
+    // const { requestDetail } = this.state;
     const { getFieldDecorator } = this.props.form;
 
-    return requestDetail == null ? (
+    return !requestDetail ? (
       <LoadingIndicator />
     ) : (
       <div>
         <Row>
-          <Col span={6}>Tiêu đề: {requestDetail.title}</Col>
-          <Col span={6}>Người gửi: {requestDetail.title}</Col>
-          <Col span={6}>
-            Trạng thái xử lý:{' '}
-            {requestDetail.status == 0
-              ? 'Đang chờ':
-              requestDetail.status==1? 'Chấp nhận':requestDetail.status==2?'Không chấp nhận':'Hủy bỏ'}
+          <Col span={12}>
+            <Row>
+              <Col span={6}>Tiêu đề: {requestDetail.title}</Col>
+              <Col span={6}>Người gửi: {requestDetail.u.email}</Col>
+              <Col span={6}>
+                Trạng thái xử lý:{' '}
+                {requestDetail.status == 0
+                  ? 'Đang chờ'
+                  : requestDetail.status == 1
+                    ? 'Chấp nhận'
+                    : requestDetail.status == 2
+                      ? 'Không chấp nhận'
+                      : 'Hủy bỏ'}
+              </Col>
+            </Row>
+            <Divider />
+            <Row>
+              <p>
+                Chi tiết:
+                {requestDetail.descriptions}
+              </p>
+            </Row>
           </Col>
-          {/*<Col span={6}>*/}
-            {/*{requestDetail.status == 1 || requestDetail.status == 2 ? (*/}
-              {/*<Switch*/}
-                {/*// onChange={status => handleChangeActive(record, status)}*/}
-                {/*checkedChildren="Approve"*/}
-                {/*unCheckedChildren="Reject"*/}
-                {/*checked={requestDetail.status == 1?true:false}*/}
-              {/*/>*/}
-            {/*) : null}*/}
-          {/*</Col>*/}
-        </Row>
-        <Divider />
-        <Row>
-          <p>
-            Chi tiết:
-            {requestDetail.descriptions}
-          </p>
-        </Row>
-        <Divider />
-        <Row>
-          <Form layout="inline" onSubmit={this.handeSendComment}>
-            <Form.Item>
-              {getFieldDecorator('comment', {
-                rules: [
-                  { required: true, message: 'Please input your username!' },
-                ],
-              })(<TextArea placeholder="Nhập bình luận ......" rows={4} />)}
-            </Form.Item>
-            <Button type="primary" htmlType="submit">
-              Gửi bình luận
-            </Button>
-          </Form>
-        </Row>
-        <Divider />
-        <Row>
-          <Comment data={requestDetail.comments} />
+          <Col span={12}>
+            <CommentWrapper
+              addComment={this.props.addComment}
+              addReply={this.props.addReply}
+              objectDetail={requestDetail}
+            />
+          </Col>
         </Row>
       </div>
     );
@@ -126,4 +124,17 @@ class RequestDetail extends Component {
 const WrappedHorizontalLoginForm = Form.create({ name: 'add_comment' })(
   RequestDetail,
 );
-export default WrappedHorizontalLoginForm;
+const mapStateToProps = createStructuredSelector({
+  currentUser: makeSelectCurrentUser(),
+  requestDetail: makeSelectRequestDetail(),
+});
+const mapDispatchToProps = dispatch => ({
+  updateRequestDetail: payload => dispatch(updateRequestDetail(payload)),
+  addComment: payload => dispatch(addComment(payload)),
+  addReply: payload => dispatch(addReply(payload)),
+});
+const withConnect = connect(
+  mapStateToProps,
+  mapDispatchToProps,
+);
+export default withRouter(compose(withConnect)(WrappedHorizontalLoginForm));

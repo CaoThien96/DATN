@@ -52,8 +52,8 @@ class Result extends Component {
             boxShadow: '0px 0px 10px 0px #888888',
           }}
         >
-          {listCheckInV2.map(el => (
-            <div>
+          {listCheckInV2.map((el,key) => (
+            <div key={key}>
               <List.Item key={el.id}>
                 <List.Item.Meta
                   avatar={
@@ -78,7 +78,6 @@ class Result extends Component {
 }
 
 Result.propTypes = {
-  listCheckIn: PropTypes.array.isRequired,
 };
 const mapStateToProps = createStructuredSelector({
   currentUser: makeSelectCurrentUser(),
