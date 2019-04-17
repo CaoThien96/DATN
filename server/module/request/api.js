@@ -6,57 +6,6 @@ routes.use('*', (req, res, next) => {
   // Check auth
   next();
 });
-routes.post('/comment', (req, res) => {
-  const { comment, u, requestIid } = req.body;
-  try {
-    Request.findOne({ iid: requestIid }, (err, docs) => {
-      if (err) {
-        return res.status(500).send({
-          success: false,
-          err: 'khong tim thay binh luan',
-        });
-      }
-      let comments = null;
-      if (docs.comments) {
-        const test = docs.comments.push({
-          content: comment,
-          u: {
-            email: u.email,
-            iid: u.iid,
-          },
-        });
-      } else {
-        comments = [
-          {
-            content: comment,
-            u,
-          },
-        ];
-      }
-      Request.update(
-        { iid: requestIid },
-        { comments: docs.comments },
-        (err2, data) => {
-          if (err) {
-            return res.status(500).send({
-              success: false,
-              err: err2,
-            });
-          }
-          res.status(200).send({
-            success: true,
-            payload: data,
-          });
-        },
-      );
-    });
-  } catch (e) {
-    return res.status(500).send({
-      success: false,
-      err: e,
-    });
-  }
-});
 /**
  * Truy van lay yeu cau
  */

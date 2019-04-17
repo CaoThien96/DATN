@@ -12,18 +12,13 @@ import {
   makeSelectError,
 } from 'containers/App/selectors';
 import { makeSelectNotificationDetail } from '../../selectors';
-import Comment from '../Comment/index';
+import CommentWrapper from 'components/Comment';
 import PreviewHtml from './PreviewHtml';
-import { addNotification, addComment } from '../../actions';
+import { updateNotificationDetail, addComment } from '../../actions';
 import Divider from 'antd/es/divider';
 class Index extends Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      notificationDetail: null,
-      textArea: '',
-    };
   }
 
   componentWillMount() {
@@ -31,79 +26,12 @@ class Index extends Component {
     const iid = match.params.id;
     request(`/api/notification/${iid}`)
       .then(res => {
-        this.setState({
-          notificationDetail: res.payload,
-        });
-        this.props.onAddNotification(res.payload);
+        this.props.updateNotificationDetail(res.payload);
       })
       .catch(err => {});
   }
 
-  handleOnKeyUpTextArea = e => {
-    const keyCode = e.keyCode;
-    const { match, notificationDetail } = this.props;
-    const iid = match.params.id;
-    console.log(notificationDetail.comments);
-    if (keyCode == 13) {
-      e.preventDefault();
-      const content = e.target.value;
-      request(`/api/notification/${iid}/comment`, {
-        method: 'POST', // or 'PUT'
-        body: JSON.stringify({ content }), // data can be `string` or {object}!
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(res => {
-          this.props.onAddNotification(res.payload);
-          this.props.onAddComment(res.payload);
-        })
-        .catch(err => {});
-      e.target.value = null;
-    }
-  };
-
-  onHandleReply = (reply, data) => {
-    const { match, currentUser, notificationDetail } = this.props;
-    const iid = match.params.id;
-    const comments = notificationDetail.comments;
-    console.log({ reply, data });
-    if (reply) {
-      const index = notificationDetail.comments.findIndex(el => {
-        if (el._id == data.iid) {
-          return true;
-        }
-        return false;
-      });
-      console.log(index);
-      if (index !== -1) {
-        if (comments[index].reply) {
-          notificationDetail.comments[index].reply.push(data.comment);
-        } else {
-          notificationDetail.comments[index].reply = [data.comment];
-        }
-      }
-
-      console.log({ notificationDetail });
-      request(`/api/notification/${iid}/comment`, {
-        method: 'POST', // or 'PUT'
-        body: JSON.stringify({ notificationDetail, type: 'reply' }), // data can be `string` or {object}!
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(res => {
-          this.props.onAddNotification(res.payload);
-          this.props.onAddComment(res.payload);
-        })
-        .catch(err => {});
-      this.props.onAddNotification(notificationDetail);
-      // alert(JSON.stringify(cm));
-    }
-  };
-
   render() {
-    const { comments } = this.state;
     const { currentUser, notificationDetail } = this.props;
     return notificationDetail ? (
       <Row gutter={16}>
@@ -116,37 +44,7 @@ class Index extends Component {
           </PreviewHtml>
         </Col>
         <Col span={12}>
-          <Row>
-            <Row>
-              <textarea
-                style={{ width: '100%' }}
-                placeholder="Nhap binh luan"
-                onKeyDown={this.handleOnKeyUpTextArea}
-              />
-            </Row>
-            {notificationDetail.comments &&
-              notificationDetail.comments.map((el, key) => (
-                <div>
-                  <Comment
-                    iid={el._id}
-                    onHandleReply={this.onHandleReply}
-                    key={key}
-                    comment={el}
-                    currentUser={currentUser}
-                  />
-                  <Divider/>
-
-                </div>
-              ))}
-            {/* {comments.map((el, key) => ( */}
-            {/* <Comment */}
-            {/* iid={el.iid} */}
-            {/* onHandleReply={this.onHandleReply} */}
-            {/* key={key} */}
-            {/* comment={el} */}
-            {/* /> */}
-            {/* ))} */}
-          </Row>
+          <CommentWrapper addComment={this.props.addComment}  objectDetail={notificationDetail} />
         </Col>
       </Row>
     ) : (
@@ -160,8 +58,8 @@ const mapStateToProps = createStructuredSelector({
   error: makeSelectError(),
 });
 const mapDispatchToProps = dispatch => ({
-  onAddNotification: payload => dispatch(addNotification(payload)),
-  onAddComment: payload => dispatch(addComment(payload)),
+  updateNotificationDetail: payload => dispatch(updateNotificationDetail(payload)),
+  addComment: payload => dispatch(addComment(payload)),
 });
 const withConnect = connect(
   mapStateToProps,

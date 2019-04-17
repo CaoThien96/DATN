@@ -1,4 +1,4 @@
-import { ADD_COMMENT, ADD_NOTIFICATION_DETAIL } from './constans';
+import { ADD_COMMENT, UPDATE_NOTIFICATION_DETAIL } from './constans';
 
 export function addComment(payload) {
   return {
@@ -6,9 +6,9 @@ export function addComment(payload) {
     payload,
   };
 }
-export function addNotification(payload) {
+export function updateNotificationDetail(payload) {
   return {
-    type: ADD_NOTIFICATION_DETAIL,
+    type: UPDATE_NOTIFICATION_DETAIL,
     payload,
   };
 }

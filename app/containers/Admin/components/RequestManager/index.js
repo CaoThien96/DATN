@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { database } from 'containers/commons/firebase';
-import { Can } from '@casl/react';
-
-import { AbilityBuilder } from '@casl/ability';
 import Button from 'antd/es/button/button';
 import Modal from 'antd/es/modal/Modal';
 import WrapperFormSearch from 'components/WrappedAdvancedSearchForm';
@@ -105,7 +102,7 @@ class RequestManagement extends Component {
         if (el.iid == item.iid) {
           return {
             ...item,
-            status
+            status,
           };
         }
         return el;
@@ -118,7 +115,6 @@ class RequestManagement extends Component {
   };
 
   render() {
-
     return (
       <div>
         <CanWrapper I="create" a="Request" user={this.props.currentUser}>

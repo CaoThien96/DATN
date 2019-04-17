@@ -273,5 +273,14 @@ routes.post('/save', async (req, res) => {
     });
   });
 });
-
+routes.post('/saveImage', (req, res) => {
+  console.log(req.files);
+  const files = Object.values(req.files);
+  const pathSave = commonPath.pathAvatar;
+  files[0].mv(`${pathSave}/${files[0].name}`, err => {
+    res.send({
+      success: true,
+    });
+  });
+});
 module.exports = routes;
