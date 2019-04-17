@@ -4,6 +4,7 @@ const User = require('./model');
 const CheckIn = require('../checkin/model');
 const CheckInDetail = require('../checkin/model/check_in_detail');
 const mail = require('../../configs/mail');
+const commonPath = require('../../common/path');
 routes.get('/', async (req, res) => {
   try {
     const body = req.body;
@@ -116,27 +117,52 @@ routes.get('/:id/check-in-detail', async (req, res) => {
   });
 });
 routes.put('/:id', async (req, res) => {
-  // res.status(200).send('oke');
-  const iid = parseInt(req.params.id);
-  let update = {};
-  if (req.body.status !== undefined) {
-    const status = req.body.status ? 1 : 2;
-    update = { ...update, status };
-  }
-  if (req.body.full_name) {
-    const full_name = req.body.full_name;
-    update = { ...update, full_name };
-  }
-  if (req.body.phone) {
-    const phone = req.body.phone;
-    update = { ...update, phone };
-  }
-  User.update({ iid }, update, (err, docs) => {
-    res.send({
-      success: true,
-      payload: docs,
+  try {
+    const iid = parseInt(req.params.id);
+    let update = {};
+    if (req.body.status !== undefined) {
+      const status = req.body.status ? 1 : 2;
+      update = { ...update, status };
+    }
+    if (req.body.full_name) {
+      const full_name = req.body.full_name;
+      update = { ...update, full_name };
+    }
+    if (req.body.phone) {
+      const phone = req.body.phone;
+      update = { ...update, phone };
+    }
+    if (req.files) {
+      const files = Object.values(req.files);
+      const name = req.user.iid;
+      const saveAvatar = new Promise((resolve, reject) => {
+        const pathSave = commonPath.pathAvatar(`${name}.jpg`);
+        files[0].mv(pathSave, (err, mes) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(pathSave);
+          }
+        });
+      });
+      const pathSave = await saveAvatar;
+      update = { ...update, avatar: `${name}.jpg` };
+    }
+    User.update({ iid }, update, (err, docs) => {
+      if (err) {
+        return res.send({ success: false, err });
+      }
+      return res.send({
+        success: true,
+        payload: docs,
+      });
     });
-  });
+  } catch (e) {
+    res.send({
+      success: false,
+      err: e,
+    });
+  }
 });
 /**
  * Change password

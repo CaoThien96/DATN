@@ -1,17 +1,14 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { database } from 'containers/commons/firebase';
 import PropTypes from 'prop-types';
-// import Form from 'react-jsonschema-form';
 import { Form, Icon, Input, Button, Checkbox, Radio, DatePicker } from 'antd';
-// import schema from './schema';
-// import uiSchema from './uiSchema';
-// import Demo from './test'
 import request from 'utils/request';
+import requestV2 from 'utils/requestV2';
 import Select from 'antd/es/select';
 import ReactQuill from 'react-quill';
 import './react-draft-wysiwyg.css';
-import 'react-quill/dist/quill.snow.css'; // ES6
+import 'react-quill/dist/quill.snow.css';
+import Upload from 'antd/es/upload/Upload'; // ES6
 const { TextArea } = Input;
 function disabledDate(current) {
   // Can not select days before today and today
@@ -37,18 +34,22 @@ class New extends Component {
         return;
       }
       const newValue = { ...values, descriptions: this.state.text };
-      request('/api/notification', {
-        method: 'POST', // or 'PUT'
-        body: JSON.stringify(newValue), // data can be `string` or {object}!
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-        .then(res => {
-          this.handleReset();
-          this.props.onSuccess();
-        })
-        .catch(err => {});
+      requestV2('/api/notification', {
+        method: 'POST',
+        body: newValue,
+      });
+      // request('/api/notification', {
+      //   method: 'POST', // or 'PUT'
+      //   body: JSON.stringify(newValue), // data can be `string` or {object}!
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      // })
+      //   .then(res => {
+      //     this.handleReset();
+      //     this.props.onSuccess();
+      //   })
+      //   .catch(err => {});
     });
   };
 
@@ -64,6 +65,14 @@ class New extends Component {
 
   handleReset = () => {
     this.props.form.resetFields();
+  };
+
+  normFile = e => {
+    console.log('Upload event:', e);
+    if (Array.isArray(e)) {
+      return e;
+    }
+    return e && e.fileList;
   };
 
   render() {
@@ -104,6 +113,23 @@ class New extends Component {
           >
             {/* <div className="my-editing-area" style={{height:'400px'}}/> */}
           </ReactQuill>
+          <Form.Item label="Upload">
+            {getFieldDecorator('files', {
+              valuePropName: 'fileList',
+              getValueFromEvent: this.normFile,
+            })(
+              <Upload
+                action="//jsonplaceholder.typicode.com/posts/"
+                listType="picture-card"
+                beforeUpload={() => false}
+              >
+                <div>
+                  <Icon type="plus" />
+                  <div className="ant-upload-text">Upload</div>
+                </div>
+              </Upload>,
+            )}
+          </Form.Item>
           <Form.Item label="Chọn người nhận thông báo" hasFeedback>
             {getFieldDecorator('type', {
               valuePropName: 'defaultValue',

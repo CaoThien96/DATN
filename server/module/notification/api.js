@@ -1,7 +1,7 @@
 const routes = require('express').Router();
 const lodash = require('lodash');
 const Notification = require('./model');
-
+const commonPath  = require('../../common/path')
 routes.use('*', (req, res, next) => {
   // Check auth
   next();
@@ -54,7 +54,7 @@ routes.get('/:id', (req, res) => {
 /**
  * Tao moi notification
  */
-routes.post('/', (req, res) => {
+routes.post('/', async (req, res) => {
   const newNotification = new Notification();
   const { title, descriptions } = req.body;
   if (title) {
@@ -62,6 +62,23 @@ routes.post('/', (req, res) => {
   }
   if (descriptions) {
     newNotification.descriptions = descriptions;
+  }
+  if(req.files){
+    const files = Object.values(req.files);
+    const saveImage = files.map((el,key)=>{
+      const pathSave = commonPath.pathAvatar(`${el.iid}/${key}.jpg`);
+      return new Promise(((resolve, reject) =>{
+        el.mv(pathSave, (err, mes) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(`${el.iid}/${key}.jpg`);
+          }
+        });
+      } ))
+    })
+    const listImage= await Promise.all(saveImage);
+    console.log(listImage)
   }
   newNotification
     .save()
@@ -81,49 +98,6 @@ routes.post('/', (req, res) => {
 /**
  * Add comment to notification
  */
-routes.post('/:id/comment', async (req, res) => {
-  const iid = req.params.id;
-  const body = req.body;
-  if (body.type == 'reply') {
-    Notification.update(
-      { iid },
-      { comments: body.notificationDetail.comments },
-      async (err, docs) => {
-        if (err) {
-          return res.status(500).send(err);
-        }
-        const notification = await Notification.findOne({ iid });
-        console.log(notification);
-        return res.send({
-          payload: notification,
-        });
-      },
-    );
-  }else{
-    try {
-      let notification = await Notification.findOne({ iid });
-      const comments = notification.comments;
-      comments.push({
-        u: req.user,
-        content: body.content,
-        time: new Date(),
-      });
-      // console.log(comments);
-      Notification.update({ iid }, { comments }, async (err, docs) => {
-        if (err) {
-          return res.status(500).send(err);
-        }
-        notification = await Notification.findOne({ iid });
-        return res.send({
-          payload: notification,
-        });
-      });
-    } catch (e) {
-      res.status(500).send(e);
-    }
-  }
-
-});
 
 routes.put('/:id', (req, res) => {
   Notification.find({}, (err, docs) => {
