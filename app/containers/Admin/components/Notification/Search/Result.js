@@ -5,65 +5,104 @@ import Link from 'react-router-dom/es/Link';
 import Switch from 'antd/es/switch';
 import CanWrapper from '../Can';
 
-const Result = ({ items, handleDelete, handleChangeActive }) => {
+const Result = ({ items, handleDelete, handleChangeActive, currentUser }) => {
   const columns = [
     {
       title: 'Mã số',
       dataIndex: 'iid',
       key: 'iid',
+      render: (text, record) => ({
+        props:
+          record.status == 0
+            ? {
+              style: { background: '#FFF1F0' },
+            }
+            : {},
+        children: <p>{text}</p>,
+      }),
     },
     {
       title: 'Tiêu đề',
       dataIndex: 'title',
       key: 'title',
+      render: (text, record) => ({
+        props:
+          record.status == 0
+            ? {
+              style: { background: '#FFF1F0' },
+            }
+            : {},
+        children: <p>{text}</p>,
+      }),
     },
     {
       title: 'Chi tiết',
       dataIndex: 'descriptions',
-      render(text,record){
-        if(text){
-          return <div>{`${text.toString().slice(0,20)}....`}</div>
-        }
-        return <div>Không có dữ liệu</div>
+      render(text, record) {
+        return {
+          props:
+            record.status == 0
+              ? {
+                  style: { background: '#FFF1F0' },
+                }
+              : {},
+          children: text ? (
+            <div>{`${text.toString().slice(0, 20)}....`}</div>
+          ) : (
+            <div>Không có dữ liệu</div>
+          ),
+        };
       },
       key: 'descriptions',
     },
     {
       title: 'Trạng thái',
       dataIndex: 'status',
-      render(text, record){
-        if(record.status == 0){
-          return (
-            <div>Đã xóa</div>
-          )
-        }else {
-          return <div>Hoạt động</div>
+      render(text, record) {
+        return {
+          props:
+            record.status == 0
+              ? {
+                style: { background: '#FFF1F0' },
+              }
+              : {},
+          children:
+            record.status == 0 ? <div>Đã xóa</div> : <div>Hoạt động</div>,
+        };
+        if (record.status == 0) {
+          return <div>Đã xóa</div>;
         }
+        return <div>Hoạt động</div>;
       },
       key: 'status',
     },
     {
       title: 'Actions',
       render(text, record) {
-        const user = {
-          role: 1000,
-        };
-        return (
-          <div>
-            <CanWrapper I="handle" a="Request" user={user}>
+        return {
+          props:
+            record.status == 0
+              ? {
+                  style: { background: '#FFF1F0' },
+                }
+              : {},
+          children: (
+            <div>
+              {record.status == 0 ? null : (
+                <CanWrapper I="delete" a="Notification" user={currentUser}>
+                  <Button onClick={() => handleDelete(record)} icon="delete">
+                    Xóa
+                  </Button>
+                </CanWrapper>
+              )}
               <Button icon="diff">
-                <Link to={`/admin/request/${record && record.iid}`}>
-                  Xóa
+                <Link to={`/admin/notification/${record && record.iid}`}>
+                  Xem chi tiết
                 </Link>
               </Button>
-            </CanWrapper>
-            <Button icon="diff">
-              <Link to={`/admin/notification/${record && record.iid}`}>
-                Xem chi tiết
-              </Link>
-            </Button>
-          </div>
-        );
+            </div>
+          ),
+        };
       },
     },
   ];

@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt-nodejs');
+const fs = require('fs');
+const commonPath = require('../../common/path');
 const autoIncrement = require('../../configs/auto-increment');
 
 const { Schema } = mongoose;
@@ -15,6 +17,7 @@ const NotificationSchema = new Schema(
     descriptions: {
       type: String,
     },
+    images: [String],
     comments: [
       {
         content: String,
@@ -41,7 +44,34 @@ NotificationSchema.plugin(autoIncrement.plugin, {
   startAt: 1000,
   incrementBy: 1,
 });
-NotificationSchema.methods.addComment = function(comments,cb) {
+NotificationSchema.pre('save', async function(next) {
+  const files = this.files;
+  try {
+    const saveImage = files.map((el, key) => {
+      const pathSave = commonPath.pathNotification(`${this.iid}/${key}.jpg`);
+      const nameSave = `${this.iid}/${key}.jpg`;
+      if (!fs.existsSync(commonPath.pathNotification(`${this.iid}`))) {
+        fs.mkdirSync(commonPath.pathNotification(`${this.iid}`));
+      }
+
+      return new Promise((resolve, reject) => {
+        el.mv(pathSave, (err, mes) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(nameSave);
+          }
+        });
+      });
+    });
+    const listName = await Promise.all(saveImage);
+    this.images = listName;
+    return next();
+  } catch (e) {
+    return next(e);
+  }
+});
+NotificationSchema.methods.addComment = function(comments, cb) {
   this.model('Notification').updateOne(
     { iid: this.iid },
     { comments },

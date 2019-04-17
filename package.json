@@ -114,6 +114,7 @@
     "react-heatmap-grid": "^0.8.0",
     "react-helmet": "5.2.0",
     "react-html5-camera-photo": "^1.3.0",
+    "react-image-gallery": "^0.8.16",
     "react-infinite-scroller": "^1.2.4",
     "react-intl": "2.7.2",
     "react-jsonschema-form": "^1.0.7",

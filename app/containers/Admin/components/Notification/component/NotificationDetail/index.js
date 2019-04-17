@@ -11,11 +11,14 @@ import {
   makeSelectCurrentUser,
   makeSelectError,
 } from 'containers/App/selectors';
-import { makeSelectNotificationDetail } from '../../selectors';
 import CommentWrapper from 'components/Comment';
+import Divider from 'antd/es/divider';
+import ImageGallery from 'react-image-gallery';
+import { makeSelectNotificationDetail } from '../../selectors';
 import PreviewHtml from './PreviewHtml';
 import { updateNotificationDetail, addComment } from '../../actions';
-import Divider from 'antd/es/divider';
+import 'react-image-gallery/styles/css/image-gallery.css';
+
 class Index extends Component {
   constructor(props) {
     super(props);
@@ -33,6 +36,13 @@ class Index extends Component {
 
   render() {
     const { currentUser, notificationDetail } = this.props;
+    const images =
+      notificationDetail.images &&
+      notificationDetail.images.map(el => ({
+        original: `http://localhost:3000/notification/${el}`,
+        thumbnail: `http://localhost:3000/notification/${el}`,
+      }));
+    console.log(images)
     return notificationDetail ? (
       <Row gutter={16}>
         <Col span={12} style={{ borderRight: '1px solid' }}>
@@ -42,9 +52,17 @@ class Index extends Component {
               ? notificationDetail.descriptions
               : ''}
           </PreviewHtml>
+          {notificationDetail.images && (
+            <Row>
+              <ImageGallery items={images} />
+            </Row>
+          )}
         </Col>
         <Col span={12}>
-          <CommentWrapper addComment={this.props.addComment}  objectDetail={notificationDetail} />
+          <CommentWrapper
+            addComment={this.props.addComment}
+            objectDetail={notificationDetail}
+          />
         </Col>
       </Row>
     ) : (
@@ -58,7 +76,8 @@ const mapStateToProps = createStructuredSelector({
   error: makeSelectError(),
 });
 const mapDispatchToProps = dispatch => ({
-  updateNotificationDetail: payload => dispatch(updateNotificationDetail(payload)),
+  updateNotificationDetail: payload =>
+    dispatch(updateNotificationDetail(payload)),
   addComment: payload => dispatch(addComment(payload)),
 });
 const withConnect = connect(

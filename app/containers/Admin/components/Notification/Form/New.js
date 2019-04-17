@@ -9,6 +9,7 @@ import ReactQuill from 'react-quill';
 import './react-draft-wysiwyg.css';
 import 'react-quill/dist/quill.snow.css';
 import Upload from 'antd/es/upload/Upload'; // ES6
+import message from 'antd/es/message';
 const { TextArea } = Input;
 function disabledDate(current) {
   // Can not select days before today and today
@@ -37,6 +38,13 @@ class New extends Component {
       requestV2('/api/notification', {
         method: 'POST',
         body: newValue,
+      }).then(data => {
+        if (data.success) {
+          this.handleReset();
+          this.props.onSuccess();
+        } else {
+          message.error('something errors');
+        }
       });
       // request('/api/notification', {
       //   method: 'POST', // or 'PUT'
@@ -88,7 +96,7 @@ class New extends Component {
     };
     return (
       <div>
-        <Form layout="vertical" onSubmit={this.submit} className="login-form">
+        <Form layout="vertical" onSubmit={this.submit}>
           <Form.Item>
             {getFieldDecorator('title', {
               rules: [{ required: true, message: 'Please input title!' }],
@@ -107,7 +115,7 @@ class New extends Component {
           {/* })(<TextArea placeholder="Enter descriptions" rows={8} />)} */}
           {/* </Form.Item> */}
           <ReactQuill
-            style={{ height: '400px' }}
+            style={{ height: '100px', marginBottom: '15px' }}
             value={this.state.text}
             onChange={this.handleChange}
           >

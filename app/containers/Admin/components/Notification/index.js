@@ -24,6 +24,7 @@ class RequestManagement extends Component {
     this.state = {
       visible: false,
       resultSearch: [],
+      valuesSearch:false,
     };
   }
 
@@ -46,6 +47,7 @@ class RequestManagement extends Component {
 
   handleSearch = value => {
     try {
+      this.setState({valuesSearch:value})
       const json = JSON.stringify(value);
       const apiUrl = `/api/notification?value=${json}`;
       request(apiUrl)
@@ -75,16 +77,20 @@ class RequestManagement extends Component {
   };
 
   handleDelete = item => {
-    request(`/api/employee/${item.iid}`, {
+    request(`/api/notification/${item.iid}`, {
       method: 'DELETE',
-    }).then(data => {});
+    }).then(data => {
+      if(data.success && this.state.valuesSearch){
+        this.handleSearch(this.state.valuesSearch)
+      }
+    });
     const resultSearch = this.state.resultSearch.filter(i => {
       if (i.iid !== item.iid) {
         return true;
       }
       return false;
     });
-    alert(JSON.stringify(resultSearch));
+    // alert(JSON.stringify(resultSearch));
     this.setState({
       resultSearch,
     });
@@ -146,6 +152,7 @@ class RequestManagement extends Component {
           items={this.state.resultSearch}
           handleDelete={this.handleDelete}
           handleChangeActive={this.handleChangeActive}
+          currentUser={this.props.currentUser}
         />
       </div>
     );
