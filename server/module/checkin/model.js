@@ -51,6 +51,21 @@ CheckInSchema.statics.searchCheckIn = function search(date = new Date(), cb) {
     .lte(endTime)
     .exec(cb);
 };
+CheckInSchema.statics.searchCheckInByMonth = function search(
+  date = new Date(),
+  cb,
+) {
+  const y = date.getFullYear();
+  const m = date.getMonth();
+  const firstDay = new Date(y, m, 1);
+  const lastDay = new Date(y, m + 1, 0);
+  console.log({ firstDay, lastDay });
+  console.log({ x: firstDay.getTime(), y: lastDay.getTime() });
+  return this.where('date')
+    .gte(firstDay.getTime())
+    .lte(lastDay.getTime())
+    .exec(cb);
+};
 CheckInSchema.statics.searchCheckInByRange = function search(start, end, cb) {
   console.log({start,end})
   return this.where('date')

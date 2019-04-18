@@ -17,3 +17,8 @@ module.exports.pathNotification = name =>
     __dirname,
     path.resolve(__dirname, `../../public/notification/${name}`),
   );
+module.exports.pathRequest = name =>
+  path.resolve(
+    __dirname,
+    path.resolve(__dirname, `../../public/request/${name}`),
+  );

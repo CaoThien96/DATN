@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt-nodejs');
+const fs = require('fs');
 const autoIncrement = require('../../configs/auto-increment');
-
+const commonPath = require('../../common/path');
 const { Schema } = mongoose;
 
 const RequestSchema = new Schema({
@@ -22,6 +22,7 @@ const RequestSchema = new Schema({
   descriptions: {
     type: String,
   },
+  images: [String],
   comments: [
     {
       content: String,
@@ -49,7 +50,34 @@ RequestSchema.plugin(autoIncrement.plugin, {
   startAt: 1000,
   incrementBy: 1,
 });
-RequestSchema.methods.addComment = function(comments, cb){
+RequestSchema.pre('save', async function(next) {
+  const files = this.files;
+  try {
+    const saveImage = files.map((el, key) => {
+      const pathSave = commonPath.pathRequest(`${this.iid}/${key}.jpg`);
+      const nameSave = `${this.iid}/${key}.jpg`;
+      if (!fs.existsSync(commonPath.pathRequest(`${this.iid}`))) {
+        fs.mkdirSync(commonPath.pathRequest(`${this.iid}`));
+      }
+
+      return new Promise((resolve, reject) => {
+        el.mv(pathSave, (err, mes) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(nameSave);
+          }
+        });
+      });
+    });
+    const listName = await Promise.all(saveImage);
+    this.images = listName;
+    return next();
+  } catch (e) {
+    return next(e);
+  }
+});
+RequestSchema.methods.addComment = function(comments, cb) {
   RequestModel.updateOne({ iid: this.iid }, { comments }, (err, docs) => {
     // Updated at most one doc, `res.modifiedCount` contains the number
     // of docs that MongoDB updated
@@ -59,5 +87,6 @@ RequestSchema.methods.addComment = function(comments, cb){
     cb(null, docs);
   });
 };
+
 const RequestModel = mongoose.model('Request', RequestSchema);
 module.exports = RequestModel;

@@ -22,6 +22,7 @@ class RequestManagement extends Component {
     this.state = {
       visible: false,
       resultSearch: [],
+      searchValue:false
     };
   }
 
@@ -37,13 +38,15 @@ class RequestManagement extends Component {
 
   onNewSuccess = () => {
     this.setState({ visible: false });
-    request('/api/request').then(data => {
-      this.setState({ resultSearch: data.payload });
-    });
+    this.handleSearch(this.state.searchValue)
+    // request('/api/request').then(data => {
+    //   this.setState({ resultSearch: data.payload });
+    // });
   };
 
   handleSearch = value => {
     try {
+      this.setState({searchValue:value})
       const json = JSON.stringify(value);
       const apiUrl = `/api/request?value=${json}`;
       request(apiUrl)

@@ -85,6 +85,11 @@ routes.post('/', (req, res) => {
   newRequest.userIid = 1001;
   newRequest.date = date;
   newRequest.u = req.user;
+  if (req.files) {
+    newRequest.files = Object.values(req.files)[0];
+    // const listImage= await Promise.all(saveImage);
+    // console.log(listImage)
+  }
   newRequest
     .save()
     .then(data => {

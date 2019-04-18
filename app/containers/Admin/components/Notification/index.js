@@ -10,28 +10,28 @@ import Col from 'antd/es/grid/col';
 import request from 'utils/request';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
+import { createStructuredSelector } from 'reselect';
+import connect from 'react-redux/es/connect/connect';
+import { Form } from 'antd';
 import CanWrapper from './Can';
 import FromNew from './Form/New';
 import FormSearch from './Search/Form';
 import Result from './Search/Result';
-import { createStructuredSelector } from 'reselect';
 import { makeSelectCurrentUser } from '../../../App/selectors';
-import connect from 'react-redux/es/connect/connect';
-import { Form } from 'antd';
-class RequestManagement extends Component {
+class NotificationManagement extends Component {
   constructor(props) {
     super(props);
     this.state = {
       visible: false,
       resultSearch: [],
-      valuesSearch:false,
+      valuesSearch: false,
     };
   }
 
   componentWillMount() {
-    request('/api/notification').then(data => {
-      this.setState({ resultSearch: data.payload });
-    });
+    // request('/api/notification').then(data => {
+    //   this.setState({ resultSearch: data.payload });
+    // });
   }
 
   componentDidMount() {
@@ -47,7 +47,7 @@ class RequestManagement extends Component {
 
   handleSearch = value => {
     try {
-      this.setState({valuesSearch:value})
+      this.setState({ valuesSearch: value });
       const json = JSON.stringify(value);
       const apiUrl = `/api/notification?value=${json}`;
       request(apiUrl)
@@ -80,8 +80,8 @@ class RequestManagement extends Component {
     request(`/api/notification/${item.iid}`, {
       method: 'DELETE',
     }).then(data => {
-      if(data.success && this.state.valuesSearch){
-        this.handleSearch(this.state.valuesSearch)
+      if (data.success && this.state.valuesSearch) {
+        this.handleSearch(this.state.valuesSearch);
       }
     });
     const resultSearch = this.state.resultSearch.filter(i => {
@@ -90,7 +90,6 @@ class RequestManagement extends Component {
       }
       return false;
     });
-    // alert(JSON.stringify(resultSearch));
     this.setState({
       resultSearch,
     });
@@ -159,12 +158,12 @@ class RequestManagement extends Component {
   }
 }
 
-RequestManagement.defaultProps = {};
-RequestManagement.propTypes = {};
+NotificationManagement.defaultProps = {};
+NotificationManagement.propTypes = {};
 const mapStateToProps = createStructuredSelector({
   currentUser: makeSelectCurrentUser(),
 });
 
 const withConnect = connect(mapStateToProps);
 
-export default withRouter(compose(withConnect)(RequestManagement));
+export default withRouter(compose(withConnect)(NotificationManagement));
