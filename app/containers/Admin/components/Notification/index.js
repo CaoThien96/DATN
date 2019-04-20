@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { database } from 'containers/commons/firebase';
 import injectReducer from 'utils/injectReducer';
 import Button from 'antd/es/button/button';
 import Modal from 'antd/es/modal/Modal';
@@ -13,6 +12,8 @@ import { compose } from 'redux';
 import { createStructuredSelector } from 'reselect';
 import connect from 'react-redux/es/connect/connect';
 import { Form } from 'antd';
+import { askForPermissioToReceiveNotifications } from 'push-notification';
+import commonFirebase from 'containers/Admin/common';
 import CanWrapper from './Can';
 import FromNew from './Form/New';
 import FormSearch from './Search/Form';
@@ -29,20 +30,19 @@ class NotificationManagement extends Component {
   }
 
   componentWillMount() {
-    // request('/api/notification').then(data => {
-    //   this.setState({ resultSearch: data.payload });
-    // });
+    console.log('NotificationManagement');
   }
 
-  componentDidMount() {
-    database.ref('/').on('value', snapshot => {});
-  }
+  componentDidMount() {}
 
-  onNewSuccess = () => {
+  onNewSuccess = async () => {
     this.setState({ visible: false });
-    request('/api/notification').then(data => {
-      this.setState({ resultSearch: data.payload });
-    });
+    this.handleSearch(this.state.valuesSearch);
+    commonFirebase.sendMessageToTopic(
+      'employee',
+      'Có một một thông báo mới!!',
+      '',
+    );
   };
 
   handleSearch = value => {

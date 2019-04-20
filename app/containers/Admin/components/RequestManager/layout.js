@@ -8,12 +8,17 @@ import reducer from './reducer';
 import routes from './routes';
 class LayoutRequestManagement extends Component {
   render() {
+    console.log('LayoutRequestManagement');
+    console.log(routes);
+    console.log(this.props);
     return (
-      <Switch>
-        {routes.map((route, i) => (
-          <RenderRoute key={i} {...route} />
-        ))}
-      </Switch>
+      <div>
+         <Switch>
+         {routes.map((route, i) => (
+         <RenderRoute key={i} {...route} />
+         ))}
+         </Switch>
+      </div>
     );
   }
 }

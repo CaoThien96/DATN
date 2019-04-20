@@ -83,7 +83,9 @@ routes.post('/', (req, res) => {
   newRequest.title = title;
   newRequest.descriptions = descriptions;
   newRequest.userIid = 1001;
-  newRequest.date = date;
+  newRequest.addition = {
+    date,
+  };
   newRequest.u = req.user;
   if (req.files) {
     newRequest.files = Object.values(req.files)[0];
@@ -110,7 +112,7 @@ routes.post('/', (req, res) => {
  */
 routes.put('/:id', (req, res) => {
   const iid = parseInt(req.params.id);
-  const status = req.body.status
+  const status = req.body.status;
   Request.update({ iid }, { status }, (err, docs) => {
     res.send({
       success: true,

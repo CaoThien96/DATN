@@ -32,6 +32,7 @@ import configureStore from './configureStore';
 // Import i18n messages
 import { translationMessages } from './i18n';
 import './global-styles.css';
+import { Test } from './push-notification';
 
 // Observe loading of Open Sans (to remove open sans, remove the <link> tag in
 // the index.html file and this observer)
@@ -57,6 +58,7 @@ const render = messages => {
     </Provider>,
     MOUNT_NODE,
   );
+  Test();
 };
 
 if (module.hot) {

@@ -1,12 +1,8 @@
 import React, { Component } from 'react';
 import moment from 'moment';
-import { database } from 'containers/commons/firebase';
 import PropTypes from 'prop-types';
 // import Form from 'react-jsonschema-form';
 import { Form, Icon, Input, Button, Checkbox, Radio, DatePicker } from 'antd';
-// import schema from './schema';
-// import uiSchema from './uiSchema';
-// import Demo from './test'
 import request from 'utils/request';
 import Select from 'antd/es/select';
 import Upload from 'antd/es/upload/Upload';
@@ -29,13 +25,18 @@ class New extends Component {
   submit = e => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
-      const date = values.date.unix();
+      const date = values.date;
+      console.log('dasda')
+
       if (err) {
+        console.log(err)
         return;
       }
+      console.log('dasda')
+
       // database.ref("/request")
       //   .push({...values,date:date,status:0});
-
+      console.log(values)
       requestV2('/api/request', {
         method: 'POST',
         body: { ...values, date },

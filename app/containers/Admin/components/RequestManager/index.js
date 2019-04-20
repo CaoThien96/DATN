@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { database } from 'containers/commons/firebase';
 import Button from 'antd/es/button/button';
 import Modal from 'antd/es/modal/Modal';
 import WrapperFormSearch from 'components/WrappedAdvancedSearchForm';
@@ -11,6 +10,8 @@ import { createStructuredSelector } from 'reselect';
 import connect from 'react-redux/es/connect/connect';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
+import { askForPermissioToReceiveNotifications } from 'push-notification';
+import commonFirebase from '../../common';
 import FromNew from './Form/New';
 import FormSearch from './Search/Form';
 import Result from './Search/Result';
@@ -22,31 +23,28 @@ class RequestManagement extends Component {
     this.state = {
       visible: false,
       resultSearch: [],
-      searchValue:false
+      searchValue: false,
     };
   }
 
   componentWillMount() {
+    // request('http://localhost:3000/api/get-current-user').then(data=>console.log(data))
     request('/api/request').then(data => {
       this.setState({ resultSearch: data.payload });
     });
   }
 
-  componentDidMount() {
-    database.ref('/').on('value', snapshot => {});
-  }
 
-  onNewSuccess = () => {
+
+  onNewSuccess = async () => {
     this.setState({ visible: false });
-    this.handleSearch(this.state.searchValue)
-    // request('/api/request').then(data => {
-    //   this.setState({ resultSearch: data.payload });
-    // });
+    this.handleSearch(this.state.searchValue);
+    commonFirebase.sendMessageToTopic('admin', 'Có một yêu cầu mới cần xử lý', '');
   };
 
   handleSearch = value => {
     try {
-      this.setState({searchValue:value})
+      this.setState({ searchValue: value });
       const json = JSON.stringify(value);
       const apiUrl = `/api/request?value=${json}`;
       request(apiUrl)

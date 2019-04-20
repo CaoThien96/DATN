@@ -7,6 +7,7 @@
  */
 
 import React, { Component } from 'react';
+import firebase from 'firebase';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Switch, Route, Link, withRouter } from 'react-router-dom';
@@ -18,14 +19,17 @@ import { createStructuredSelector } from 'reselect';
 import connect from 'react-redux/es/connect/connect';
 import { compose } from 'redux';
 import Button from 'antd/es/button/button';
+import notification from 'antd/es/notification';
+import Icon from 'antd/es/icon';
 import GlobalStyle from '../../global-styles';
-import { makeSelectShowLoading } from './selectors';
+import { makeSelectCurrentUser, makeSelectShowLoading } from './selectors';
 // import { mapDispatchToProps } from '../HomePage';
 import injectReducer from '../../utils/injectReducer';
 import reducer from '../Admin/components/Notification/reducer';
 import { showLoading, hiddenLoading, loadUserLogin } from './actions';
 import injectSaga from '../../utils/injectSaga';
 import saga from './saga';
+
 const AppWrapper = styled.div`
   margin: 0 auto;
   display: flex;
@@ -46,7 +50,7 @@ const SpinWrapper = styled.div`
   width: 100%;
 `;
 class Index extends Component {
-  componentDidMount() {
+  async componentDidMount() {
     const token = localStorage.getItem('token');
     if (token !== null) {
       this.props.getCurrentUser();
@@ -87,6 +91,7 @@ Index.propTypes = {};
 
 const mapStateToProps = createStructuredSelector({
   showLoading: makeSelectShowLoading(),
+  currentUser: makeSelectCurrentUser(),
 });
 
 const mapDispatchToProps = dispatch => ({

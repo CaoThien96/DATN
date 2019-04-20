@@ -23,6 +23,9 @@ const RequestSchema = new Schema({
     type: String,
   },
   images: [String],
+  addition: {
+    type: Schema.Types.Mixed,
+  },
   comments: [
     {
       content: String,
@@ -51,8 +54,14 @@ RequestSchema.plugin(autoIncrement.plugin, {
   incrementBy: 1,
 });
 RequestSchema.pre('save', async function(next) {
-  const files = this.files;
+  if (!this.files) {
+    return next();
+  }
   try {
+    let files = this.files;
+    if (!Array.isArray(files)) {
+      files = [files];
+    }
     const saveImage = files.map((el, key) => {
       const pathSave = commonPath.pathRequest(`${this.iid}/${key}.jpg`);
       const nameSave = `${this.iid}/${key}.jpg`;
