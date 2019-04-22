@@ -17,6 +17,7 @@ import ImageGallery from 'react-image-gallery';
 import { makeSelectNotificationDetail } from '../../selectors';
 import PreviewHtml from './PreviewHtml';
 import { updateNotificationDetail, addComment } from '../../actions';
+import { updateNews } from 'containers/Admin/actions';
 import 'react-image-gallery/styles/css/image-gallery.css';
 
 class Index extends Component {
@@ -30,8 +31,23 @@ class Index extends Component {
     request(`/api/notification/${iid}`)
       .then(res => {
         this.props.updateNotificationDetail(res.payload);
+        this.props.updateNews()
       })
       .catch(err => {});
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const nextIid = nextProps.match.params.id;
+    const { match } = this.props;
+    const iid = match.params.id;
+    if (nextIid !== iid) {
+      request(`/api/notification/${nextIid}`)
+        .then(res => {
+          this.props.updateNotificationDetail(res.payload);
+          this.props.updateNews()
+        })
+        .catch(err => {});
+    }
   }
 
   render() {
@@ -42,7 +58,6 @@ class Index extends Component {
         original: `http://localhost:3000/notification/${el}`,
         thumbnail: `http://localhost:3000/notification/${el}`,
       }));
-    console.log(images)
     return notificationDetail ? (
       <Row gutter={16}>
         <Col span={12} style={{ borderRight: '1px solid' }}>
@@ -52,11 +67,11 @@ class Index extends Component {
               ? notificationDetail.descriptions
               : ''}
           </PreviewHtml>
-          {notificationDetail.images && (
+          {notificationDetail.images && notificationDetail.images.length ? (
             <Row>
               <ImageGallery items={images} />
             </Row>
-          )}
+          ) : null}
         </Col>
         <Col span={12}>
           <CommentWrapper
@@ -79,6 +94,7 @@ const mapDispatchToProps = dispatch => ({
   updateNotificationDetail: payload =>
     dispatch(updateNotificationDetail(payload)),
   addComment: payload => dispatch(addComment(payload)),
+  updateNews: () => dispatch(updateNews()),
 });
 const withConnect = connect(
   mapStateToProps,

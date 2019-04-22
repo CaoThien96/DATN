@@ -43,9 +43,11 @@ export default function request(url, options) {
   const formData = new FormData();
   lodash.forEach(options.body, (value, key) => {
     if (key == 'files') {
-      value.forEach(el => {
-        formData.append('files[]', el.originFileObj);
-      });
+      if(value){
+        value.forEach(el => {
+          formData.append('files[]', el.originFileObj);
+        });
+      }
     } else {
       formData.append(key, value);
     }

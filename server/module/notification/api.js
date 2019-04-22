@@ -1,7 +1,9 @@
 const routes = require('express').Router();
 const lodash = require('lodash');
 const Notification = require('./model');
+const News = require('../news/model');
 const commonPath = require('../../common/path');
+
 routes.use('*', (req, res, next) => {
   // Check auth
   next();
@@ -71,10 +73,23 @@ routes.post('/', async (req, res) => {
   newNotification
     .save()
     .then(docs => {
-      res.status(200).send({
-        success: true,
-        payload: docs,
-      });
+      News.createNewsForEmployee(
+        `Có thông báo mới:${title}`,
+        `/admin/notification/${docs.iid}`,
+        (err, doc) => {
+          if (err) {
+            return res.send({
+              success: false,
+              err,
+            });
+          }
+          req.app.io.emit('action', { type: 'boilerplate/Admin/Update_News' });
+          return res.status(200).send({
+            success: true,
+            payload: 'Tạo thông báo thành công',
+          });
+        },
+      );
     })
     .catch(err => {
       res.status(500).send({

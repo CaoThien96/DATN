@@ -4,47 +4,98 @@ import PropTypes from 'prop-types';
 import { Layout, Menu, Breadcrumb, Icon } from 'antd';
 import './style.css';
 import { Switch, withRouter } from 'react-router-dom';
-import adminSubRoutes from 'routes/admin';
 import Link from 'react-router-dom/es/Link';
 import defineAbilitiesFor from 'containers/casl/abilityForMenu';
 import Dropdown from 'antd/es/dropdown/dropdown';
 import { createStructuredSelector } from 'reselect';
 import connect from 'react-redux/es/connect/connect';
 import { compose } from 'redux';
-import Modal from 'antd/es/modal/Modal';
 import firebase from 'firebase';
 import notification from 'antd/es/notification';
 import Avatar from 'antd/es/avatar';
+import Badge from 'antd/es/badge';
+import injectSaga from 'utils/injectSaga';
 import RenderRoute from '../../routes/render';
 import request from '../../utils/request';
 import { makeSelectCurrentUser, makeSelectError } from '../App/selectors';
+import { makeSelectNews } from './selectors';
 import { loadUserLogin, removeUser } from '../App/actions';
+import { updateNews } from './actions';
 import injectReducer from '../../utils/injectReducer';
-import reducer from './components/Notification/reducer';
+import reducer from './reducer';
 import routes_not_menu from '../../routes/admin_routes_not_menu';
-import FormChangePassWord from './components/FormChangePassWord';
 import commonFirebase from './common';
 import {
   askForPermissioToReceiveNotifications,
-  initializeFirebase,
-  Test
 } from '../../push-notification';
-import Button from 'antd/es/button/button';
+import saga from './saga';
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
-const menu = (
-  <Menu>
-    <Menu.Item key="0">
-      <a href="http://www.alipay.com/">1st menu item</a>
-    </Menu.Item>
-    <Menu.Item key="1">
-      <a href="http://www.taobao.com/">2nd menu item</a>
-    </Menu.Item>
-    <Menu.Divider />
-    <Menu.Item key="3">3rd menu item</Menu.Item>
-  </Menu>
-);
-
+const menu = props => {
+  const { news } = props;
+  return (
+    <Menu>
+      {news &&
+        news.map((el, key) => (
+          <Menu.Item key={key}>
+            <Link
+              to={el.action}
+              onClick={() => {
+                request('/api/news/updateStatus', {
+                  method: 'PUT',
+                  body: JSON.stringify({
+                    iid: el._id,
+                  }),
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                }).then(data => {
+                  if (data.success) {
+                    props.history.replace(el.action);
+                  }
+                });
+              }}
+            >
+              <span className="nav-text">{el.title}</span>
+            </Link>
+          </Menu.Item>
+        ))}
+    </Menu>
+  );
+};
+const News = props => {
+  const { news } = props;
+  return (
+    <Menu>
+      {news &&
+        news.map((el, key) => (
+          <Menu.Item key={key}>
+            {/* <Link */}
+            {/* to={el.action} */}
+            {/* // onClick={() => { */}
+            {/* //   request('/api/news/updateStatus', { */}
+            {/* //     method: 'PUT', */}
+            {/* //     body: JSON.stringify({ */}
+            {/* //       iid: el._id, */}
+            {/* //     }), */}
+            {/* //     headers: { */}
+            {/* //       'Content-Type': 'application/json', */}
+            {/* //     }, */}
+            {/* //   }).then(data => { */}
+            {/* //     if (data.success) { */}
+            {/* //       this.props.history.replace(el.action); */}
+            {/* //     } */}
+            {/* //   }); */}
+            {/* // }} */}
+            {/* > */}
+            {/* <span className="nav-text">{el.title}</span> */}
+            {/* </Link> */}
+            <span>dsadas</span>
+          </Menu.Item>
+        ))}
+    </Menu>
+  );
+};
 class LayoutAdmin extends Component {
   constructor(props) {
     super(props);
@@ -55,14 +106,11 @@ class LayoutAdmin extends Component {
   }
 
   componentWillMount() {
-    const token = localStorage.getItem('token');
     this.props.getCurrentUser();
+    this.props.updateNews();
   }
 
   async componentDidMount() {
-    // initializeFirebase();
-    // Test();
-
     try {
       const token = await askForPermissioToReceiveNotifications();
       this.tokenFirebase = token;
@@ -99,10 +147,10 @@ class LayoutAdmin extends Component {
     }
   }
 
-  openNotification = (payload) => {
+  openNotification = payload => {
     notification.open({
       message: payload.title,
-      description:payload.body,
+      description: payload.body,
       icon: <Avatar size="large" src="http://localhost:3000/logo.png" />,
     });
   };
@@ -186,7 +234,13 @@ class LayoutAdmin extends Component {
         this.props.history.replace(routerCurrent.path);
       }
     }
-    console.log(filter)
+    console.log(filter);
+    let bage = 0;
+    this.props.news.forEach(el => {
+      if (el.status === 0) {
+        bage++;
+      }
+    });
     return (
       <Layout>
         <Sider
@@ -261,9 +315,15 @@ class LayoutAdmin extends Component {
                 style={{ lineHeight: '64px' }}
               >
                 <Menu.Item key="4">
-                  <Dropdown overlay={menu} trigger={['click']}>
+                  <Dropdown overlay={menu(this.props)} trigger={['click']}>
                     <div>
-                      <Icon type="notification" />
+                      <Badge count={bage} showZero>
+                        <Icon
+                          style={{ fontSize: '25px' }}
+                          size="large"
+                          type="notification"
+                        />
+                      </Badge>
                     </div>
                   </Dropdown>
                 </Menu.Item>
@@ -274,7 +334,7 @@ class LayoutAdmin extends Component {
                   }}
                   title={
                     <span className="submenu-title-wrapper">
-                      <Icon type="smile" theme="twoTone" />
+                      <Icon type="user" style={{ fontSize: '25px' }} />
                       {currentUser && currentUser.email.slice(0, 4)}
                     </span>
                   }
@@ -334,15 +394,25 @@ class LayoutAdmin extends Component {
 const mapStateToProps = createStructuredSelector({
   currentUser: makeSelectCurrentUser(),
   error: makeSelectError(),
+  news: makeSelectNews(),
 });
 const mapDispatchToProps = dispatch => ({
   logout: () => dispatch(removeUser()),
   getCurrentUser: () => dispatch(loadUserLogin()),
+  updateNews: () => dispatch(updateNews()),
 });
 const withConnect = connect(
   mapStateToProps,
   mapDispatchToProps,
 );
+const withReducer = injectReducer({ key: 'admin', reducer });
+const withSaga = injectSaga({ key: 'admin', saga });
 LayoutAdmin.defaultProps = {};
 LayoutAdmin.propTypes = {};
-export default withRouter(compose(withConnect)(LayoutAdmin));
+export default withRouter(
+  compose(
+    withReducer,
+    withSaga,
+    withConnect,
+  )(LayoutAdmin),
+);
