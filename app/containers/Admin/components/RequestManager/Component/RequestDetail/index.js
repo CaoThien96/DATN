@@ -15,7 +15,12 @@ import { compose } from 'redux';
 import CommentWrapper from 'components/Comment';
 import ImageGallery from 'react-image-gallery';
 import Comment from './Comment';
-import { updateRequestDetail, addComment, addReply } from '../../actions';
+import {
+  updateRequestDetail,
+  addComment,
+  addReply,
+  fetchRequestDetail,
+} from '../../actions';
 import { makeSelectCurrentUser } from '../../../../../App/selectors';
 import { makeSelectRequestDetail } from '../../selectors';
 import 'react-image-gallery/styles/css/image-gallery.css';
@@ -32,10 +37,11 @@ class RequestDetail extends Component {
     const { match } = this.props;
     console.log('componentWillMount');
     const id = match.params.id;
-    request(`/api/request/${id}`).then(data => {
-      this.setState({ requestDetail: data.payload });
-      this.props.updateRequestDetail(data.payload);
-    });
+    this.props.fetchRequestDetail({ id });
+    // request(`/api/request/${id}`).then(data => {
+    //   this.setState({ requestDetail: data.payload });
+    //   this.props.updateRequestDetail(data.payload);
+    // });
   }
 
   handleGetDetail = () => {
@@ -43,38 +49,6 @@ class RequestDetail extends Component {
     const id = match.params.id;
     request(`/api/request/${id}`).then(data => {
       this.setState({ requestDetail: data.payload });
-    });
-  };
-
-  handeSendComment = e => {
-    e.preventDefault();
-    const { match } = this.props;
-    const id = match.params.id;
-    this.props.form.validateFields((err, values) => {
-      if (!err) {
-        // alert(JSON.stringify(values));
-        request('/api/request/comment', {
-          method: 'POST', // or 'PUT'
-          body: JSON.stringify({
-            ...values,
-            requestIid: id,
-            u: {
-              email: 'caothien029@gmail.com',
-              iid: 1001,
-            },
-          }), // data can be `string` or {object}!
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-          .then(res => {
-            this.props.form.resetFields();
-            this.handleGetDetail();
-            // this.handleReset();
-            // this.props.onSuccess();
-          })
-          .catch(err => {});
-      }
     });
   };
 
@@ -93,7 +67,7 @@ class RequestDetail extends Component {
     ) : (
       <div>
         <Row>
-          <Col style={{paddingRight:'20px'}} span={14}>
+          <Col style={{ paddingRight: '20px' }} span={14}>
             <Row>
               <Col span={6}>Tiêu đề: {requestDetail.title}</Col>
               <Col span={6}>Người gửi: {requestDetail.u.email}</Col>
@@ -144,6 +118,7 @@ const mapDispatchToProps = dispatch => ({
   updateRequestDetail: payload => dispatch(updateRequestDetail(payload)),
   addComment: payload => dispatch(addComment(payload)),
   addReply: payload => dispatch(addReply(payload)),
+  fetchRequestDetail: payload => dispatch(fetchRequestDetail(payload)),
 });
 const withConnect = connect(
   mapStateToProps,

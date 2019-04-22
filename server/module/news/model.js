@@ -20,22 +20,22 @@ const NewsSchema = new Schema(
   },
   { timestamps: { createdAt: 'created_at' } },
 );
-NewsSchema.statics.createNewsForAdmin =async function(
+NewsSchema.statics.createNewsForAdmin = async function(
   title,
   action = false,
   cb,
 ) {
-  const u = await this.model('User').findOne({email:'admin@gmail.com',role:1001});
+  const u = await this.model('User').findOne({
+    email: 'admin@gmail.com',
+    role: 1001,
+  });
 
-  this.create(
-    { title: 'title', action: 'action', receiver: { type: 'admin',u } },
-    (err, doc) => {
-      if (err) {
-        return cb(err, null);
-      }
-      return cb(null, doc);
-    },
-  );
+  this.create({ title, action, receiver: { type: 'admin', u } }, (err, doc) => {
+    if (err) {
+      return cb(err, null);
+    }
+    return cb(null, doc);
+  });
 };
 NewsSchema.statics.createNewsForEmployee = async function(
   title,

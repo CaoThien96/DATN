@@ -1,7 +1,7 @@
 const routes = require('express').Router();
 const lodash = require('lodash');
 const Request = require('./model');
-
+const News = require('../news/model')
 routes.use('*', (req, res, next) => {
   // Check auth
   next();
@@ -94,11 +94,24 @@ routes.post('/', (req, res) => {
   }
   newRequest
     .save()
-    .then(data => {
-      res.status(200).send({
-        success: true,
-        payload: data,
-      });
+    .then(docs => {
+      News.createNewsForAdmin(
+        `Có yêu cầu mới mới:${title}`,
+        `/admin/request/${docs.iid}`,
+        (err, doc) => {
+          if (err) {
+            return res.send({
+              success: false,
+              err,
+            });
+          }
+          req.app.io.emit('action', { type: 'boilerplate/Admin/Update_News' });
+          return res.status(200).send({
+            success: true,
+            payload: 'Tạo thông báo thành công',
+          });
+        },
+      );
     })
     .catch(e =>
       res.status(500).send({

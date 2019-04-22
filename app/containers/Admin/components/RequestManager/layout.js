@@ -6,6 +6,8 @@ import injectReducer from 'utils/injectReducer';
 import { compose } from 'redux';
 import reducer from './reducer';
 import routes from './routes';
+import injectSaga from '../../../../utils/injectSaga';
+import saga from './saga';
 class LayoutRequestManagement extends Component {
   render() {
     console.log('LayoutRequestManagement');
@@ -13,11 +15,11 @@ class LayoutRequestManagement extends Component {
     console.log(this.props);
     return (
       <div>
-         <Switch>
-         {routes.map((route, i) => (
-         <RenderRoute key={i} {...route} />
-         ))}
-         </Switch>
+        <Switch>
+          {routes.map((route, i) => (
+            <RenderRoute key={i} {...route} />
+          ))}
+        </Switch>
       </div>
     );
   }
@@ -26,4 +28,10 @@ class LayoutRequestManagement extends Component {
 LayoutRequestManagement.defaultProps = {};
 LayoutRequestManagement.propTypes = {};
 const withReducer = injectReducer({ key: 'request', reducer });
-export default withRouter(compose(withReducer)(LayoutRequestManagement));
+const withSaga = injectSaga({ key: 'request', saga });
+export default withRouter(
+  compose(
+    withReducer,
+    withSaga,
+  )(LayoutRequestManagement),
+);
