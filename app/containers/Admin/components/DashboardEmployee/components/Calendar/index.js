@@ -55,7 +55,6 @@ class Index extends Component {
   dateRenderCell = value => {
     const { success, warning, error, m, data } = this.state;
     const d = new Date(value).getDate();
-    console.log(d)
     const month = new Date(value).getMonth();
     let check = -1;
     let time = false;
@@ -76,7 +75,6 @@ class Index extends Component {
     if (m !== month) {
       check = 3;
     }
-    console.log({ time });
     switch (check) {
       case 1:
         return (

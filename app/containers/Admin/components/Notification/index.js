@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { database } from 'containers/commons/firebase';
 import injectReducer from 'utils/injectReducer';
 import Button from 'antd/es/button/button';
 import Modal from 'antd/es/modal/Modal';
@@ -10,42 +9,45 @@ import Col from 'antd/es/grid/col';
 import request from 'utils/request';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
+import { createStructuredSelector } from 'reselect';
+import connect from 'react-redux/es/connect/connect';
+import { Form } from 'antd';
+import { askForPermissioToReceiveNotifications } from 'push-notification';
+import commonFirebase from 'containers/Admin/common';
 import CanWrapper from './Can';
 import FromNew from './Form/New';
 import FormSearch from './Search/Form';
 import Result from './Search/Result';
-import { createStructuredSelector } from 'reselect';
 import { makeSelectCurrentUser } from '../../../App/selectors';
-import connect from 'react-redux/es/connect/connect';
-import { Form } from 'antd';
-class RequestManagement extends Component {
+class NotificationManagement extends Component {
   constructor(props) {
     super(props);
     this.state = {
       visible: false,
       resultSearch: [],
+      valuesSearch: false,
     };
   }
 
   componentWillMount() {
-    request('/api/notification').then(data => {
-      this.setState({ resultSearch: data.payload });
-    });
+    console.log('NotificationManagement');
   }
 
-  componentDidMount() {
-    database.ref('/').on('value', snapshot => {});
-  }
+  componentDidMount() {}
 
-  onNewSuccess = () => {
+  onNewSuccess = async () => {
     this.setState({ visible: false });
-    request('/api/notification').then(data => {
-      this.setState({ resultSearch: data.payload });
-    });
+    this.handleSearch(this.state.valuesSearch);
+    commonFirebase.sendMessageToTopic(
+      'employee',
+      'Có một một thông báo mới!!',
+      '',
+    );
   };
 
   handleSearch = value => {
     try {
+      this.setState({ valuesSearch: value });
       const json = JSON.stringify(value);
       const apiUrl = `/api/notification?value=${json}`;
       request(apiUrl)
@@ -75,16 +77,19 @@ class RequestManagement extends Component {
   };
 
   handleDelete = item => {
-    request(`/api/employee/${item.iid}`, {
+    request(`/api/notification/${item.iid}`, {
       method: 'DELETE',
-    }).then(data => {});
+    }).then(data => {
+      if (data.success && this.state.valuesSearch) {
+        this.handleSearch(this.state.valuesSearch);
+      }
+    });
     const resultSearch = this.state.resultSearch.filter(i => {
       if (i.iid !== item.iid) {
         return true;
       }
       return false;
     });
-    alert(JSON.stringify(resultSearch));
     this.setState({
       resultSearch,
     });
@@ -146,18 +151,19 @@ class RequestManagement extends Component {
           items={this.state.resultSearch}
           handleDelete={this.handleDelete}
           handleChangeActive={this.handleChangeActive}
+          currentUser={this.props.currentUser}
         />
       </div>
     );
   }
 }
 
-RequestManagement.defaultProps = {};
-RequestManagement.propTypes = {};
+NotificationManagement.defaultProps = {};
+NotificationManagement.propTypes = {};
 const mapStateToProps = createStructuredSelector({
   currentUser: makeSelectCurrentUser(),
 });
 
 const withConnect = connect(mapStateToProps);
 
-export default withRouter(compose(withConnect)(RequestManagement));
+export default withRouter(compose(withConnect)(NotificationManagement));

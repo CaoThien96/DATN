@@ -1,7 +1,7 @@
 const routes = require('express').Router();
 const lodash = require('lodash');
 const Request = require('./model');
-
+const News = require('../news/model')
 routes.use('*', (req, res, next) => {
   // Check auth
   next();
@@ -83,15 +83,35 @@ routes.post('/', (req, res) => {
   newRequest.title = title;
   newRequest.descriptions = descriptions;
   newRequest.userIid = 1001;
-  newRequest.date = date;
+  newRequest.addition = {
+    date,
+  };
   newRequest.u = req.user;
+  if (req.files) {
+    newRequest.files = Object.values(req.files)[0];
+    // const listImage= await Promise.all(saveImage);
+    // console.log(listImage)
+  }
   newRequest
     .save()
-    .then(data => {
-      res.status(200).send({
-        success: true,
-        payload: data,
-      });
+    .then(docs => {
+      News.createNewsForAdmin(
+        `Có yêu cầu mới mới:${title}`,
+        `/admin/request/${docs.iid}`,
+        (err, doc) => {
+          if (err) {
+            return res.send({
+              success: false,
+              err,
+            });
+          }
+          req.app.io.emit('action', { type: 'boilerplate/Admin/Update_News' });
+          return res.status(200).send({
+            success: true,
+            payload: 'Tạo thông báo thành công',
+          });
+        },
+      );
     })
     .catch(e =>
       res.status(500).send({
@@ -105,7 +125,7 @@ routes.post('/', (req, res) => {
  */
 routes.put('/:id', (req, res) => {
   const iid = parseInt(req.params.id);
-  const status = req.body.status
+  const status = req.body.status;
   Request.update({ iid }, { status }, (err, docs) => {
     res.send({
       success: true,

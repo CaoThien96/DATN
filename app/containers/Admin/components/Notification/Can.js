@@ -5,7 +5,7 @@ import React from 'react';
 const CanWrapper = ({ user, children, I, a }) => {
   const ability = AbilityBuilder.define((can, cannot) => {
     if (user.role === 1001) {
-      can(['read', 'create', 'comment'], 'Notification');
+      can(['read', 'create', 'comment', 'delete'], 'Notification');
     } else if (user.role === 1000) {
       can(['read', 'comment'], 'Notification');
     }

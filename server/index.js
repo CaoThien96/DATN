@@ -9,8 +9,6 @@ const socket_io = require('socket.io');
 const logger = require('./logger');
 const bodyParser = require('body-parser');
 const passport = require('passport');
-const svm = require('node-svm');
-const commonPath = require('./common/path');
 require('./configs/db');
 require('./configs/cronJob');
 const createJob = require('./configs/cronJobV2');
@@ -18,11 +16,8 @@ const argv = require('./argv');
 const port = require('./port');
 const setup = require('./middlewares/frontendMiddleware');
 const api = require('./middlewares/apiMiddlewares');
-const socketController = require('./module/socket/index')
+const socketController = require('./module/socket/index');
 const User = require('./module/employee/model');
-const Notification = require('./module/notification/model');
-const CheckIn = require('./module/checkin/model');
-const CheckInDetail = require('./module/checkin/model/check_in_detail');
 
 const config = require('./configs/index');
 const isDev = process.env.NODE_ENV !== 'production';
@@ -32,7 +27,8 @@ const ngrok =
     : false;
 const { resolve } = require('path');
 const app = express();
-const usersConnected = [];
+let usersConnected = [];
+app.usersConnected = usersConnected;
 const jobs = [];
 app.jobs = jobs;
 /**
@@ -114,6 +110,7 @@ io.listen(
 app.io = io.on('connection', async socket => {
   app.socket = socket;
   const id = socket.id;
+
   console.log(`Socket connected: ${socket.id}`);
   jwt.verify(socket.handshake.query.token, config.jwtSecret, (err, decoded) => {
     if (err) {
@@ -126,25 +123,36 @@ app.io = io.on('connection', async socket => {
         if (userErr || !user) {
           console.log('client chua dang nhap');
         }
+        console.log(`client dang nhap voi socket id: ${id}`);
         // pass user details onto next route
         const isUser = usersConnected.findIndex(el => {
-          if (el.iid == user.iid) {
+          if (el.user.iid == user.iid) {
             return true;
           }
           return false;
         });
         if (isUser == -1) {
-          usersConnected.push(user);
+          usersConnected.push({ id, user });
         }
         console.log(`Danh sach nguoi dung da dang nhap`);
         for (let i = 0; i < usersConnected.length; i++) {
-          console.log(`${i + 1}: ${usersConnected[i].email}`);
+          console.log(
+            `${i + 1}: ${usersConnected[i].user.email} voi socket id: ${
+              usersConnected[i].id
+            }`,
+          );
         }
       });
     }
   });
-  socket.on('disconnect', function () {
-    console.log(`Socket disconnect ${socket.id}`)
+  socket.on('disconnect', () => {
+    console.log(`Socket disconnect ${socket.id}`);
+    usersConnected = usersConnected.filter(el => {
+      if (el.id === socket.id) {
+        return false;
+      }
+      return true;
+    });
   });
   socket.on('action', async action => {
     if (action.type === 'server/hello') {
@@ -157,15 +165,23 @@ app.io = io.on('connection', async socket => {
      */
     if (action.type === 'server/boilerplate/Notification/AddComment') {
       const newPayload = { ...action.payload, time: new Date() };
-      const onAddCommentNotification = await socketController.handleAddCommentNotification(io,socket,action)
+      const onAddCommentNotification = await socketController.handleAddCommentNotification(
+        io,
+        socket,
+        action,
+      );
       // socket.broadcast.emit('action', {
       //   type: 'boilerplate/Notification/OnAddComment',
       //   payload: newPayload,
       // });
     }
     if (action.type === 'server/boilerplate/Request/AddComment') {
-      const onAddComment = await socketController.handleAddCommentRequest(app.io,socket,action);
-      console.log(onAddComment)
+      const onAddComment = await socketController.handleAddCommentRequest(
+        app.io,
+        socket,
+        action,
+      );
+      console.log(onAddComment);
     }
 
     /**
@@ -174,7 +190,7 @@ app.io = io.on('connection', async socket => {
      * Con neu du doan co xac xuat nho hon 0.3 10 lan thi ping ra mot thong bao khong nhan dang duoc doi tuong
      */
     if (action.type === 'server/boilerplate/Checker/OnPredict') {
-      socketController.handleUpdateStatusCheckIn(socket,action);
+      socketController.handleUpdateStatusCheckIn(socket, action);
     }
   });
 });

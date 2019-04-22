@@ -94,7 +94,7 @@ class CameraWrapper extends Component {
     console.log({val:values[0],indices:indices[0]});
     // console.log(indices);
 
-    if (values < 0.75) {
+    if (values < 0.6) {
       this.miss = this.miss + 1;
       if (this.miss > 2) {
         this.props.handleOpenCheckInManually();
@@ -104,6 +104,7 @@ class CameraWrapper extends Component {
         this.pendding = false;
       }
     } else {
+      this.miss=0
       this.props.handleCheckInAutoSuccess(indices);
       this.pendding = false;
     }

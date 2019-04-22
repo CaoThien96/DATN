@@ -13,10 +13,17 @@ import connect from 'react-redux/es/connect/connect';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
 import CommentWrapper from 'components/Comment';
+import ImageGallery from 'react-image-gallery';
 import Comment from './Comment';
-import { updateRequestDetail, addComment,addReply } from '../../actions';
+import {
+  updateRequestDetail,
+  addComment,
+  addReply,
+  fetchRequestDetail,
+} from '../../actions';
 import { makeSelectCurrentUser } from '../../../../../App/selectors';
 import { makeSelectRequestDetail } from '../../selectors';
+import 'react-image-gallery/styles/css/image-gallery.css';
 const { TextArea } = Input;
 class RequestDetail extends Component {
   constructor(props) {
@@ -28,12 +35,13 @@ class RequestDetail extends Component {
 
   componentWillMount() {
     const { match } = this.props;
-    console.log('componentWillMount')
+    console.log('componentWillMount');
     const id = match.params.id;
-    request(`/api/request/${id}`).then(data => {
-      this.setState({ requestDetail: data.payload });
-      this.props.updateRequestDetail(data.payload);
-    });
+    this.props.fetchRequestDetail({ id });
+    // request(`/api/request/${id}`).then(data => {
+    //   this.setState({ requestDetail: data.payload });
+    //   this.props.updateRequestDetail(data.payload);
+    // });
   }
 
   handleGetDetail = () => {
@@ -44,49 +52,22 @@ class RequestDetail extends Component {
     });
   };
 
-  handeSendComment = e => {
-    e.preventDefault();
-    const { match } = this.props;
-    const id = match.params.id;
-    this.props.form.validateFields((err, values) => {
-      if (!err) {
-        // alert(JSON.stringify(values));
-        request('/api/request/comment', {
-          method: 'POST', // or 'PUT'
-          body: JSON.stringify({
-            ...values,
-            requestIid: id,
-            u: {
-              email: 'caothien029@gmail.com',
-              iid: 1001,
-            },
-          }), // data can be `string` or {object}!
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-          .then(res => {
-            this.props.form.resetFields();
-            this.handleGetDetail();
-            // this.handleReset();
-            // this.props.onSuccess();
-          })
-          .catch(err => {});
-      }
-    });
-  };
-
   render() {
     const { requestDetail } = this.props;
     // const { requestDetail } = this.state;
     const { getFieldDecorator } = this.props.form;
-
+    const images =
+      requestDetail.images &&
+      requestDetail.images.map(el => ({
+        original: `http://localhost:3000/request/${el}`,
+        thumbnail: `http://localhost:3000/request/${el}`,
+      }));
     return !requestDetail ? (
       <LoadingIndicator />
     ) : (
       <div>
         <Row>
-          <Col span={12}>
+          <Col style={{ paddingRight: '20px' }} span={14}>
             <Row>
               <Col span={6}>Tiêu đề: {requestDetail.title}</Col>
               <Col span={6}>Người gửi: {requestDetail.u.email}</Col>
@@ -108,8 +89,13 @@ class RequestDetail extends Component {
                 {requestDetail.descriptions}
               </p>
             </Row>
+            {requestDetail.images && (
+              <Row>
+                <ImageGallery items={images} />
+              </Row>
+            )}
           </Col>
-          <Col span={12}>
+          <Col span={10}>
             <CommentWrapper
               addComment={this.props.addComment}
               addReply={this.props.addReply}
@@ -132,6 +118,7 @@ const mapDispatchToProps = dispatch => ({
   updateRequestDetail: payload => dispatch(updateRequestDetail(payload)),
   addComment: payload => dispatch(addComment(payload)),
   addReply: payload => dispatch(addReply(payload)),
+  fetchRequestDetail: payload => dispatch(fetchRequestDetail(payload)),
 });
 const withConnect = connect(
   mapStateToProps,
