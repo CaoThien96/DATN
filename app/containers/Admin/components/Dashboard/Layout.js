@@ -5,6 +5,8 @@ import request from 'utils/request';
 
 import OverviewRange from './components/Overview';
 import OverviewDate from './index';
+import OverviewWarning from './components/Warning'
+import Icon from 'antd/es/icon';
 const TabPane = Tabs.TabPane;
 
 class Layout extends Component {
@@ -18,12 +20,15 @@ class Layout extends Component {
   render() {
     return (
       <div>
-        <Tabs defaultActiveKey="1">
-          <TabPane tab="Thống kê theo khoảng thời gian" key="1">
+        <Tabs type="card" defaultActiveKey="1">
+          <TabPane tab={<span><Icon type="bar-chart" />Thống kê theo khoảng thời gian</span>} key="1">
             <OverviewRange />
           </TabPane>
-          <TabPane tab="Thông kê chi tiết theo ngày" key="2">
+          <TabPane tab={<span><Icon type="credit-card" />Thông kê chi tiết theo ngày</span>} key="2">
             <OverviewDate />
+          </TabPane>
+          <TabPane tab={<span><Icon type="alert" />Cảnh báo</span>} key="3">
+            <OverviewWarning />
           </TabPane>
         </Tabs>
       </div>

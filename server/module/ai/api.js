@@ -10,6 +10,7 @@ const User = require('../employee/model');
 const config = require('../../configs/index');
 const commonPath = require('../../common/path');
 const commonControll = require('./common');
+const job  = require('../../configs/JobExcuse')
 
 async function training() {
   return new Promise(async (resolve, reject) => {
@@ -88,6 +89,7 @@ async function getDataSetFetchMatcher(numberClass, users) {
 routes.get('/testIo', (req, res) => {
   const connected = req.app.io.connected;
   console.log({ connected });
+  job.createCheckin();
 });
 routes.post('/', async (req, res) => {
   // try {

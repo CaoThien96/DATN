@@ -28,29 +28,40 @@ class RequestManagement extends Component {
   }
 
   componentWillMount() {
-    // request('http://localhost:3000/api/get-current-user').then(data=>console.log(data))
-    request('/api/request').then(data => {
-      this.setState({ resultSearch: data.payload });
-    });
   }
-
-
 
   onNewSuccess = async () => {
     this.setState({ visible: false });
     this.handleSearch(this.state.searchValue);
-    commonFirebase.sendMessageToTopic('admin', 'Có một yêu cầu mới cần xử lý', '');
+    commonFirebase.sendMessageToTopic(
+      'admin',
+      'Có một yêu cầu mới cần xử lý',
+      '',
+    );
   };
 
   handleSearch = value => {
     try {
+      const { currentUser } = this.props;
       this.setState({ searchValue: value });
       const json = JSON.stringify(value);
       const apiUrl = `/api/request?value=${json}`;
       request(apiUrl)
         .then(data => {
           console.log(data);
-          this.setState({ resultSearch: data.payload });
+          if (data.success) {
+            let resultSearch = [];
+            if (currentUser.role === 1000) {
+              resultSearch = data.payload.filter(el => {
+                if (el.u.iid === currentUser.iid) {
+                  return true;
+                }
+              });
+            } else {
+              resultSearch = data.payload;
+            }
+            this.setState({ resultSearch });
+          }
         })
         .catch(err => alert(err));
     } catch (e) {

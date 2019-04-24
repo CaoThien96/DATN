@@ -25,17 +25,13 @@ class New extends Component {
   submit = e => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
-      const date = values.date;
-      console.log('dasda')
+      const date = values.date.unix()*1000;
+      console.log({date:date})
 
       if (err) {
         console.log(err)
         return;
       }
-      console.log('dasda')
-
-      // database.ref("/request")
-      //   .push({...values,date:date,status:0});
       console.log(values)
       requestV2('/api/request', {
         method: 'POST',
@@ -156,7 +152,7 @@ class New extends Component {
           {this.state.type == '1' ? (
             <Form.Item label="Yêu cầu xin nghỉ phải trước 2 ngày">
               {getFieldDecorator('date', config)(
-                <DatePicker format="YYYY-MM-DD" disabledDate={disabledDate} />,
+                <DatePicker format="YYYY-MM-DD" />,
               )}
             </Form.Item>
           ) : null}

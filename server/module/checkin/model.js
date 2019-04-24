@@ -67,10 +67,59 @@ CheckInSchema.statics.searchCheckInByMonth = function search(
     .exec(cb);
 };
 CheckInSchema.statics.searchCheckInByRange = function search(start, end, cb) {
-  console.log({start,end})
+  console.log({ start, end });
   return this.where('date')
     .gte(start)
     .lte(end)
     .exec(cb);
+};
+CheckInSchema.statics.searchCheckInDetailByRangeWithUser = function(
+  start,
+  end,
+  user,
+  cb,
+) {
+  this.searchCheckInByRange(start, end, (err, docs) => {
+    if (err) {
+      return cb(err);
+    }
+    if (docs === null) {
+      return cb('Khong tim thay phien giam sat');
+    }
+    const listPid = docs.map(el => el.iid);
+    console.log(listPid);
+    this.aggregate([
+      {
+        $match: {
+          iid: { $in: listPid },
+        },
+      },
+      {
+        $lookup: {
+          from: 'checkindetails',
+          let: { checkInIid: '$iid' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ['$pid', '$$checkInIid'] },
+                    { $eq: ['$user.iid', user.iid] },
+                  ],
+                },
+              },
+            },
+          ],
+          as: 'check_in_detail',
+        },
+      },
+      { $unwind: '$check_in_detail' }
+    ]).exec((err, listCheckIn) => {
+      if (err) {
+        return cb(err);
+      }
+      return cb(null,listCheckIn);
+    });
+  });
 };
 module.exports = mongoose.model('CheckIn', CheckInSchema);

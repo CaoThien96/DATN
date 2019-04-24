@@ -1,8 +1,8 @@
 const routes = require('express').Router();
 const lodash = require('lodash');
 const CheckIn = require('./model');
+const User = require('../employee/model')
 const CheckInDetail = require('./model/check_in_detail');
-const compareYMD = (date1, date2) => {};
 routes.post('/', async (req, res) => {
   const checkInDetail = await CheckInDetail.find({
     'user.iid': 1011,
@@ -238,5 +238,26 @@ routes.get('/list-check-in-by-range-with-admin/:start/:end', (req, res) => {
     //   });
     // });
   });
+});
+routes.get('/list-check-in-by-range-with-employee/:start/:end/:iid',async (req, res) => {
+  const { start, end,iid } = req.params;
+  const user =await User.findOne({iid:parseInt(iid)})
+  CheckIn.searchCheckInDetailByRangeWithUser(
+    start,
+    end,
+    user,
+    (err, listCheckIn) => {
+      if (err) {
+        return res.send({
+          success: false,
+          err,
+        });
+      }
+      return res.send({
+        success: true,
+        payload: listCheckIn,
+      });
+    },
+  );
 });
 module.exports = routes;

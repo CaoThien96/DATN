@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const fs = require('fs');
 const autoIncrement = require('../../configs/auto-increment');
 const commonPath = require('../../common/path');
+const timeCommon = require('../../common/timeCommon');
 const { Schema } = mongoose;
 
 const RequestSchema = new Schema({
@@ -24,7 +25,7 @@ const RequestSchema = new Schema({
   },
   images: [String],
   addition: {
-    type: Schema.Types.Mixed,
+    date: Number,
   },
   comments: [
     {
@@ -96,6 +97,28 @@ RequestSchema.methods.addComment = function(comments, cb) {
     cb(null, docs);
   });
 };
-
+RequestSchema.statics.findRequestByUserMatchTime = function(user) {
+  const { iid } = user;
+  const startDate = timeCommon.getStartDay().getTime();
+  const endDay = timeCommon.getEndDay().getTime();
+  return new Promise((resolve, reject) => {
+    this.model('Request').findOne(
+      {
+        'u.iid': iid,
+        $and: [
+          { 'addition.date': { $gte: startDate } },
+          { 'addition.date': { $lte: endDay } },
+        ],
+        status: 1,
+      },
+      (err, doc) => {
+        if (err) {
+          return reject(err);
+        }
+        return resolve(doc);
+      },
+    );
+  });
+};
 const RequestModel = mongoose.model('Request', RequestSchema);
 module.exports = RequestModel;

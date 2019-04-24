@@ -24,7 +24,7 @@ const routes = [
     key: 'admin-dashboard',
     exact: true,
     component: Dashboard,
-    label: 'Dashboard',
+    label: 'Thống kê',
     icon: <Icon type="dashboard" />,
   },
   {
@@ -32,7 +32,7 @@ const routes = [
     key: 'admin-dashboard-employee',
     exact: true,
     component: DashboardEmployee,
-    label: 'Dashboard',
+    label: 'Thống kê',
     icon: <Icon type="dashboard" />,
   },
   {
@@ -48,14 +48,14 @@ const routes = [
     key: 'admin-employee',
     // exact: true,
     component: EmployeeLayout,
-    label: 'Employee',
+    label: 'Nhân viên',
     icon: <Icon type="team" />,
   },
   {
     path: '/admin/request',
     key: 'admin-request',
     component: RequestLayoutManagement,
-    label: 'Request',
+    label: 'Yêu cầu',
     icon: <Icon type="clock-circle" />,
   },
   {
@@ -63,7 +63,7 @@ const routes = [
     key: 'admin-notification',
     // exact: true,
     component: NotificationLayoutManagement,
-    label: 'Notification',
+    label: 'Thông báo',
     icon: <Icon type="sound" />,
   },
   {
@@ -71,7 +71,7 @@ const routes = [
     key: 'admin-checker',
     exact: true,
     component: Checker,
-    label: 'Checker',
+    label: 'Giám sát',
     icon: <Icon type="clock-circle" />,
   },
   {
@@ -87,7 +87,7 @@ const routes = [
     key: 'admin-configuration',
     exact: true,
     component: Configuration,
-    label: 'Configuration',
+    label: 'Cài đặt hệ thống',
     icon: <Icon type="setting" />,
   },
   {
@@ -95,7 +95,7 @@ const routes = [
     key: 'admin-configuration-model',
     exact: true,
     component: ConfigurationModel,
-    label: 'Configuration Model',
+    label: 'Cài đặt mô hình',
     icon: <Icon type="setting" />,
   },
   {
@@ -106,14 +106,14 @@ const routes = [
         path: '/admin/user',
         key: 'admin-user-center',
         label: 'Thông tin cá nhân',
-        icon: <Icon type="setting" />,
+        icon: <Icon type="profile" />,
         exact: true,
         component: Center,
       },
       {
         path: '/admin/user/change-password',
         key: 'admin-user-change-password',
-        icon: <Icon type="setting" />,
+        icon: <Icon type="eye-invisible" />,
         exact: true,
         component: ChangePass,
         label: 'Thay đổi mật khẩu',
@@ -122,8 +122,8 @@ const routes = [
     // exact: true,
     component: Information,
     hidden: true,
-    label: 'Configuration Model',
-    icon: <Icon type="setting" />,
+    label: 'Thông tin',
+    icon: <Icon type="user" />,
   },
   {
     path: '',
