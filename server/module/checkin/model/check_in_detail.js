@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const moment = require('moment');
+const Request = require('../../request/model');
 const { Schema } = mongoose;
 const Configuration = require('../../configuration/model');
 const CheckInDetailSchema = new Schema(
@@ -14,6 +14,7 @@ const CheckInDetailSchema = new Schema(
     /**
      * 1 la dung gio
      * 2 la di muon
+     * 3 la xin nghi
      * 0 la nghi
      */
     status: {
@@ -30,10 +31,10 @@ const CheckInDetailSchema = new Schema(
 //   incrementBy: 1,
 // });
 
-CheckInDetailSchema.methods.updateStatus = function(cb) {
+CheckInDetailSchema.methods.updateStatus = async function(cb) {
   Configuration.find(
     { $or: [{ name: 'on_time' }, { name: 'late_time' }] },
-    (err, docs) => {
+    async (err, docs) => {
       if (err) {
         return cb(err);
       }
@@ -48,6 +49,10 @@ CheckInDetailSchema.methods.updateStatus = function(cb) {
       let status = 1;
       if (current_time > late) {
         status = 2;
+      }
+      const request = await Request.findRequestByUserMatchTime(this.user);
+      if(request){
+        status = 3;
       }
       console.log({ status });
       console.log({ current_time});

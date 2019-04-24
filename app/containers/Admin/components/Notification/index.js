@@ -11,8 +11,6 @@ import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
 import { createStructuredSelector } from 'reselect';
 import connect from 'react-redux/es/connect/connect';
-import { Form } from 'antd';
-import { askForPermissioToReceiveNotifications } from 'push-notification';
 import commonFirebase from 'containers/Admin/common';
 import CanWrapper from './Can';
 import FromNew from './Form/New';

@@ -1,7 +1,7 @@
 const routes = require('express').Router();
 const lodash = require('lodash');
 const Request = require('./model');
-const News = require('../news/model')
+const News = require('../news/model');
 routes.use('*', (req, res, next) => {
   // Check auth
   next();

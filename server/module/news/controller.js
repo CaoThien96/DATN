@@ -5,6 +5,7 @@ module.exports.handleGetNews = async (req, res, next) => {
     const user = req.user;
     const news = await News.find({
       'receiver.u.iid': parseInt(iid),
+      'status':0,
     });
     res.send({
       success: true,

@@ -1,16 +1,9 @@
 import React, { Component } from 'react';
 import { Button, Checkbox, Form, Icon, Input } from 'antd';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
-// import get from 'lodash/get';
-// import Request from 'utils/request.api';
 import './styles.css';
-// import connect from 'react-redux/es/connect/connect';
-// import { compose } from 'redux';
-// import { makeSelectGlobal } from 'containers/App/selectors';
-// import { createStructuredSelector } from 'reselect';
-// import { checkLogin } from '../../App/actions';
 import request from 'utils/request';
+
 const Error = styled.div`
   color: red;
 `;
@@ -87,15 +80,6 @@ class NormalLoginForm extends Component {
           {this.state.error && (
             <Error>Username or password not correct!!</Error>
           )}
-          {/*<FormItem>*/}
-            {/*{getFieldDecorator('remember', {*/}
-              {/*valuePropName: 'checked',*/}
-              {/*initialValue: true,*/}
-            {/*})(<Checkbox>Remember me</Checkbox>)}*/}
-            {/*<a className="login-form-forgot" href="">*/}
-              {/*Forgot password*/}
-            {/*</a>*/}
-          {/*</FormItem>*/}
           <div>
             {
               this.state.err?(
@@ -111,7 +95,6 @@ class NormalLoginForm extends Component {
             >
               Log in
             </Button>
-            {/*<Link to="/sign-up">Or register now!</Link>*/}
           </div>
         </Form>
       </div>
@@ -119,18 +102,5 @@ class NormalLoginForm extends Component {
   }
 }
 
-// const mapStateToProps = createStructuredSelector({
-//   globalState: makeSelectGlobal(),
-// });
-// const mapDispatchToProps = dispatch => ({
-//   onHandleCheckLogin: () => {
-//     dispatch(checkLogin());
-//   },
-// });
-// const withConnect = connect(
-//   mapStateToProps,
-//   mapDispatchToProps,
-// );
-// const NormalLoginFormConnect = compose(withConnect)(NormalLoginForm);
 const WrappedNormalLoginForm = Form.create()(NormalLoginForm);
 export default WrappedNormalLoginForm;

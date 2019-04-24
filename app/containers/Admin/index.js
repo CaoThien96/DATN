@@ -15,19 +15,18 @@ import notification from 'antd/es/notification';
 import Avatar from 'antd/es/avatar';
 import Badge from 'antd/es/badge';
 import injectSaga from 'utils/injectSaga';
+import { getPathImage } from 'common/pathImage';
 import RenderRoute from '../../routes/render';
 import request from '../../utils/request';
 import { makeSelectCurrentUser, makeSelectError } from '../App/selectors';
 import { makeSelectNews } from './selectors';
-import { loadUserLogin, removeUser } from '../App/actions';
+import { loadUserLogin, removeUser,loadUserSuccess } from '../App/actions';
 import { updateNews } from './actions';
 import injectReducer from '../../utils/injectReducer';
 import reducer from './reducer';
 import routes_not_menu from '../../routes/admin_routes_not_menu';
 import commonFirebase from './common';
-import {
-  askForPermissioToReceiveNotifications,
-} from '../../push-notification';
+import { askForPermissioToReceiveNotifications } from '../../push-notification';
 import saga from './saga';
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
@@ -138,9 +137,6 @@ class LayoutAdmin extends Component {
       messaging.onMessage(payload => {
         console.log('Message received. ', payload);
         this.openNotification(payload.notification);
-        // [START_EXCLUDE]
-        // Update the UI to include the received message.
-        // [END_EXCLUDE]
       });
     } catch (e) {
       console.log(e);
@@ -148,17 +144,16 @@ class LayoutAdmin extends Component {
   }
 
   openNotification = payload => {
+    notification.config({
+      placement: 'bottomRight',
+      bottom: 50,
+      duration: 3,
+    });
     notification.open({
       message: payload.title,
       description: payload.body,
       icon: <Avatar size="large" src="http://localhost:3000/logo.png" />,
     });
-  };
-
-  handleOk = () => {};
-
-  handleCancel = () => {
-    this.setState({ visible: false });
   };
 
   handleLogout = () => {
@@ -176,23 +171,14 @@ class LayoutAdmin extends Component {
     } catch (e) {
       console.log({ e });
     }
+    this.props.loadUserSuccess(false)
     this.props.history.replace('/');
-  };
-
-  onFormSubmitSuccess = () => {
-    this.setState({ visible: false });
-    localStorage.removeItem('token');
-    this.props.history.replace('/');
-  };
-
-  handleOpen = () => {
-    this.setState({ visible: true });
   };
 
   render() {
     const { routes, currentUser, error, history } = this.props;
-    if (error) {
-      // history.replace('/');
+    if(!currentUser){
+      return null
     }
     const ability = defineAbilitiesFor(currentUser);
     const filter = lodashcommon.lodashFilter(routes, el =>
@@ -241,6 +227,7 @@ class LayoutAdmin extends Component {
         bage++;
       }
     });
+    getPathImage('1046.jpg');
     return (
       <Layout>
         <Sider
@@ -254,7 +241,16 @@ class LayoutAdmin extends Component {
           }}
           // width={200} style={{ paddingTop: '25px' }}
         >
-          <div className="logo" />
+          <div className="text-center logo">
+            <Avatar size={64}>
+              <img
+                width={64}
+                height={64}
+                src={getPathImage(currentUser.avatar)}
+                alt="user"
+              />
+            </Avatar>
+          </div>
           <Menu
             mode="inline"
             theme="dark"
@@ -273,8 +269,8 @@ class LayoutAdmin extends Component {
                       key={menu && menu.key}
                       title={
                         <span>
-                          <Icon type="notification" />
-                          {menu && menu.label}
+                          {menu && menu.icon ? menu.icon : <Icon type="user" />}
+                          <span className="nav-text">{menu && menu.label}</span>
                         </span>
                       }
                     >
@@ -400,6 +396,7 @@ const mapDispatchToProps = dispatch => ({
   logout: () => dispatch(removeUser()),
   getCurrentUser: () => dispatch(loadUserLogin()),
   updateNews: () => dispatch(updateNews()),
+  loadUserSuccess: (user)=>dispatch(loadUserSuccess(user))
 });
 const withConnect = connect(
   mapStateToProps,

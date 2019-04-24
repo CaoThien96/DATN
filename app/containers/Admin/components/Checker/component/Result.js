@@ -30,9 +30,9 @@ class Result extends Component {
 
   componentWillMount() {
     request('/api/check-in/list-check-in-success').then(data => {
-      console.log(data)
+      console.log(data);
 
-      this.props.onUpdateListCheckIn(data.listCheckSuccess)
+      this.props.onUpdateListCheckIn(data.listCheckSuccess);
     });
   }
 
@@ -52,7 +52,7 @@ class Result extends Component {
             boxShadow: '0px 0px 10px 0px #888888',
           }}
         >
-          {listCheckInV2.map((el,key) => (
+          {listCheckInV2.map((el, key) => (
             <div key={key}>
               <List.Item key={el.id}>
                 <List.Item.Meta
@@ -65,7 +65,11 @@ class Result extends Component {
                   })}
                 />
                 <Button style={{ marginRight: '5px' }} type="primary">
-                  {el.status == 1 ? 'Đúng giờ' : 'Đi muộn'}
+                  {el.status == 1
+                    ? 'Đúng giờ'
+                    : el.status == 2
+                      ? 'Đi muộn'
+                      : 'Có phép'}
                 </Button>
               </List.Item>
               <Divider style={{ margin: '0px', padding: '0px' }} />
@@ -77,8 +81,7 @@ class Result extends Component {
   }
 }
 
-Result.propTypes = {
-};
+Result.propTypes = {};
 const mapStateToProps = createStructuredSelector({
   currentUser: makeSelectCurrentUser(),
   listCheckInV2: makeSelectListCheckIn(),

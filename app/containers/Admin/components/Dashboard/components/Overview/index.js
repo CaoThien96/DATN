@@ -7,6 +7,7 @@ import {
   getStartMonth,
   getEndMonth,
   getStartEndWeek,
+  getStartDay,getEndDay
 } from 'utils/commonDateTime';
 import ChartResult from './ChartResult';
 import request from '../../../../../../utils/request';
@@ -22,6 +23,9 @@ class Index extends Component {
     };
   }
   componentWillMount(){
+    const startDate = getStartDay().getTime();
+    const endDay = getEndDay().getTime();
+    console.log({startDate,endDay})
     this.handleOnchange(moment())
   }
   handleTypeReportChange = value => {
@@ -97,7 +101,7 @@ class Index extends Component {
           {
             this.state.listCheckIn.length>0?(
               <ChartResult listCheckIn={this.state.listCheckIn}/>
-            ):null
+            ):(<p className='text-center'>Không có dữ liệu</p>)
           }
         </div>
       </div>
