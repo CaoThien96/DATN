@@ -136,11 +136,7 @@ class LayoutChecker extends Component {
             ):null
           }
           <Divider />
-          <div className="text-center">
-            <Button type="danger" onClick={this.onOpenCheckInManual}>
-              Giám sát thủ công
-            </Button>
-          </div>
+
           <Camera
             checkInManual={checkInManual}
             model={this.props.model}
@@ -149,6 +145,11 @@ class LayoutChecker extends Component {
             handleOpenCheckInManually={this.onOpenCheckInManual}
             handleShowCurrentPredict={this.handleShowCurrentPredict}
           />
+          <div className="text-center">
+            <Button type="danger" onClick={this.onOpenCheckInManual}>
+              Giám sát thủ công
+            </Button>
+          </div>
         </Col>
         <Col style={{ height: '-webkit-fill-available' }} span={12}>
           <h2 className="text-center">Thông tin giám sát: {stringDate}</h2>

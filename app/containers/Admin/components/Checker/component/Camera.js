@@ -18,6 +18,7 @@ import adminCommon from '../../../common';
 
 const DivWrapper = styled.div`
   position: relative;
+  height: 480px;
 `;
 
 const VideoTag = styled.video`
