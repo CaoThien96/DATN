@@ -1,6 +1,7 @@
 const routes = require('express').Router();
 const lodash = require('lodash');
 const User = require('./model');
+const Controller = require('./controller')
 const CheckIn = require('../checkin/model');
 const CheckInDetail = require('../checkin/model/check_in_detail');
 const mail = require('../../configs/mail');
@@ -273,4 +274,5 @@ routes.post('/upload-image', (req, res) => {
     success: 'oke',
   });
 });
+routes.post('/save-data-training/:iid',Controller.handleSaveImageTrain);
 module.exports = routes;

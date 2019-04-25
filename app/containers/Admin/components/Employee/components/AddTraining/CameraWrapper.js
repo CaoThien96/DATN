@@ -11,16 +11,17 @@ import connect from 'react-redux/es/connect/connect';
 import TrainingImage from '../../../Attendance/components/bbt3.jpg';
 import { getFaceDetectorOptions } from '../../../Checker/common/faceDetectionControls';
 import { drawDetections } from '../../../Checker/common/drawing';
-
+import adminCommon from 'containers/Admin/common'
+import { makeSelectCurrentUser } from '../../../../../App/selectors';
 const ButtonTry = styled.div`
   position: relative;
   text-align: center;
-  top: 400px;
   display: block;
 `;
 
 const DivWrapper = styled.div`
   position: relative;
+  height: 480px;
 `;
 
 const VideoTag = styled.video`
@@ -33,7 +34,6 @@ class CameraWrapper extends Component {
   constructor(props) {
     super(props);
     this.videoTag = React.createRef();
-    this.imageTag = React.createRef();
     this.canvasRef = React.createRef();
     this.canvasClone = React.createRef();
     this.resultTag = React.createRef();
@@ -42,6 +42,7 @@ class CameraWrapper extends Component {
     this.state = {
       status: 'un-previewed',// un-previewed chua tao du || previewed tao du
       statusTraining: 0, // If status = 0 is create manual else create auto
+      countImage:0
     };
   }
 
@@ -86,11 +87,9 @@ class CameraWrapper extends Component {
     const result = await faceapi
       .detectSingleFace(this.canvasClone.current, options)
       .withFaceLandmarks();
-    console.log({result})
     if (result) {
       if (statusTraining == 1 && result.detection.score > 0.85) {
-        console.log(statusTraining)
-        if (this.images.length < 20) {
+        if (this.images.length < 36) {
           const tmp = this.images;
           const imageExtract = await faceapi.extractFaces(
             this.videoTag.current,
@@ -98,11 +97,15 @@ class CameraWrapper extends Component {
           );
           const imageToSquare = await faceapi.imageToSquare(
             imageExtract[0],
-            150,
+            64,
             true,
           );
-          tmp.push(imageToSquare);
+          console.log(imageToSquare)
+          const grayImage = adminCommon.getGrayImage(imageToSquare)
+          console.log({imageToSquare,grayImage})
+          tmp.push(grayImage);
           this.images = tmp;
+          this.setState({countImage:this.images.length})
         } else if (this.status == 'un-previewed') {
           this.props.onDetectedFaceSuccess(this.images);
           this.status = 'previewed';
@@ -111,13 +114,13 @@ class CameraWrapper extends Component {
           });
         }
       }
-      drawDetections(this.imageTag.current, this.canvasRef.current, [
+      drawDetections(this.videoTag.current, this.canvasRef.current, [
         result.alignedRect,
       ]);
     } else {
-      drawDetections(this.imageTag.current, this.canvasRef.current, []);
+      drawDetections(this.videoTag.current, this.canvasRef.current, []);
     }
-    setTimeout(() => this.onPlay(this.videoTag.current), 1000 / 30);
+    setTimeout(() => this.onPlay(this.videoTag.current), 1000 / 40);
   };
 
   onReTraining = () => {
@@ -146,7 +149,7 @@ class CameraWrapper extends Component {
         .detectSingleFace(this.canvasClone.current, options)
         .withFaceLandmarks();
       if (result) {
-        if (this.images.length < 20) {
+        if (this.images.length < 36) {
           const tmp = this.images;
           const imageExtract = await faceapi.extractFaces(
             this.videoTag.current,
@@ -154,11 +157,13 @@ class CameraWrapper extends Component {
           );
           const imageToSquare = await faceapi.imageToSquare(
             imageExtract[0],
-            150,
+            64,
             true,
           );
-          tmp.push(imageToSquare);
+          const grayImage = adminCommon.getGrayImage(imageToSquare)
+          tmp.push(grayImage);
           this.images = tmp;
+          this.setState({countImage:this.images.length})
         } else if (this.status == 'un-previewed') {
           this.props.onDetectedFaceSuccess(this.images);
           this.handleButtonRelease();
@@ -177,6 +182,7 @@ class CameraWrapper extends Component {
 
   onSave = async () => {
     this.props.showLoading();
+    adminCommon.saveImage(this.images,this.props.currentUser.iid)
     const descriptors = this.images.map(
       el =>
         new Promise(async (resolve, reject) => {
@@ -224,18 +230,11 @@ class CameraWrapper extends Component {
             // style={{ position: 'absolute' }}
             onPlay={this.onPlay}
             ref={this.videoTag}
-            width="594"
-            height="383"
+            width="640"
+            height="480"
             controls
             autoPlay
             muted
-          />
-
-          <img
-            style={{ position: 'absolute', display: 'none' }}
-            ref={this.imageTag}
-            src={TrainingImage}
-            alt=""
           />
           <CanvasTag ref={this.canvasRef} id="overlay" />
         </DivWrapper>
@@ -257,7 +256,7 @@ class CameraWrapper extends Component {
             type="primary"
             onClick={() => this.setState({ statusTraining: 1 })}
           >
-            Tạo Tự Động
+            Tạo Tự Động{` (${this.state.countImage} ảnh)`}
           </Button>
           <Button
             onTouchStart={this.onCreateTrainingManual}
@@ -269,14 +268,16 @@ class CameraWrapper extends Component {
             className="m-l-15"
             type="primary"
           >
-            Tạo Thủ Công
+            Tạo Thủ Công{` (${this.state.countImage} ảnh)`}
           </Button>
         </ButtonTry>
       </div>
     );
   }
 }
-const mapStateToProps = createStructuredSelector({});
+const mapStateToProps = createStructuredSelector({
+  currentUser: makeSelectCurrentUser(),
+});
 const mapDispatchToProps = dispatch => ({
   showLoading: () => dispatch(showLoading()),
   hiddenLoading: () => dispatch(hiddenLoading()),

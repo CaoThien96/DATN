@@ -39,7 +39,7 @@ class Index extends Component {
             xs={24}
             sm={24}
             md={24}
-            xl={11}
+            xl={13}
           >
             <CameraWrapper
               {...this.props}
@@ -53,7 +53,7 @@ class Index extends Component {
             sm={24}
             md={24}
             style={{ height: '-webkit-fill-available' }}
-            xl={13}
+            xl={11}
           >
             <Preview
               resultTag={this.resultTag}

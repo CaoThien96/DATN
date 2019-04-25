@@ -14,6 +14,7 @@ import {
   makeSelectPredict,
   makeSelectPending,
 } from '../seclectors';
+import adminCommon from '../../../common';
 
 const DivWrapper = styled.div`
   position: relative;
@@ -67,20 +68,30 @@ class CameraWrapper extends Component {
     const result = await faceapi
       .detectSingleFace(tmpHtmlMedia, options)
       .withFaceLandmarks()
-      .withFaceDescriptor();
-
     if (result) {
       const alignedRect = result.alignedRect;
+      const imageExtract = await faceapi.extractFaces(
+        this.videoTag.current,
+        [alignedRect],
+      );
+      const imageToSquare = await faceapi.imageToSquare(
+        imageExtract[0],
+        64,
+        true,
+      );
+      const grayImage = adminCommon.getGrayImage(imageToSquare)
+      const descriptor = await faceapi.computeFaceDescriptor(grayImage)
+      console.log({descriptor})
       // console.log({pendding:this.pendding,checkInManual:this.props.checkInManual})
       if (!this.pendding && !this.props.checkInManual) {
         this.pendding = true;
-        this.onRecognition(result);
+        this.onRecognition({descriptor});
       }
-      drawDetections(this.imageTag.current, this.canvasRef.current, [
+      drawDetections(this.videoTag.current, this.canvasRef.current, [
         alignedRect,
       ]);
     } else {
-      drawDetections(this.imageTag.current, this.canvasRef.current, []);
+      drawDetections(this.videoTag.current, this.canvasRef.current, []);
     }
     setTimeout(() => this.onPlay(this.videoTag.current));
   };
@@ -91,20 +102,21 @@ class CameraWrapper extends Component {
     let { values, indices } = tf.topk(yPredict);
     values = values.as1D().dataSync();
     indices = indices.as1D().dataSync();
-    console.log({val:values[0],indices:indices[0]});
-    // console.log(indices);
 
-    if (values < 0.6) {
+    if (values < 0.7) {
       this.miss = this.miss + 1;
-      if (this.miss > 2) {
-        this.props.handleOpenCheckInManually();
-        this.pendding = false;
-      } else {
-        console.log('thu lai');
-        this.pendding = false;
-      }
+      this.props.handleShowCurrentPredict(indices,values);
+      // if (this.miss > 2) {
+      //   this.props.handleOpenCheckInManually();
+      //   this.pendding = false;
+      // } else {
+      //   console.log('thu lai');
+      //   this.pendding = false;
+      // }
+      this.pendding = false;
     } else {
       this.miss=0
+      this.props.handleShowCurrentPredict(indices,values);
       this.props.handleCheckInAutoSuccess(indices);
       this.pendding = false;
     }
@@ -129,17 +141,11 @@ class CameraWrapper extends Component {
           // style={{ position: 'absolute' }}
           onPlay={this.onPlay}
           ref={this.videoTag}
-          width="594"
-          height="383"
+          width="640"
+          height="480"
           controls
           autoPlay
           muted
-        />
-        <img
-          style={{ position: 'absolute', display: 'none' }}
-          ref={this.imageTag}
-          src={TrainingImage}
-          alt=""
         />
         <CanvasTag ref={this.canvasRef} id="overlay" />
       </DivWrapper>

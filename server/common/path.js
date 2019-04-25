@@ -22,3 +22,8 @@ module.exports.pathRequest = name =>
     __dirname,
     path.resolve(__dirname, `../../public/request/${name}`),
   );
+module.exports.pathTrain = name =>
+  path.resolve(
+    __dirname,
+    path.resolve(__dirname, `../../public/train/${name}`),
+  );

@@ -29,6 +29,7 @@ class LayoutChecker extends Component {
     super(props);
     this.state = {
       checkInManual: false,
+      curentPredict:false,
     };
   }
 
@@ -81,7 +82,21 @@ class LayoutChecker extends Component {
       checkInManual: false,
     });
   };
-
+  handleShowCurrentPredict = (indices,value)=>{
+    if (this.props.usersOfModel) {
+      // console.log(this.props.usersOfModel)
+      const userPredict = this.props.usersOfModel[indices];
+      this.setState({
+        currentPredict : {
+          userPredict,
+          value
+        }
+      })
+      /**
+       * Gui event bao da tim thay mot doi tuong moi co xac suat okie! Va hay cap nhat trang thai checkin cho doi tuong nay di!!!
+       */
+    }
+  }
   handleCheckInAutoSuccess = indices => {
     if (this.props.usersOfModel) {
       // console.log(this.props.usersOfModel)
@@ -95,7 +110,7 @@ class LayoutChecker extends Component {
   };
 
   render() {
-    const { checkInManual } = this.state;
+    const { checkInManual,currentPredict } = this.state;
     const currentDate = new Date();
     const stringDate = `${currentDate.getDate()}/${currentDate.getMonth()}/${currentDate.getFullYear()}`;
     return (
@@ -109,7 +124,17 @@ class LayoutChecker extends Component {
           style={{ borderRight: '1px solid', height: '-webkit-fill-available' }}
           span={12}
         >
-          <h2 className="text-center">Camera</h2>
+          <h2 className="text-center">Camera </h2>
+          {
+            currentPredict ? (
+              <div>
+                <h3>{`Xác định ${currentPredict.userPredict.email} voi do tin cay ${currentPredict.value}!`}</h3>
+                {
+                  currentPredict.value<0.7 ? (<h3>Độ tin cậy thấp bạn có thể giám sát thủ công</h3>):null
+                }
+              </div>
+            ):null
+          }
           <Divider />
           <div className="text-center">
             <Button type="danger" onClick={this.onOpenCheckInManual}>
@@ -119,8 +144,10 @@ class LayoutChecker extends Component {
           <Camera
             checkInManual={checkInManual}
             model={this.props.model}
+            userOfModel = {this.props.userOfModel}
             handleCheckInAutoSuccess={this.handleCheckInAutoSuccess}
             handleOpenCheckInManually={this.onOpenCheckInManual}
+            handleShowCurrentPredict={this.handleShowCurrentPredict}
           />
         </Col>
         <Col style={{ height: '-webkit-fill-available' }} span={12}>
