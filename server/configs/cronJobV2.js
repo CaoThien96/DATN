@@ -12,6 +12,7 @@ async function createJobUpdateModel() {
       const configJob = `0 ${time.minute()} ${time.hour()} * * 0-4`.toString();
       const job = new CronJob(configJob, async () => {
         console.log(`time_update_model${new Date().toDateString()}`);
+        JobExcuse.saveAndUpdateModel();
       });
       resolve(job);
     });

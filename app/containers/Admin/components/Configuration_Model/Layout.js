@@ -208,6 +208,9 @@ class LayoutConfigurationModel extends Component {
         // tickLabels: classNames
       },
     );
+    if(!tfvis.visor().isOpen()){
+      tfvis.visor().toggle()
+    }
   };
 
 

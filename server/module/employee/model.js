@@ -26,6 +26,7 @@ const UserSchema = new Schema({
   address: {
     type: String,
   },
+  birthday: Number,
   avatar: {
     type: String,
   },
@@ -35,6 +36,7 @@ const UserSchema = new Schema({
   },
   status: {
     type: Number,
+    default: 1,
   },
   training: {
     type: String,
@@ -51,7 +53,7 @@ UserSchema.pre('save', function(next) {
   /**
    * Tao phien giam sat cho nhan vien moi tao
    */
-  if(this.role === 1000){
+  if (this.role === 1000) {
     CheckIn.searchCheckIn(new Date(), (err, doc) => {
       console.log({ err, doc });
       if (err) {
@@ -72,11 +74,9 @@ UserSchema.pre('save', function(next) {
         });
       }
     });
-    if (user && user.role === 1000) {
-      user.status = 1;
-    } else {
-      user.status = 0;
-    }
+  }
+  if (user) {
+    user.status = 1;
   }
   if (this.isModified('password') || this.isNew) {
     bcrypt.genSalt(10, (err, salt) => {

@@ -64,7 +64,7 @@ class CameraWrapper extends Component {
       !faceapi.nets.tinyFaceDetector.params
     )
       return setTimeout(() => this.onPlay(this.videoTag.current));
-    const options = getFaceDetectorOptions();
+    const options = getFaceDetectorOptions(0.6);
     const tmpHtmlMedia = faceapi.createCanvasFromMedia(this.videoTag.current);
     const result = await faceapi
       .detectSingleFace(tmpHtmlMedia, options)
@@ -104,7 +104,7 @@ class CameraWrapper extends Component {
     values = values.as1D().dataSync();
     indices = indices.as1D().dataSync();
 
-    if (values < 0.7) {
+    if (values < 0.85) {
       this.miss = this.miss + 1;
       this.props.handleShowCurrentPredict(indices,values);
       // if (this.miss > 2) {

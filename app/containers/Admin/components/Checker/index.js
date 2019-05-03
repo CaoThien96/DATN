@@ -36,7 +36,7 @@ class LayoutChecker extends Component {
   async componentDidMount() {
     try {
       const model = await tf.loadModel(
-        'http://localhost:3000/model/model.json',
+        'http://localhost:3000/model2/model.json',
       );
       const params = JSON.stringify({
         training: 1,

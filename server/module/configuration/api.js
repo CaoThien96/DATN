@@ -66,7 +66,7 @@ routes.post('/', (req, res) => {
       const time = moment.unix(value);
       const configJob = `0 ${time.minute()} ${time.hour()} * * 1-5`.toString();
       const job = new CronJob(configJob, async () => {
-        console.log(`createJobUpdateModel ${new Date().toDateString()}`);
+        JobExcuse.saveAndUpdateModel();
       });
       job.start();
       req.app.jobs.push({

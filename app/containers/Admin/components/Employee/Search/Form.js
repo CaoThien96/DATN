@@ -1,15 +1,16 @@
 import React from 'react';
 import { Form, Icon, Input, Row, Col,Checkbox} from 'antd';
+import Radio from 'antd/es/radio/radio';
 
 export default ({ getFieldDecorator }) => (
   <div>
     <Row>
-      <Col span={6}>
+      <Col span={4}>
         <Form.Item>
           {getFieldDecorator('iid')(
             <Input
               prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
-              placeholder="Tìm kiếm bằng mã nhân viên"
+              placeholder="Nhập nhân viên"
             />,
           )}
         </Form.Item>
@@ -19,12 +20,12 @@ export default ({ getFieldDecorator }) => (
           {getFieldDecorator('email')(
             <Input
               prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
-              placeholder="enter email"
+              placeholder="Nhập email"
             />,
           )}
         </Form.Item>
       </Col>
-      <Col span={12}>
+      <Col span={9}>
         <Form.Item>
           {getFieldDecorator('status',{
             initialValue: [1],
@@ -39,6 +40,21 @@ export default ({ getFieldDecorator }) => (
           )}
         </Form.Item>
       </Col>
+
     </Row>
+    <row>
+      <Col span={24}>
+        <Form.Item>
+          {getFieldDecorator('role',{
+            initialValue: 1000,
+          })(
+            <Radio.Group>
+              <Radio value={1000}>Nhân viên</Radio>
+              <Radio value={1002}>Giám sát viên</Radio>
+            </Radio.Group>
+          )}
+        </Form.Item>
+      </Col>
+    </row>
   </div>
 );

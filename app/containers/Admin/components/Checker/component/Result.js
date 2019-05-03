@@ -13,6 +13,7 @@ import request from 'utils/request';
 import { makeSelectCurrentUser } from '../../../../App/selectors';
 import { makeSelectListCheckIn, makeSelectPredict } from '../seclectors';
 import { onUpdateListCheckIn } from '../actions';
+import { getPathImage } from '../../../../../common/pathImage';
 
 const ResultWarapper = styled.div`
   padding: 0px 10px;
@@ -52,29 +53,32 @@ class Result extends Component {
             boxShadow: '0px 0px 10px 0px #888888',
           }}
         >
-          {listCheckInV2.map((el, key) => (
-            <div key={key}>
-              <List.Item key={el.id}>
-                <List.Item.Meta
-                  avatar={
-                    <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
-                  }
-                  title={<a href="https://ant.design">{el.user.email}</a>}
-                  description={new Date(el.updatedAt).toLocaleString('en-US', {
-                    timeZone: 'Asia/Jakarta',
-                  })}
-                />
-                <Button style={{ marginRight: '5px' }} type="primary">
-                  {el.status == 1
-                    ? 'Đúng giờ'
-                    : el.status == 2
-                      ? 'Đi muộn'
-                      : 'Có phép'}
-                </Button>
-              </List.Item>
-              <Divider style={{ margin: '0px', padding: '0px' }} />
-            </div>
-          ))}
+          {listCheckInV2.map((el, key) => {
+            console.log({el})
+            return (
+              <div key={key}>
+                <List.Item key={el.id}>
+                  <List.Item.Meta
+                    avatar={
+                      <Avatar src={getPathImage(el.user.avatar)} />
+                    }
+                    title={<a href="#">{el.user.email}</a>}
+                    description={new Date(el.updatedAt).toLocaleString('en-US', {
+                      timeZone: 'Asia/Jakarta',
+                    })}
+                  />
+                  <Button style={{ marginRight: '5px' }} type="primary">
+                    {el.status == 1
+                      ? 'Đúng giờ'
+                      : el.status == 2
+                        ? 'Đi muộn'
+                        : 'Có phép'}
+                  </Button>
+                </List.Item>
+                <Divider style={{ margin: '0px', padding: '0px' }} />
+              </div>
+            )
+          })}
         </div>
       </ResultWarapper>
     );

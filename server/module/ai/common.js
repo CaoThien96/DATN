@@ -74,7 +74,7 @@ module.exports.getModel = numberClass => {
 };
 
 module.exports.saveModel = async model => {
-  const pathSave= path.resolve(__dirname, '../../../public/model2')
+  const pathSave= path.resolve(__dirname, '../../../public/model')
   try {
     await model.save(`file://${pathSave}`);
     return true;

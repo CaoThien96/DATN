@@ -35,12 +35,12 @@ const list_config = [
     name: 'time_create_checkin',
     type: 'time',
   },
-  {
-    label: 'Điều kiện cảnh báo(số lân đi muộn vượt quá)',
-    name: 'maxMiss',
-    type: 'number',
-    default: 5,
-  },
+  // {
+  //   label: 'Điều kiện cảnh báo(số lân đi muộn vượt quá)',
+  //   name: 'maxMiss',
+  //   type: 'number',
+  //   default: 5,
+  // },
 ];
 const Span = Styled.span`
      font-size: 20px;

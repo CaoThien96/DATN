@@ -28,6 +28,7 @@ class Index extends Component {
   render() {
     const { listFaceDetected } = this.state;
     const { params } = this.props.match;
+    console.log({params})
     return (
       <div>
         <Row>

@@ -8,10 +8,10 @@ import { compose } from 'redux';
 import { createStructuredSelector } from 'reselect';
 import * as _ from 'lodash';
 import connect from 'react-redux/es/connect/connect';
+import adminCommon from 'containers/Admin/common';
 import TrainingImage from '../../../Attendance/components/bbt3.jpg';
 import { getFaceDetectorOptions } from '../../../Checker/common/faceDetectionControls';
 import { drawDetections } from '../../../Checker/common/drawing';
-import adminCommon from 'containers/Admin/common'
 import { makeSelectCurrentUser } from '../../../../../App/selectors';
 const ButtonTry = styled.div`
   position: relative;
@@ -40,9 +40,9 @@ class CameraWrapper extends Component {
     this.images = [];
     this.status = 'un-previewed';
     this.state = {
-      status: 'un-previewed',// un-previewed chua tao du || previewed tao du
+      status: 'un-previewed', // un-previewed chua tao du || previewed tao du
       statusTraining: 0, // If status = 0 is create manual else create auto
-      countImage:0
+      countImage: 0,
     };
   }
 
@@ -75,7 +75,10 @@ class CameraWrapper extends Component {
       !faceapi.nets.tinyFaceDetector.params
     )
       return setTimeout(() => this.onPlay(this.videoTag.current));
-    const options = new faceapi.TinyFaceDetectorOptions({ inputSize:224, scoreThreshold:0.5 })
+    const options = new faceapi.TinyFaceDetectorOptions({
+      inputSize: 224,
+      scoreThreshold: 0.5,
+    });
     const canvasClone = this.canvasClone.current.getContext('2d');
     canvasClone.drawImage(
       this.videoTag.current,
@@ -100,12 +103,12 @@ class CameraWrapper extends Component {
             64,
             true,
           );
-          console.log(imageToSquare)
-          const grayImage = adminCommon.getGrayImage(imageToSquare)
-          console.log({imageToSquare,grayImage})
+          console.log(imageToSquare);
+          const grayImage = adminCommon.getGrayImage(imageToSquare);
+          console.log({ imageToSquare, grayImage });
           tmp.push(grayImage);
           this.images = tmp;
-          this.setState({countImage:this.images.length})
+          this.setState({ countImage: this.images.length });
         } else if (this.status == 'un-previewed') {
           this.props.onDetectedFaceSuccess(this.images);
           this.status = 'previewed';
@@ -126,7 +129,7 @@ class CameraWrapper extends Component {
   onReTraining = () => {
     this.setState({
       status: 'un-previewed',
-      statusTraining:0
+      statusTraining: 0,
     });
     this.images = [];
     this.status = 'un-previewed';
@@ -135,7 +138,7 @@ class CameraWrapper extends Component {
 
   onCreateTrainingManual = async () => {
     this.buttonPressTimer = setInterval(async () => {
-      console.log('onCreateTrainingManual')
+      console.log('onCreateTrainingManual');
       const options = getFaceDetectorOptions();
       const canvasClone = this.canvasClone.current.getContext('2d');
       canvasClone.drawImage(
@@ -160,10 +163,10 @@ class CameraWrapper extends Component {
             64,
             true,
           );
-          const grayImage = adminCommon.getGrayImage(imageToSquare)
+          const grayImage = adminCommon.getGrayImage(imageToSquare);
           tmp.push(grayImage);
           this.images = tmp;
-          this.setState({countImage:this.images.length})
+          this.setState({ countImage: this.images.length });
         } else if (this.status == 'un-previewed') {
           this.props.onDetectedFaceSuccess(this.images);
           this.handleButtonRelease();
@@ -182,43 +185,46 @@ class CameraWrapper extends Component {
 
   onSave = async () => {
     this.props.showLoading();
-    adminCommon.saveImage(this.images,this.props.currentUser.iid)
-    const descriptors = this.images.map(
-      el =>
-        new Promise(async (resolve, reject) => {
-          try {
-            const tmp = await faceapi.computeFaceDescriptor(el);
-            resolve(tmp);
-          } catch (e) {
-            reject(e);
-          }
-        }),
-    );
-    Promise.all(descriptors)
-      .then(data => {
-        console.log('goi qpi save');
-        const customData = {
-          _label: this.props.params.id,
-          _descriptors: data,
-        };
-        request('/api/employee', {
-          method: 'PUT', // or 'PUT'
-          body: JSON.stringify({
-            id: this.props.params.id,
-            data: customData,
+    console.log(this.props.params.id);
+    setTimeout(() => {
+      adminCommon.saveImage(this.images, this.props.params.id);
+      const descriptors = this.images.map(
+        el =>
+          new Promise(async (resolve, reject) => {
+            try {
+              const tmp = await faceapi.computeFaceDescriptor(el);
+              resolve(tmp);
+            } catch (e) {
+              reject(e);
+            }
           }),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }).then(data => {
+      );
+      Promise.all(descriptors)
+        .then(data => {
+          console.log('goi qpi save');
+          const customData = {
+            _label: this.props.params.id,
+            _descriptors: data,
+          };
+          request('/api/employee', {
+            method: 'PUT', // or 'PUT'
+            body: JSON.stringify({
+              id: this.props.params.id,
+              data: customData,
+            }),
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }).then(data => {
+            this.props.hiddenLoading();
+            this.props.history.replace('/admin/employee');
+          });
+        })
+        .catch(e => {
           this.props.hiddenLoading();
-          this.props.history.replace('/admin/employee');
+          alert('Some things errors! Please retraining');
         });
-      })
-      .catch(e => {
-        this.props.hiddenLoading();
-        alert('Some things errors! Please retraining');
-      });
+    }, 100);
   };
 
   render() {
@@ -252,11 +258,15 @@ class CameraWrapper extends Component {
           </Button>
           <Button
             className="m-l-15"
-            disabled={this.state.statusTraining === 1||this.state.status === 'previewed'}
+            disabled={
+              this.state.statusTraining === 1 ||
+              this.state.status === 'previewed'
+            }
             type="primary"
             onClick={() => this.setState({ statusTraining: 1 })}
           >
-            Tạo Tự Động{` (${this.state.countImage} ảnh)`}
+            Tạo Tự Động
+            {` (${this.state.countImage} ảnh)`}
           </Button>
           <Button
             onTouchStart={this.onCreateTrainingManual}
@@ -268,7 +278,8 @@ class CameraWrapper extends Component {
             className="m-l-15"
             type="primary"
           >
-            Tạo Thủ Công{` (${this.state.countImage} ảnh)`}
+            Tạo Thủ Công
+            {` (${this.state.countImage} ảnh)`}
           </Button>
         </ButtonTry>
       </div>

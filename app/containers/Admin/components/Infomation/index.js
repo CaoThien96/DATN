@@ -193,7 +193,7 @@ class Index extends Component {
           <div style={{ color: 'red' }}>{this.state.err}</div>
           <div className="text-center">
             <Button type="primary" htmlType="submit">
-              Update information
+              Lưu
             </Button>
           </div>
         </Form>

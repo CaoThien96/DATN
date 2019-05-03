@@ -32,10 +32,10 @@ export default function defineAbilitiesFor(user) {
       );
     } else if (user.role === 1000) {
       // Nhan vien
-      can(['admin-notification', 'admin-request','admin-dashboard-employee','admin-test'], 'Menu');
+      can(['admin-notification', 'admin-request','admin-dashboard-employee','admin-test','admin-user'], 'Menu');
     } else if (user.role === 1002) {
       // Giam sat vien
-      can(['admin-config', 'admin-checker'], 'Menu');
+      can(['admin-configuration','admin-configuration-model', 'admin-checker','admin-user'], 'Menu');
     }
   });
 }

@@ -14,21 +14,23 @@ import FormSearch from './FormSearch';
 import FormCheckIn from './FormCheckIn';
 import { makeSelectCurrentUser } from '../../../../../App/selectors';
 import { onUpdateListCheckIn } from '../../actions';
-
+import { getPathImage } from '../../../../../../common/pathImage';
+import Modal from 'antd/es/modal/Modal';
+import User from './User'
 const Error = styled.div`
   text-align: center;
   color: red;
 `;
-const User = ({ user }) => (
-  <List.Item key={user.iid}>
-    <List.Item.Meta
-      avatar={
-        <Avatar src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png" />
-      }
-      title={<a href="https://ant.design">{user.email}</a>}
-    />
-  </List.Item>
-);
+// const User = ({ user ,showModal}) => (
+//   <List.Item key={user.iid}>
+//     <List.Item.Meta
+//       avatar={
+//         <Avatar src={getPathImage(user.avatar)} />
+//       }
+//       title={<a href="#" onClick={showModal}>{user.email}</a>}
+//     />
+//   </List.Item>
+// );
 class StepFormWrapper extends Component {
   constructor(props) {
     super(props);

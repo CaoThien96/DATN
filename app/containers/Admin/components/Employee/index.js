@@ -113,7 +113,7 @@ class LayoutEmployee extends Component {
           onCancel={this.handleCancel}
           footer={null}
         >
-          <FromNew onSuccess={this.onNewSuccess} />
+          <FromNew visible={this.state.visible} onSuccess={this.onNewSuccess} />
         </Modal>
         <Row type="flex" justify="end">
           <Col>
