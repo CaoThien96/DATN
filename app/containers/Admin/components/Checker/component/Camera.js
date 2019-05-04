@@ -77,7 +77,7 @@ class CameraWrapper extends Component {
       );
       const imageToSquare = await faceapi.imageToSquare(
         imageExtract[0],
-        64,
+        128,
         true,
       );
       const grayImage = adminCommon.getGrayImage(imageToSquare)
@@ -104,7 +104,7 @@ class CameraWrapper extends Component {
     values = values.as1D().dataSync();
     indices = indices.as1D().dataSync();
 
-    if (values < 0.85) {
+    if (values < 0.9) {
       this.miss = this.miss + 1;
       this.props.handleShowCurrentPredict(indices,values);
       // if (this.miss > 2) {

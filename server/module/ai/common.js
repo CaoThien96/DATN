@@ -1,11 +1,13 @@
 const fs = require('fs');
-const path = require('path')
+const path = require('path');
 const tf = require('@tensorflow/tfjs');
 require('tfjs-node-save');
 module.exports.getDataSetTfModel = (numberClass, users) => {
   users = users.slice(0, numberClass);
   let xTrainFull = [];
   let yTrainFull = [];
+  let xValidation = [];
+  let yValidation = [];
   let xTestFull = [];
   let yTestFull = [];
   for (let index = 0; index < users.length; index++) {
@@ -15,7 +17,12 @@ module.exports.getDataSetTfModel = (numberClass, users) => {
     const numDescriptor = descriptors.length;
     let training = [];
     let test = [];
-    const numTraining = parseInt((numDescriptor * 70) / 100);
+    let validation = [];
+    const numTraining = parseInt((numDescriptor * 60) / 100);
+    const numValidation =
+      parseInt((numDescriptor * 20) / 100) < 1
+        ? 1
+        : parseInt((numDescriptor * 20) / 100);
     const ys = tf.oneHot(
       tf.fill([1, numDescriptor], index, 'int32').as1D(),
       numberClass,
@@ -28,24 +35,36 @@ module.exports.getDataSetTfModel = (numberClass, users) => {
     const ytrain = tf.slice(ys, 0, numTraining);
     xTrainFull.push(xTrain);
     yTrainFull.push(ytrain);
+
+    validation = descriptors
+      .slice(numTraining, numTraining + numValidation)
+      .map(des => tf.tensor2d(Object.values(des), [1, 128]));
+    const xVal = tf.concat(validation);
+    const yVal = tf.slice(ys, numTraining, numValidation);
+    xValidation.push(xVal);
+    yValidation.push(yVal);
+
     test = descriptors
-      .slice(numTraining)
+      .slice(numTraining + numValidation)
       .map(des => tf.tensor2d(Object.values(des), [1, 128]));
     const xTest = tf.concat(test);
-    const yTest = tf.slice(ys, numTraining, -1);
+    const yTest = tf.slice(ys, numTraining + numValidation, -1);
     xTestFull.push(xTest);
     yTestFull.push(yTest);
   }
   xTestFull = tf.concat(xTestFull);
   yTestFull = tf.concat(yTestFull);
-
   xTrainFull = tf.concat(xTrainFull);
   yTrainFull = tf.concat(yTrainFull);
+  xValidation = tf.concat(xValidation);
+  yValidation = tf.concat(yValidation);
   return {
     xTrainFull,
     yTrainFull,
     xTestFull,
     yTestFull,
+    xValidation,
+    yValidation,
   };
 };
 module.exports.getModel = numberClass => {
@@ -74,7 +93,7 @@ module.exports.getModel = numberClass => {
 };
 
 module.exports.saveModel = async model => {
-  const pathSave= path.resolve(__dirname, '../../../public/model')
+  const pathSave = path.resolve(__dirname, '../../../public/model');
   try {
     await model.save(`file://${pathSave}`);
     return true;

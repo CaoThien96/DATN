@@ -184,17 +184,21 @@ routes.get('/dataset', async (req, res) => {
       yTrainFull,
       xTestFull,
       yTestFull,
+      xValidation,
+      yValidation
     } = commonControll.getDataSetTfModel(users.length, users);
     xTrainFull = xTrainFull.arraySync();
     yTrainFull = yTrainFull.arraySync();
     xTestFull = xTestFull.arraySync();
     yTestFull = yTestFull.arraySync();
-    console.log({
-      xTrainFull,
-      yTrainFull,
-      xTestFull,
-      yTestFull,
-    });
+    xValidation = xValidation.arraySync();
+    yValidation = yValidation.arraySync();
+    // console.log({
+    //   xTrainFull,
+    //   yTrainFull,
+    //   xTestFull,
+    //   yTestFull,
+    // });
     // let valAcc;
     const model = commonControll.getModel(numberClass);
     // const history = await model.fit(xTrainFull, yTrainFull, {
@@ -246,6 +250,8 @@ routes.get('/dataset', async (req, res) => {
       yTrainFull,
       xTestFull,
       yTestFull,
+      xValidation,
+      yValidation,
       numberClass,
       users,
     });

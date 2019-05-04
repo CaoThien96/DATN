@@ -16,7 +16,8 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend, Label,
+  Legend,
+  Label,
 } from 'recharts';
 
 import ShowConfusion from './components/ShowConfusion';
@@ -30,9 +31,10 @@ class LayoutConfigurationModel extends Component {
     super(props);
     this.state = {
       statusTraining: false,
-      status:'un-train',// status: un-train, training, trained
+      status: 'un-train', // status: un-train, training, trained
       xTestFull: null,
       yTestFull: null,
+      users: null,
       model: null,
       epoch: 0,
       dataAcc: [
@@ -47,22 +49,20 @@ class LayoutConfigurationModel extends Component {
 
   handleTrain = async () => {
     this.setState({ statusTraining: true });
-    if(this.state.status == 'trained'){
+    if (this.state.status == 'trained') {
       this.setState({
         epoch: 0,
-        dataAcc:[
+        dataAcc: [
           {
             epoch: 0,
             acc: 0,
-          }
+          },
         ],
-        dataLoss: [
-
-        ],
-        model:null
-      })
+        dataLoss: [],
+        model: null,
+      });
     }
-    this.setState({status:'training'})
+    this.setState({ status: 'training' });
     request('/api/ai/dataset').then(async data => {
       if (data.success) {
         let {
@@ -70,14 +70,21 @@ class LayoutConfigurationModel extends Component {
           yTrainFull,
           xTestFull,
           yTestFull,
+          xValidation,
+          yValidation,
           numberClass,
+          users,
         } = data;
         xTrainFull = tf.tensor2d(xTrainFull);
         yTrainFull = tf.tensor2d(yTrainFull);
 
         xTestFull = tf.tensor2d(xTestFull);
         yTestFull = tf.tensor2d(yTestFull);
-        this.setState({ xTestFull, yTestFull });
+
+        xValidation = tf.tensor2d(xValidation);
+        yValidation = tf.tensor2d(yValidation);
+
+        this.setState({ xTestFull, yTestFull, users });
         console.log(`
           Thông tin dataset:
           - Số lượng mẫu ${xTrainFull.shape}
@@ -108,6 +115,7 @@ class LayoutConfigurationModel extends Component {
         // const callbacks = tfvis.show.fitCallbacks(container, metrics);
         const history = await model.fit(xTrainFull, yTrainFull, {
           epochs: 100,
+          validationData: [xValidation, yValidation],
           shuffle: true,
           callbacks: {
             onBatchEnd: (onBatch, logBatch) => {
@@ -123,6 +131,7 @@ class LayoutConfigurationModel extends Component {
                   {
                     epoch,
                     acc: logs.acc,
+                    val_acc: logs.val_acc,
                   },
                 ],
                 dataLoss: [
@@ -130,6 +139,7 @@ class LayoutConfigurationModel extends Component {
                   {
                     epoch,
                     loss: logs.loss,
+                    val_loss: logs.val_loss
                   },
                 ],
                 epoch,
@@ -164,7 +174,7 @@ class LayoutConfigurationModel extends Component {
         //         `,
         // );
         this.setState({ statusTraining: false });
-        this.setState({status:'trained'})
+        this.setState({ status: 'trained' });
       }
     });
   };
@@ -197,7 +207,7 @@ class LayoutConfigurationModel extends Component {
       yTestFull.argMax(1),
       yPredict.argMax(1),
     );
-
+    const classNames = this.state.users.map(el => el.email.slice(0, 8));
     tfvis.render.confusionMatrix(
       {
         name: 'Confusion Matrix',
@@ -205,17 +215,15 @@ class LayoutConfigurationModel extends Component {
       },
       {
         values: confusionMatrix,
-        // tickLabels: classNames
+        tickLabels: classNames,
       },
     );
-    if(!tfvis.visor().isOpen()){
-      tfvis.visor().toggle()
+    if (!tfvis.visor().isOpen()) {
+      tfvis.visor().toggle();
     }
   };
 
-
   showEvaluation = data => {};
-
 
   render() {
     const {
@@ -233,16 +241,18 @@ class LayoutConfigurationModel extends Component {
     return (
       <div>
         <Button onClick={this.handleTrain} disabled={this.state.statusTraining}>
-          {
-            status == 'un-train' ? 'Bắt đầu huấn luyện' : status=='training'? 'Đang huấn luyện': 'Huấn luyện lại'
-          }
+          {status == 'un-train'
+            ? 'Bắt đầu huấn luyện'
+            : status == 'training'
+              ? 'Đang huấn luyện'
+              : 'Huấn luyện lại'}
         </Button>
         <Button disabled={model == null} onClick={this.handleSaveAndUpdate}>
           {'Lưu và cập nhật mô hình'}
         </Button>
         <Button
           onClick={this.handleShowMatrixConfusionMatrix}
-          disabled={this.state.statusTraining||model == null}
+          disabled={this.state.statusTraining || model == null}
         >
           {'Hiển thị ma trận đánh giá'}
         </Button>
@@ -270,10 +280,13 @@ class LayoutConfigurationModel extends Component {
           <XAxis dataKey="epoch">
             <Label value="Kỷ nguyên" offset={0} position="insideBottom" />
           </XAxis>
-          <YAxis label={{ value: 'Độ mất mát', angle: -90, position: 'insideLeft' }} />
+          <YAxis
+            label={{ value: 'Độ mất mát', angle: -90, position: 'insideLeft' }}
+          />
           <Tooltip />
           <Legend />
           <Line type="monotone" dataKey="loss" stroke="#82ca9d" />
+          <Line type="monotone" dataKey="val_loss" stroke="#f2f23c" />
         </LineChart>
         <p>Accurance</p>
         <LineChart
@@ -291,10 +304,19 @@ class LayoutConfigurationModel extends Component {
           <XAxis dataKey="epoch">
             <Label value="Kỷ nguyên" offset={0} position="insideBottom" />
           </XAxis>
-          <YAxis label={{ value: 'Độ chính xác', angle: -90, position: 'insideLeft' }} type="number" domain={[0, 1]} />
+          <YAxis
+            label={{
+              value: 'Độ chính xác',
+              angle: -90,
+              position: 'insideLeft',
+            }}
+            type="number"
+            domain={[0, 1]}
+          />
           <Tooltip />
           <Legend />
           <Line type="monotone" dataKey="acc" stroke="#82ca9d" />
+          <Line type="monotone" dataKey="val_acc" stroke="#f2f23c" />
         </LineChart>
         <Row>
           <Col>

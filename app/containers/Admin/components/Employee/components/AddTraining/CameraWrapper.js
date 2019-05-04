@@ -30,6 +30,16 @@ const VideoTag = styled.video`
 const CanvasTag = styled.canvas`
   position: absolute;
 `;
+function shuffle(a) {
+  var j, x, i;
+  for (i = a.length - 1; i > 0; i--) {
+    j = Math.floor(Math.random() * (i + 1));
+    x = a[i];
+    a[i] = a[j];
+    a[j] = x;
+  }
+  return a;
+}
 class CameraWrapper extends Component {
   constructor(props) {
     super(props);
@@ -77,7 +87,7 @@ class CameraWrapper extends Component {
       return setTimeout(() => this.onPlay(this.videoTag.current));
     const options = new faceapi.TinyFaceDetectorOptions({
       inputSize: 224,
-      scoreThreshold: 0.5,
+      scoreThreshold: 0.3,
     });
     const canvasClone = this.canvasClone.current.getContext('2d');
     canvasClone.drawImage(
@@ -88,33 +98,35 @@ class CameraWrapper extends Component {
       this.videoTag.current.height,
     );
     const result = await faceapi
-      .detectSingleFace(this.canvasClone.current, options)
+      .detectSingleFace(this.videoTag.current, options)
       .withFaceLandmarks();
     if (result) {
-      if (statusTraining == 1 && result.detection.score > 0.85) {
-        if (this.images.length < 36) {
-          const tmp = this.images;
-          const imageExtract = await faceapi.extractFaces(
-            this.videoTag.current,
-            [result.alignedRect],
-          );
-          const imageToSquare = await faceapi.imageToSquare(
-            imageExtract[0],
-            64,
-            true,
-          );
-          console.log(imageToSquare);
-          const grayImage = adminCommon.getGrayImage(imageToSquare);
-          console.log({ imageToSquare, grayImage });
-          tmp.push(grayImage);
-          this.images = tmp;
-          this.setState({ countImage: this.images.length });
-        } else if (this.status == 'un-previewed') {
-          this.props.onDetectedFaceSuccess(this.images);
-          this.status = 'previewed';
-          this.setState({
-            status: 'previewed',
-          });
+      if ( result.alignedRect.box.width >100 && result.alignedRect.box.height>100) {
+        if(statusTraining == 1){
+          console.log({result})
+          if (this.images.length < 36) {
+            const tmp = this.images;
+            const imageExtract = await faceapi.extractFaces(
+              this.videoTag.current,
+              [result.alignedRect],
+            );
+            const imageToSquare = await faceapi.imageToSquare(
+              imageExtract[0],
+              128,
+              true,
+            );
+            const grayImage = adminCommon.getGrayImage(imageToSquare);
+            tmp.push(grayImage);
+            this.images = tmp;
+            this.setState({ countImage: this.images.length });
+          } else if (this.status == 'un-previewed') {
+            this.images = shuffle(this.images)
+            this.props.onDetectedFaceSuccess(this.images);
+            this.status = 'previewed';
+            this.setState({
+              status: 'previewed',
+            });
+          }
         }
       }
       drawDetections(this.videoTag.current, this.canvasRef.current, [
@@ -123,23 +135,28 @@ class CameraWrapper extends Component {
     } else {
       drawDetections(this.videoTag.current, this.canvasRef.current, []);
     }
-    setTimeout(() => this.onPlay(this.videoTag.current), 1000 / 40);
+    setTimeout(() => this.onPlay(this.videoTag.current), 1000 / 50);
   };
 
   onReTraining = () => {
+
+    this.images = [];
+    this.status = 'un-previewed';
     this.setState({
       status: 'un-previewed',
       statusTraining: 0,
+      countImage: this.images.length
     });
-    this.images = [];
-    this.status = 'un-previewed';
     this.props.onTryDetectedFace();
   };
 
   onCreateTrainingManual = async () => {
     this.buttonPressTimer = setInterval(async () => {
       console.log('onCreateTrainingManual');
-      const options = getFaceDetectorOptions();
+      const options = new faceapi.TinyFaceDetectorOptions({
+        inputSize: 224,
+        scoreThreshold: 0.3,
+      });
       const canvasClone = this.canvasClone.current.getContext('2d');
       canvasClone.drawImage(
         this.videoTag.current,
@@ -152,7 +169,7 @@ class CameraWrapper extends Component {
         .detectSingleFace(this.canvasClone.current, options)
         .withFaceLandmarks();
       if (result) {
-        if (this.images.length < 36) {
+        if (this.images.length < 36 && result.alignedRect.box.width >100 && result.alignedRect.box.height>100) {
           const tmp = this.images;
           const imageExtract = await faceapi.extractFaces(
             this.videoTag.current,
@@ -160,7 +177,7 @@ class CameraWrapper extends Component {
           );
           const imageToSquare = await faceapi.imageToSquare(
             imageExtract[0],
-            64,
+            128,
             true,
           );
           const grayImage = adminCommon.getGrayImage(imageToSquare);
@@ -168,6 +185,7 @@ class CameraWrapper extends Component {
           this.images = tmp;
           this.setState({ countImage: this.images.length });
         } else if (this.status == 'un-previewed') {
+          this.images = shuffle(this.images)
           this.props.onDetectedFaceSuccess(this.images);
           this.handleButtonRelease();
           this.status = 'previewed';
@@ -176,7 +194,7 @@ class CameraWrapper extends Component {
           });
         }
       }
-    }, 1000 / 20);
+    }, 1000 / 30);
   };
 
   handleButtonRelease = () => {

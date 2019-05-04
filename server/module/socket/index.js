@@ -20,8 +20,22 @@ module.exports.handleUpdateStatusCheckIn = (socket, action) => {
         CheckInDetail.findOne(
           { pid: checkIn.iid, 'user.iid': parseInt(userPredict.iid) },
           (err, check_in_detail) => {
-            if (check_in_detail.status === 0) {
-              check_in_detail.updateStatus((err, res) => {
+            if (check_in_detail) {
+              if (check_in_detail.status === 0) {
+                check_in_detail.updateStatus((err, res) => {
+                  CheckInDetail.findCheckInSuccess(
+                    checkIn,
+                    (err, listCheckSuccess) => {
+                      console.log({ listCheckSuccess });
+                      socket.emit('action', {
+                        type: 'boilerplate/Check/OnUpdateListCheckIn',
+                        payload: listCheckSuccess,
+                      });
+                    },
+                  );
+                });
+              } else {
+                console.log('bo qua doi tuong da duoc check_in_detail');
                 CheckInDetail.findCheckInSuccess(
                   checkIn,
                   (err, listCheckSuccess) => {
@@ -32,19 +46,9 @@ module.exports.handleUpdateStatusCheckIn = (socket, action) => {
                     });
                   },
                 );
-              });
+              }
             } else {
-              console.log('bo qua doi tuong da duoc check_in_detail');
-              CheckInDetail.findCheckInSuccess(
-                checkIn,
-                (err, listCheckSuccess) => {
-                  console.log({ listCheckSuccess });
-                  socket.emit('action', {
-                    type: 'boilerplate/Check/OnUpdateListCheckIn',
-                    payload: listCheckSuccess,
-                  });
-                },
-              );
+              console.log('khong tim thay phien checkin cua user');
             }
           },
         );
