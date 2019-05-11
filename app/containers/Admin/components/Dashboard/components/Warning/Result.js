@@ -1,56 +1,72 @@
 import React, { Component } from 'react';
+import moment from 'moment';
 import Table from 'antd/es/table/Table';
-import Row from 'antd/es/grid/row';
-import Col from 'antd/es/grid/col';
 import Badge from 'antd/es/badge';
 import Button from 'antd/es/button/button';
 import Input from 'antd/es/input/Input';
 import Icon from 'antd/es/icon';
+import Calendar from 'antd/es/calendar';
+import './style.css';
+const getMatch = (
+  time1 = moment(),
+  time2 = { created_at: '2019-05-01T09:21:00.126Z', status: 2 },
+) => {
+  let check = false;
+  const timeTmp = new Date(time2.created_at);
+  if (time1.date() === timeTmp.getDate()) {
+    check = true;
+  }
+  if (check) {
+    switch (time2.status) {
+      case 0:
+        return <Badge status="error" text="Nghỉ làm" />;
+        break;
+      case 1:
+        return <Badge status="success" text="Đúng giờ" />;
+      case 2:
+        return <Badge status="warning" text="Muộn giờ" />;
+      case 3:
+        return <Badge status="warning" text="Xin nghỉ có phép" />;
+      default:
+        return null;
+    }
+  } else {
+    return null;
+  }
+};
+const getRender = (
+  time = moment(),
+  arrayTime = [{ created_at: '2019-05-01T09:21:00.126Z', status: 2 }],
+) => {
+  let render = null;
+  arrayTime.forEach(el => {
+    const tmp = getMatch(time, el);
+    if (tmp) {
+      render = tmp;
+    }
+  });
+  return render;
+};
+const dateRenderCell = (time, created_at) => {
+  let result = null;
+  result = getRender(time, created_at.on_time);
+  if (result) return result;
+  result = getRender(time, created_at.later);
+  if (result) return result;
+  result = getRender(time, created_at.miss);
+  if (result) return result;
+  result = getRender(time, created_at.miss_request);
+  return result;
+};
 const ShowDate = props => {
   const created_at = props.created_at;
-  if (Array.isArray(created_at)) {
+  console.log({ created_at });
+  if (created_at) {
     return (
-      <Row>
-        <Col span={8}>
-          {created_at.slice(0, 9).map((el, key) => {
-            const time = new Date(el);
-            return (
-              <div>
-                <Badge
-                  status="success"
-                  text={`${time.getFullYear()}/${time.getMonth()}/${time.getDate()}`}
-                />
-              </div>
-            );
-          })}
-        </Col>
-        <Col span={8}>
-          {created_at.slice(10, 19).map((el, key) => {
-            const time = new Date(el);
-            return (
-              <div>
-                <Badge
-                  status="success"
-                  text={`${time.getFullYear()}/${time.getMonth()}/${time.getDate()}`}
-                />
-              </div>
-            );
-          })}
-        </Col>
-        <Col span={8}>
-          {created_at.slice(20).map((el, key) => {
-            const time = new Date(el);
-            return (
-              <div>
-                <Badge
-                  status="success"
-                  text={`${time.getFullYear()}/${time.getMonth()}/${time.getDate()}`}
-                />
-              </div>
-            );
-          })}
-        </Col>
-      </Row>
+      <Calendar
+        dateCellRender={time => dateRenderCell(time, created_at)}
+        mode="month"
+      />
     );
   }
   console.log('no');
@@ -118,7 +134,7 @@ class Result extends Component {
       <Icon type="search" style={{ color: filtered ? '#1890ff' : undefined }} />
     ),
     onFilter: (value, record) => {
-      console.log({value, record});
+      console.log({ value, record });
       if (record.created_at.miss.length > parseInt(value)) {
         return true;
       }
@@ -142,13 +158,18 @@ class Result extends Component {
     this.setState({ searchText: '' });
   };
 
+  handleRowSelection = (record, selected, selectedRows, nativeEvent) => {
+    console.log({ record, selected, selectedRows, nativeEvent });
+  };
+
   render() {
     const { result } = this.props;
-    const { filteredInfo ,searchText} = this.state;
-    console.log(searchText)
+    let { filteredInfo, searchText, sortedInfo } = this.state;
+    sortedInfo = sortedInfo || {};
+    console.log(searchText);
     const columns = [
       {
-        title: 'Ma so nhân viên',
+        title: 'Mã số nhân viên',
         dataIndex: '_id',
         key: 'iid',
         render: (text, record) => <p>{record._id.iid}</p>,
@@ -157,52 +178,69 @@ class Result extends Component {
         title: 'Địa chỉ email',
         dataIndex: '_id',
         key: 'email',
+        sorter: (a, b) =>
+          a._id.email.length - b._id.email.length,
+        // sortDirections: 'descend',
+        defaultSortOrder:'descend',
+        sortOrder: sortedInfo.columnKey === 'email' && sortedInfo.order,
         render: (text, record) => <p>{record._id.email}</p>,
       },
       {
-        title: 'Đúng giờ',
+        title: 'Đúng giờ(lần)',
         dataIndex: 'created_at',
         key: 'on_time',
+        sorter: (a, b) =>
+          a.created_at.on_time.length - b.created_at.on_time.length,
+        sortOrder: sortedInfo.columnKey === 'on_time' && sortedInfo.order,
         render: (text, record) => (
-          <p>{record && record.created_at.on_time.length}</p>
+          <p>{record && record.created_at.on_time.length?(<Badge status="success" text={record.created_at.miss.length} />):(<Badge status="success" text={0} />)}</p>
         ),
       },
       {
-        title: 'Đi muộn',
-        dataIndex: 'created_at',
-        key: 'later',
-        render: (text, record) => (
-          <p>{record && record.created_at.later.length}</p>
-        ),
-      },
-      {
-        title: 'Nghỉ có phép',
+        title: 'Nghỉ có phép(lần)',
         dataIndex: 'created_at',
         key: 'miss_request',
+        sorter: (a, b) =>
+          a.created_at.miss_request.length - b.created_at.miss_request.length,
+        sortOrder: sortedInfo.columnKey === 'miss_request' && sortedInfo.order,
         render: (text, record) => (
-          <p>{record && record.created_at.miss_request.length}</p>
+          <p>{record && record.created_at.miss_request.length ? (<Badge status="default" text={record.created_at.miss_request.length} />):<Badge status="default" text={0} />}</p>
         ),
       },
       {
-        title: 'Nghỉ không phép',
+        title: 'Đi muộn(lần)',
+        dataIndex: 'created_at',
+        key: 'later',
+        sorter: (a, b) => a.created_at.later.length - b.created_at.later.length,
+        sortOrder: sortedInfo.columnKey === 'later' && sortedInfo.order,
+        render: (text, record) => (
+          <p>{record && record.created_at.later.length ? (<Badge status="warning" text={record.created_at.miss.length} />):(<Badge status="warning" text={0} />)}</p>
+        ),
+      },
+
+      {
+        title: 'Nghỉ không phép(lần)',
         dataIndex: 'created_at',
         key: 'miss',
-        ...this.getColumnSearchProps(),
-        render: (text, record) => {
-          return (
-            <p>{record && record.created_at.miss.length}</p>
-          )
-        },
+        sorter: (a, b) => a.created_at.miss.length - b.created_at.miss.length,
+        sortOrder: sortedInfo.columnKey === 'miss' && sortedInfo.order,
+        // ...this.getColumnSearchProps(),
+        render: (text, record) => (
+          <p>{record && record.created_at.miss.length ? (<Badge status="error" text={record.created_at.miss.length} />):(<Badge status="error" text={0} />)}</p>
+        ),
       },
     ];
     return (
       <div>
         <Table
           columns={columns}
-          // expandedRowRender={record => (
-          //   <ShowDate created_at={record.created_at} />
-          // )}
+          expandedRowRender={record => (
+            <ShowDate created_at={record.created_at} />
+          )}
           onChange={this.handleChange}
+          // rowSelection={
+          //   {onSelect:this.handleRowSelection}
+          // }
           bordered
           dataSource={result}
         />

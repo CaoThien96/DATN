@@ -281,4 +281,5 @@ routes.post('/upload-image', (req, res) => {
   });
 });
 routes.post('/save-data-training/:iid',Controller.handleSaveImageTrain);
+routes.post('/create-users/manual',Controller.handleCreateManualUser)
 module.exports = routes;

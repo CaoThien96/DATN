@@ -18,7 +18,7 @@ module.exports.getDataSetTfModel = (numberClass, users) => {
     let training = [];
     let test = [];
     let validation = [];
-    const numTraining = parseInt((numDescriptor * 60) / 100);
+    const numTraining = parseInt((numDescriptor * 70) / 100);
     const numValidation =
       parseInt((numDescriptor * 20) / 100) < 1
         ? 1

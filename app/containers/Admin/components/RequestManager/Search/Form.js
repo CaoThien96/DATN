@@ -21,10 +21,10 @@ export default ({ getFieldDecorator }) => (
           })(
             <Checkbox.Group style={{ width: "100%" }}>
               <Row>
-                <Col span={4}><Checkbox value={0}>Đang chờ</Checkbox></Col>
-                <Col span={4}><Checkbox value={1}>Đã chấp nhận</Checkbox></Col>
-                <Col span={4}><Checkbox value={2}>Không chấp nhân</Checkbox></Col>
-                <Col span={4}><Checkbox value={3}>Hủy bỏ</Checkbox></Col>
+                <Col span={6}><Checkbox value={0}>Đang chờ</Checkbox></Col>
+                <Col span={6}><Checkbox value={1}>Chấp nhận</Checkbox></Col>
+                <Col span={6}><Checkbox value={2}>Từ chối</Checkbox></Col>
+                <Col span={6}><Checkbox value={3}>Hủy bỏ</Checkbox></Col>
               </Row>
             </Checkbox.Group>
           )}

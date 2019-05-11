@@ -97,27 +97,7 @@ class Index extends Component {
   render() {
     return (
       <div>
-        <div>
-          {/*<img ref={this.inputRef} src={Img} alt="Logo" />*/}
-          <video
-            // style={{ position: 'absolute' }}
-            onPlay={this.onPlay}
-            ref={this.videoTag}
-            width="640"
-            height="480"
-            controls
-            autoPlay
-            muted
-          />
-          <canvas ref={this.canvasClone} style={{ display: 'none' }} />
-          <canvas ref={this.canvasRef}/>
-        </div>
-        <div>
-          <Button onClick={this.handleCropFace}>Send Message</Button>
-          <div ref={this.inputReview} style={{backgroundColor:'blue'}}>
 
-          </div>
-        </div>
       </div>
 
     );

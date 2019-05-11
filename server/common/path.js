@@ -27,3 +27,8 @@ module.exports.pathTrain = name =>
     __dirname,
     path.resolve(__dirname, `../../public/train/${name}`),
   );
+module.exports.pathDataJson = (name = '') =>
+  path.resolve(
+    __dirname,
+    path.resolve(__dirname, `../../public/data_json/data1.txt`),
+  );

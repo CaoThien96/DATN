@@ -1,6 +1,9 @@
 const routes = require('express').Router();
 const lodash = require('lodash');
+const mongoose = require('mongoose');
 const Request = require('./model');
+const CheckIn = require('../checkin/model');
+const CheckInDetail = require('../checkin/model/check_in_detail');
 const News = require('../news/model');
 routes.use('*', (req, res, next) => {
   // Check auth
@@ -16,7 +19,7 @@ routes.get('/', (req, res) => {
     const status = query.status;
     const iid = parseInt(query.iid);
     if (iid) {
-      condition = { ...condition, iid };
+      condition = { ...condition, 'u.iid': iid };
     }
 
     if (status.length) {
@@ -123,9 +126,45 @@ routes.post('/', (req, res) => {
 /**
  * Tao yeu cau
  */
-routes.put('/:id', (req, res) => {
+routes.put('/:id', async (req, res) => {
   const iid = parseInt(req.params.id);
-  const status = req.body.status;
+  const status = parseInt(req.body.status);
+  // Kiem tra xem hom nay cua phai ngay xin nghi ko
+  const request = await Request.findOne({ iid });
+  if (status === 1) {
+    CheckIn.searchCheckIn(new Date(request.addition.date), (err, docs) => {
+      if (err) {
+        console.log(err);
+        res.status(500).send(err);
+      } else if (docs.length) {
+        const checkIn = docs[0];
+        if (checkIn) {
+          CheckInDetail.findOne(
+            { pid: checkIn.iid, 'user.iid': request.u.iid },
+            (err, check_in_detail) => {
+              if (check_in_detail) {
+                console.log(check_in_detail);
+                const _id = mongoose.Types.ObjectId(
+                  check_in_detail._id.toString(),
+                );
+                CheckInDetail.updateOne(
+                  { _id },
+                  { status: 3 },
+                  (err, mes) => {},
+                );
+              }
+            },
+          );
+        } else {
+          console.log('khong tim thay phien giam sát');
+        }
+      }
+    });
+  }
+
+  // Neu co thi cap nhat luon phien giam sat
+  // Neu khong thi không lam gi cả
+
   Request.update({ iid }, { status }, (err, docs) => {
     res.send({
       success: true,

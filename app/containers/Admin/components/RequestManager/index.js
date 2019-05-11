@@ -44,11 +44,11 @@ class RequestManagement extends Component {
     try {
       const { currentUser } = this.props;
       this.setState({ searchValue: value });
+      console.log({value})
       const json = JSON.stringify(value);
       const apiUrl = `/api/request?value=${json}`;
       request(apiUrl)
         .then(data => {
-          console.log(data);
           if (data.success) {
             let resultSearch = [];
             if (currentUser.role === 1000) {
@@ -109,20 +109,7 @@ class RequestManagement extends Component {
         'Content-Type': 'application/json',
       },
     }).then(data => {
-      const resultSearch = this.state.resultSearch.map(el => {
-        const tmp = status ? 1 : 2;
-        if (el.iid == item.iid) {
-          return {
-            ...item,
-            status,
-          };
-        }
-        return el;
-      });
-
-      this.setState({
-        resultSearch,
-      });
+      this.handleSearch(this.state.searchValue);
     });
   };
 
@@ -137,7 +124,7 @@ class RequestManagement extends Component {
             onCancel={this.handleCancel}
             footer={null}
           >
-            <FromNew onSuccess={this.onNewSuccess} />
+            <FromNew currentUser = {this.props.currentUser} onSuccess={this.onNewSuccess} />
           </Modal>
           <Row type="flex" justify="end">
             <Col>

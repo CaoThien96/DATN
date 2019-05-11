@@ -15,6 +15,7 @@ class LayoutEmployee extends Component {
     this.state = {
       visible: false,
       resultSearch: [],
+      valuesSearch: false,
     };
   }
 
@@ -27,13 +28,12 @@ class LayoutEmployee extends Component {
 
   onNewSuccess = () => {
     this.setState({ visible: false });
-    request('/api/employee').then(data => {
-      this.setState({ resultSearch: data });
-    });
+    this.handleSearch(this.state.valuesSearch);
   };
 
   handleSearch = value => {
     try {
+      this.setState({ valuesSearch: value });
       const json = JSON.stringify(value);
       const apiUrl = `/api/employee?value=${json}`;
       request(apiUrl)

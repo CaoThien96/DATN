@@ -82,21 +82,35 @@ class CameraWrapper extends Component {
       );
       const grayImage = adminCommon.getGrayImage(imageToSquare)
       const descriptor = await faceapi.computeFaceDescriptor(grayImage)
-      console.log({descriptor})
+      const iid = this.props.faceMatch.findBestMatch(descriptor)
+      const boxesWithText = new faceapi.BoxWithText(
+        alignedRect.box,
+        iid.toString()
+      )
+      drawDetections(this.videoTag.current, this.canvasRef.current, []);
+      faceapi.drawDetection(this.canvasRef.current, boxesWithText)
       // console.log({pendding:this.pendding,checkInManual:this.props.checkInManual})
       if (!this.pendding && !this.props.checkInManual) {
         this.pendding = true;
-        this.onRecognition({descriptor});
+        const tmpIid = this.onRecognition({descriptor});
+        if(iid.label !== 'unknown'){
+          if(tmpIid == parseInt(iid.label)){
+            this.onCheckInSuccessWithFaceMatcher(iid.label)
+          }else{
+            console.log(`model va findbestmatch khong khop`)
+          }
+        }else{
+          this.pendding = false
+        }
       }
-      drawDetections(this.videoTag.current, this.canvasRef.current, [
-        alignedRect,
-      ]);
+      // drawDetections(this.videoTag.current, this.canvasRef.current, [
+      //   alignedRect,
+      // ]);
     } else {
       drawDetections(this.videoTag.current, this.canvasRef.current, []);
     }
     setTimeout(() => this.onPlay(this.videoTag.current));
   };
-
   onRecognition(result) {
     const tfDescriptor = tf.tensor2d(result.descriptor, [1, 128]);
     const yPredict = this.props.model.predict(tfDescriptor);
@@ -115,14 +129,28 @@ class CameraWrapper extends Component {
       //   this.pendding = false;
       // }
       this.pendding = false;
+      return null;
     } else {
       this.miss=0
       this.props.handleShowCurrentPredict(indices,values);
-      this.props.handleCheckInAutoSuccess(indices);
+      if (this.props.usersOfModel) {
+        // console.log(this.props.usersOfModel)
+        const userPredict = this.props.usersOfModel[indices];
+        this.pendding = false;
+        return userPredict.iid;
+      }
+
+
+      // this.props.handleCheckInAutoSuccess(indices);
       this.pendding = false;
+      // return userPredict.iid
+      return null;
     }
   }
-
+  onCheckInSuccessWithFaceMatcher = (iid)=>{
+    this.props.handleCheckInAutoSuccessV2WithFaceMatcher(iid)
+    this.pendding = false;
+  }
   onStop = () => {
     this.videoTag.current.stop();
   };

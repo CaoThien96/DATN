@@ -67,15 +67,15 @@ class Index extends Component {
     const columns2 = [
       {
         title: 'Mã định danh',
-        dataIndex: 'user',
+        dataIndex: 'iid',
         width: 150,
-        render: (text, record) => <p>{text.iid}</p>,
+        render: (text, record) => <p>{record.user.iid}</p>,
       },
       {
         title: 'Email',
-        dataIndex: 'user',
+        dataIndex: 'email',
         width: 200,
-        render: (text, record) => <p>{text.email}</p>,
+        render: (text, record) => <p>{record.user.email}</p>,
       },
       {
         title: 'Thời gian',

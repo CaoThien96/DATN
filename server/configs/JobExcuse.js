@@ -58,7 +58,7 @@ async function createCheckin() {
             }
           }
           CheckInDetail.insertMany(newCheckInDetail, (error, docs) => {
-            if (err) {
+            if (error) {
               console.log({ error });
             } else {
               console.log({ docs });

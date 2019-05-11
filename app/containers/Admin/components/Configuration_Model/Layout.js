@@ -29,6 +29,7 @@ import { onUpdateModel } from './actions';
 class LayoutConfigurationModel extends Component {
   constructor(props) {
     super(props);
+    this.matrixRef = React.createRef()
     this.state = {
       statusTraining: false,
       status: 'un-train', // status: un-train, training, trained
@@ -37,6 +38,7 @@ class LayoutConfigurationModel extends Component {
       users: null,
       model: null,
       epoch: 0,
+      stop:false,
       dataAcc: [
         {
           epoch: 0,
@@ -48,7 +50,8 @@ class LayoutConfigurationModel extends Component {
   }
 
   handleTrain = async () => {
-    this.setState({ statusTraining: true });
+
+    this.setState({ statusTraining: true,stop:false });
     if (this.state.status == 'trained') {
       this.setState({
         epoch: 0,
@@ -75,6 +78,7 @@ class LayoutConfigurationModel extends Component {
           numberClass,
           users,
         } = data;
+        console.log({length:users.length})
         xTrainFull = tf.tensor2d(xTrainFull);
         yTrainFull = tf.tensor2d(yTrainFull);
 
@@ -95,23 +99,37 @@ class LayoutConfigurationModel extends Component {
         model.add(
           tf.layers.dense({
             inputShape: [128],
-            activation: 'sigmoid',
+            activation: 'tanh',
+            kernelInitializer: 'varianceScaling',
+            useBias: true,
             units: 128,
           }),
         );
-
         model.add(tf.layers.dropout({ rate: 0.5 }));
+        // model.add(
+        //   tf.layers.dense({
+        //     inputShape: [128],
+        //     activation: 'relu',
+        //     kernelInitializer: 'varianceScaling',
+        //     useBias: true,
+        //     units: 128,
+        //   }),
+        // );
+        // model.add(tf.layers.dropout({ rate: 0.2 }));
         model.add(
           tf.layers.dense({
             activation: 'softmax',
+            kernelInitializer: 'varianceScaling',
+            useBias: false,
             units: numberClass,
           }),
         );
         model.compile({
           loss: 'categoricalCrossentropy',
-          optimizer: tf.train.adam(0.01),
+          optimizer: tf.train.adam(0.02),
           metrics: ['accuracy'],
         });
+        model.summary()
         // const callbacks = tfvis.show.fitCallbacks(container, metrics);
         const history = await model.fit(xTrainFull, yTrainFull, {
           epochs: 100,
@@ -149,7 +167,7 @@ class LayoutConfigurationModel extends Component {
                 acc: logs.acc,
               });
               valAcc = logs.val_acc;
-              if (logs.acc * 100 > 99) {
+              if (this.state.stop) {
                 model.stopTraining = true;
               } else {
                 await tf.nextFrame();
@@ -217,12 +235,18 @@ class LayoutConfigurationModel extends Component {
         values: confusionMatrix,
         tickLabels: classNames,
       },
+      {
+        width:1200,
+        height:800
+      }
     );
     if (!tfvis.visor().isOpen()) {
       tfvis.visor().toggle();
     }
   };
-
+  handleStopTraing = ()=>{
+    this.setState({stop:true})
+  }
   showEvaluation = data => {};
 
   render() {
@@ -256,6 +280,7 @@ class LayoutConfigurationModel extends Component {
         >
           {'Hiển thị ma trận đánh giá'}
         </Button>
+        <Button onClick={this.handleStopTraing}>Dừng đào tạo</Button>
         <Progress
           strokeColor={{
             from: '#108ee9',
@@ -333,6 +358,9 @@ class LayoutConfigurationModel extends Component {
           </Col>
         </Row>
         <Row />
+        <div ref={this.matrixRef}>
+
+        </div>
       </div>
     );
   }

@@ -81,6 +81,24 @@ const Result = ({ items, handleDelete, handleChangeActive, user }) => {
       }),
     },
     {
+      title: 'Ngày xin nghỉ',
+      dataIndex: 'addition',
+      key: 'time_miss',
+      render: (text, record) => ({
+        props:
+          record.status == 1
+            ? {
+              style: { background: '#E6F7FF' },
+            }
+            : record.status == 2
+            ? { style: { background: '#FFF1F0' } }
+            : record.status == 3
+              ? { style: { background: '#FFFBE6' } }
+              : {},
+        children: <p>{new Date(text.date).toDateString()}</p>,
+      }),
+    },
+    {
       title: 'Trạng thái',
       dataIndex: 'status',
       render:(text,record)=>{
@@ -100,7 +118,6 @@ const Result = ({ items, handleDelete, handleChangeActive, user }) => {
 
       },
       // render(text, record) {
-      //   console.log({ status: record.status });
       //   if (record.status == 0) {
       //     return <div>Đang chờ</div>;
       //   }
@@ -115,29 +132,28 @@ const Result = ({ items, handleDelete, handleChangeActive, user }) => {
       key: 'status',
     },
     {
-      title: 'Actions',
+      title: 'Hành Động',
       render(text, record) {
         return (
           <div>
-            {record.status !== 3 ? (
-              <CanWrapper I="handle" a="Request" user={user}>
-                {/* <Switch */}
-                {/* onChange={status => handleChangeActive(record, status)} */}
-                {/* checkedChildren="Approve" */}
-                {/* unCheckedChildren="Reject" */}
-                {/* checked={record.status == 1} */}
-                {/* /> */}
-                {record.status == 0 ? (
-                  <Select
-                    style={{ width: '150px' }}
-                    placeholder="Handle request"
-                    onChange={status => handleChangeActive(record, status)}
-                  >
-                    <Option value="1">Accept</Option>
-                    <Option value="2">Reject</Option>
-                  </Select>
-                ) : (
-                  <span>
+            {record.status === 0 ? (
+              <div style={{display:'contents'}}>
+                <CanWrapper I="cancel" user={user} a="Request">
+                  <Button type={'danger'} onClick={()=>handleDelete(record)}>Hủy bỏ</Button>
+                </CanWrapper>
+                <CanWrapper I="handle" a="Request" user={user}>
+
+                  {record.status == 0 ? (
+                    <Select
+                      style={{ width: '150px' }}
+                      placeholder="Handle request"
+                      onChange={status => handleChangeActive(record, status)}
+                    >
+                      <Option value="1">Accept</Option>
+                      <Option value="2">Reject</Option>
+                    </Select>
+                  ) : (
+                    <span>
                     <Select
                       style={{ width: '150px' }}
                       placeholder="Handle request"
@@ -148,8 +164,9 @@ const Result = ({ items, handleDelete, handleChangeActive, user }) => {
                       <Option value="2">Reject</Option>
                     </Select>
                   </span>
-                )}
-              </CanWrapper>
+                  )}
+                </CanWrapper>
+              </div>
             ) : null}
 
             <Button icon="diff">

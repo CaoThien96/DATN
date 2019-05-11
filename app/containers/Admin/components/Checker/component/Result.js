@@ -54,7 +54,6 @@ class Result extends Component {
           }}
         >
           {listCheckInV2.map((el, key) => {
-            console.log({el})
             return (
               <div key={key}>
                 <List.Item key={el.id}>

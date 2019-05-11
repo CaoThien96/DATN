@@ -16,7 +16,6 @@ const filterData = (data = []) => {
   let later = [];
   let miss_request = [];
   let miss = [];
-  console.log(data)
   for (let i = 0; i < data.length; i++) {
     const el = data[i];
     if (el.status == 0) {

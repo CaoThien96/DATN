@@ -12,6 +12,8 @@ import request from 'utils/request';
 import { createStructuredSelector } from 'reselect';
 import connect from 'react-redux/es/connect/connect';
 import { updateModel } from 'containers/App/actions';
+import Alert from 'antd/es/alert';
+import Spin from 'antd/es/spin';
 import Camera from './component/Camera';
 import Result from './component/Result';
 import CheckInManual from './component/CheckInManual/index';
@@ -24,26 +26,37 @@ import {
   makeSelectShouldUpdateModel,
   makeSelectUsersOfModel,
 } from '../../../App/selectors';
+import {
+  getFaceDetectorOptions,
+  createFetchMatcher,
+} from './common/faceDetectionControls';
 class LayoutChecker extends Component {
   constructor(props) {
     super(props);
     this.state = {
       checkInManual: false,
-      curentPredict:false,
+      curentPredict: false,
+      faceMatch: false,
     };
   }
 
   async componentDidMount() {
     try {
       const model = await tf.loadModel(
-        'http://localhost:3000/model2/model.json',
+        'http://localhost:3000/model/model.json',
       );
+      model.summary();
       const params = JSON.stringify({
         training: 1,
+        // status:1,
       });
       const users = await request(`/api/employee?value=${params}`);
+      console.log({ users });
       this.setState({ model, users });
+      const faceMatch = await createFetchMatcher(faceapi, users);
+      this.setState({ faceMatch });
       this.props.updateModel({ model, users });
+
       message.success('Tải mô hình thành công');
     } catch (e) {
       console.log(e);
@@ -56,6 +69,7 @@ class LayoutChecker extends Component {
       const model = await tf.loadModel(
         'http://localhost:3000/model/model.json',
       );
+      model.summary();
       const params = JSON.stringify({
         training: 1,
       });
@@ -82,26 +96,47 @@ class LayoutChecker extends Component {
       checkInManual: false,
     });
   };
-  handleShowCurrentPredict = (indices,value)=>{
+
+  handleShowCurrentPredict = (indices, value) => {
     if (this.props.usersOfModel) {
-      // console.log(this.props.usersOfModel)
-      const userPredict = this.props.usersOfModel[indices];
+      const userPredict = this.props.usersOfModel[indices[0]];
+      console.log({
+        userPredict,
+        indices,
+        usersOfModel: this.props.usersOfModel,
+      });
       this.setState({
-        currentPredict : {
+        currentPredict: {
           userPredict,
-          value
-        }
-      })
+          value,
+        },
+      });
       /**
        * Gui event bao da tim thay mot doi tuong moi co xac suat okie! Va hay cap nhat trang thai checkin cho doi tuong nay di!!!
        */
     }
-  }
+  };
+
   handleCheckInAutoSuccess = indices => {
     if (this.props.usersOfModel) {
       // console.log(this.props.usersOfModel)
-      const userPredict = this.props.usersOfModel[indices];
-      console.log({ userPredict });
+      const userPredict = this.props.usersOfModel[indices[0]];
+      /**
+       * Gui event bao da tim thay mot doi tuong moi co xac suat okie! Va hay cap nhat trang thai checkin cho doi tuong nay di!!!
+       */
+      this.props.onPredict(userPredict);
+    }
+  };
+
+  handleCheckInAutoSuccessV2WithFaceMatcher = iid => {
+    if (this.props.usersOfModel) {
+      // console.log(this.props.usersOfModel)
+      const userPredict = this.props.usersOfModel.find(el => {
+        if (el.iid == parseInt(iid)) {
+          return true;
+        }
+        return false;
+      });
       /**
        * Gui event bao da tim thay mot doi tuong moi co xac suat okie! Va hay cap nhat trang thai checkin cho doi tuong nay di!!!
        */
@@ -110,53 +145,72 @@ class LayoutChecker extends Component {
   };
 
   render() {
-    const { checkInManual,currentPredict } = this.state;
+    const { checkInManual, currentPredict, faceMatch } = this.state;
+    const { usersOfModel, model } = this.props;
     const currentDate = new Date();
     const stringDate = `${currentDate.getDate()}/${currentDate.getMonth()}/${currentDate.getFullYear()}`;
+    console.log({ faceMatch, usersOfModel });
     return (
-      <Row>
-        <CheckInManual
-          onCloseCheckInManual={this.onCloseCheckInManual}
-          checkInManual={checkInManual}
-          onCheckInManualSuccess={this.onCheckInManualSuccess}
-        />
-        <Col
-          style={{ borderRight: '1px solid', height: '-webkit-fill-available' }}
-          span={12}
-        >
-          <h2 className="text-center">Camera </h2>
-          {
-            currentPredict ? (
-              <div>
-                <h3>{`Xác định ${currentPredict.userPredict.email} voi do tin cay ${currentPredict.value}!`}</h3>
-                {
-                  currentPredict.value<0.7 ? (<h3>Độ tin cậy thấp bạn có thể giám sát thủ công</h3>):null
-                }
-              </div>
-            ):null
-          }
-          <Divider />
+      <div>
+        {faceMatch && usersOfModel ? (
+          <Row>
+            <CheckInManual
+              onCloseCheckInManual={this.onCloseCheckInManual}
+              checkInManual={checkInManual}
+              onCheckInManualSuccess={this.onCheckInManualSuccess}
+            />
+            <Col
+              style={{
+                borderRight: '1px solid',
+                height: '-webkit-fill-available',
+              }}
+              span={12}
+            >
+              <h2 className="text-center">Camera </h2>
+              {currentPredict ? (
+                <div>
+                  {currentPredict.value < 0.9 ? (
+                    <Alert message="Hãy giám thủ công!!" type="error" />
+                  ) : (
+                    <Alert
+                      message={`Xác định ${
+                        currentPredict.userPredict.email
+                      } voi do tin cay ${currentPredict.value}!`}
+                      type="success"
+                    />
+                  )}
+                </div>
+              ) : null}
+              <Divider />
 
-          <Camera
-            checkInManual={checkInManual}
-            model={this.props.model}
-            userOfModel = {this.props.userOfModel}
-            handleCheckInAutoSuccess={this.handleCheckInAutoSuccess}
-            handleOpenCheckInManually={this.onOpenCheckInManual}
-            handleShowCurrentPredict={this.handleShowCurrentPredict}
-          />
-          <div className="text-center">
-            <Button type="danger" onClick={this.onOpenCheckInManual}>
-              Giám sát thủ công
-            </Button>
-          </div>
-        </Col>
-        <Col style={{ height: '-webkit-fill-available' }} span={12}>
-          <h2 className="text-center">Thông tin giám sát: {stringDate}</h2>
-          <Divider />
-          <Result />
-        </Col>
-      </Row>
+              <Camera
+                checkInManual={checkInManual}
+                model={this.props.model}
+                faceMatch={this.state.faceMatch}
+                usersOfModel={this.props.usersOfModel}
+                handleCheckInAutoSuccess={this.handleCheckInAutoSuccess}
+                handleCheckInAutoSuccessV2WithFaceMatcher={
+                  this.handleCheckInAutoSuccessV2WithFaceMatcher
+                }
+                handleOpenCheckInManually={this.onOpenCheckInManual}
+                handleShowCurrentPredict={this.handleShowCurrentPredict}
+              />
+              <div className="text-center">
+                <Button type="danger" onClick={this.onOpenCheckInManual}>
+                  Giám sát thủ công
+                </Button>
+              </div>
+            </Col>
+            <Col style={{ height: '-webkit-fill-available' }} span={12}>
+              <h2 className="text-center">Thông tin giám sát: {stringDate}</h2>
+              <Divider />
+              <Result />
+            </Col>
+          </Row>
+        ) : (
+          <Spin>Đang tải mô hình</Spin>
+        )}
+      </div>
     );
   }
 }

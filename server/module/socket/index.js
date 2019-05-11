@@ -26,7 +26,6 @@ module.exports.handleUpdateStatusCheckIn = (socket, action) => {
                   CheckInDetail.findCheckInSuccess(
                     checkIn,
                     (err, listCheckSuccess) => {
-                      console.log({ listCheckSuccess });
                       socket.emit('action', {
                         type: 'boilerplate/Check/OnUpdateListCheckIn',
                         payload: listCheckSuccess,
@@ -39,7 +38,6 @@ module.exports.handleUpdateStatusCheckIn = (socket, action) => {
                 CheckInDetail.findCheckInSuccess(
                   checkIn,
                   (err, listCheckSuccess) => {
-                    console.log({ listCheckSuccess });
                     socket.emit('action', {
                       type: 'boilerplate/Check/OnUpdateListCheckIn',
                       payload: listCheckSuccess,
@@ -64,7 +62,6 @@ module.exports.handleAddCommentRequest = async (io, socket, action) =>
       const payload = action.payload;
       const request = await Request.findOne({ iid: payload.objectDetail.iid });
       request.addComment(payload.comments, async (err, docs) => {
-        console.log({ err, docs });
         const tmp = await Request.findOne({ iid: payload.objectDetail.iid });
         io.emit('action', {
           type: 'boilerplate/Request/Update_Request_Detail',
@@ -85,7 +82,6 @@ module.exports.handleAddCommentNotification = async (io, socket, action) =>
         iid: payload.objectDetail.iid,
       });
       notification.addComment(payload.comments, async (err, docs) => {
-        console.log({ err, docs });
         const tmp = await Notification.findOne({
           iid: payload.objectDetail.iid,
         });

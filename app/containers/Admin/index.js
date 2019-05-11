@@ -106,6 +106,7 @@ class LayoutAdmin extends Component {
 
   componentWillMount() {
     this.props.getCurrentUser();
+    console.log('componentWillMount admin')
     this.props.updateNews();
   }
 
@@ -317,7 +318,7 @@ class LayoutAdmin extends Component {
                         <Icon
                           style={{ fontSize: '25px' }}
                           size="large"
-                          type="notification"
+                          type="sound"
                         />
                       </Badge>
                     </div>

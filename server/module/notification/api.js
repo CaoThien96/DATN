@@ -14,9 +14,9 @@ routes.get('/', (req, res) => {
   if (!lodash.isEmpty(req.query)) {
     const query = JSON.parse(req.query.value);
     const status = query.status;
-    const title = parseInt(query.title);
+    const title = query.title;
     if (title) {
-      condition = { ...condition, email: { $regex: email, $options: 'i' } };
+      condition = { ...condition, title: { $regex: title, $options: 'i' } };
     }
     if (status.length) {
       let or = [];
@@ -67,8 +67,6 @@ routes.post('/', async (req, res) => {
   }
   if (req.files) {
     newNotification.files = Object.values(req.files)[0];
-    // const listImage= await Promise.all(saveImage);
-    // console.log(listImage)
   }
   newNotification
     .save()

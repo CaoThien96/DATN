@@ -124,3 +124,26 @@ function initFaceDetectionControls() {
   inputSizeSelect.on('change', onInputSizeChanged);
   inputSizeSelect.material_select();
 }
+export async function createFetchMatcher (faceapi,users){
+  const labeledFaceDescriptors = await Promise.all(users.map(
+    async element => {
+      if(element.iid){
+        let tmp2 = element.iid.toString()
+        console.log({tmp2,element})
+        const label = tmp2;
+        const descriptors = JSON.parse(element.training)._descriptors;
+        const tmp = descriptors.map(des=>{
+          return new Float32Array(Object.values(des));
+        })
+        return new faceapi.LabeledFaceDescriptors(
+          label,
+          tmp
+        )
+      }else {
+        console.log({element})
+      }
+
+    }
+  ))
+  return new faceapi.FaceMatcher(labeledFaceDescriptors)
+}
