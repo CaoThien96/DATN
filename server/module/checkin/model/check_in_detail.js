@@ -38,9 +38,7 @@ CheckInDetailSchema.methods.updateStatus = async function(cb) {
       if (err) {
         return cb(err);
       }
-      const on_time = docs.find(el => {
-        if (el.name == 'on_time') return true;
-      });
+
       const late_time = docs.find(el => {
         if (el.name == 'late_time') return true;
       });

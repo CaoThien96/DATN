@@ -1,10 +1,12 @@
 const CronJob = require('cron').CronJob;
 const moment = require('moment');
+const tf = require('@tensorflow/tfjs');
 const User = require('../module/employee/model');
 const Configuration = require('../module/configuration/model');
 const CheckIn = require('../module/checkin/model');
 const Request = require('../module/request/model');
 const CheckInDetail = require('../module/checkin/model/check_in_detail');
+const commonControll = require('../module/ai/common');
 async function createCheckin() {
   try {
     const users = await User.find({ role: 1000, status: 1 });
@@ -56,7 +58,7 @@ async function createCheckin() {
             }
           }
           CheckInDetail.insertMany(newCheckInDetail, (error, docs) => {
-            if (err) {
+            if (error) {
               console.log({ error });
             } else {
               console.log({ docs });
@@ -67,6 +69,85 @@ async function createCheckin() {
     );
   } catch (e) {}
 }
+async function saveAndUpdateModel() {
+  console.log(`chay train va save model ${new Date().toDateString()}`);
+
+  try {
+    const users = await User.find({
+      role: 1000,
+      training: { $exists: true },
+      status: 1,
+    });
+    const numberClass = users.length;
+    let {
+      xTrainFull,
+      yTrainFull,
+      xTestFull,
+      yTestFull,
+    } = commonControll.getDataSetTfModel(users.length, users);
+    xTrainFull = xTrainFull.arraySync();
+    yTrainFull = yTrainFull.arraySync();
+    xTestFull = xTestFull.arraySync();
+    yTestFull = yTestFull.arraySync();
+    console.log({
+      xTrainFull,
+      yTrainFull,
+      xTestFull,
+      yTestFull,
+    });
+    xTrainFull = tf.tensor2d(xTrainFull);
+    yTrainFull = tf.tensor2d(yTrainFull);
+
+    xTestFull = tf.tensor2d(xTestFull);
+    yTestFull = tf.tensor2d(yTestFull);
+    // let valAcc;
+    const model = commonControll.getModel(numberClass);
+    const history = await model.fit(xTrainFull, yTrainFull, {
+      batchSize: 7,
+      epochs: 100,
+      // validationData: [xTestFull, yTestFull],
+      // validationSplit:0.4,
+      shuffle: true,
+      callbacks: {
+        onBatchEnd: (onBatch, x) => {
+          // console.log(onBatch)
+        },
+        onEpochEnd: async (epoch, logs) => {
+          const valAcc = logs.acc;
+          console.log(`Epoch ${epoch} Accuracy:${valAcc}`);
+          if (logs.acc * 100 > 99) {
+            model.stopTraining = true;
+          } else {
+            await tf.nextFrame();
+          }
+        },
+      },
+    });
+    commonControll.saveModel(model);
+    // const yPredict = model.predict(xTestFull);
+    // yPredict.print(true);
+    // yPredict.argMax(1).print();
+    // yTestFull.print(true);
+    // console.log(history.history.loss[0]);
+    // const testResult = model.evaluate(xTestFull, yTestFull);
+    // const testAccPercent = testResult[1].dataSync()[0] * 100;
+    // const finalValAccPercent = valAcc * 100;
+    // console.log(
+    //   `Final validation accuracy: ${finalValAccPercent.toFixed(1)}%; ` +
+    //     `Final test accuracy: ${testAccPercent.toFixed(1)}%
+    //         `,
+    // );
+    // const out = tf.math.confusionMatrix(
+    //   yTestFull.argMax(1),
+    //   yPredict.argMax(1),
+    //   numberClass,
+    // );
+    // out.print();
+  } catch (e) {
+    console.log(e);
+  }
+}
 module.exports = {
   createCheckin,
+  saveAndUpdateModel,
 };

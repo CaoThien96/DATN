@@ -10,9 +10,6 @@ import injectSaga from '../../../../utils/injectSaga';
 import saga from './saga';
 class LayoutRequestManagement extends Component {
   render() {
-    console.log('LayoutRequestManagement');
-    console.log(routes);
-    console.log(this.props);
     return (
       <div>
         <Switch>

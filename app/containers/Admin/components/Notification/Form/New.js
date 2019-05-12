@@ -76,7 +76,6 @@ class New extends Component {
   };
 
   normFile = e => {
-    console.log('Upload event:', e);
     if (Array.isArray(e)) {
       return e;
     }
@@ -99,13 +98,13 @@ class New extends Component {
         <Form layout="vertical" onSubmit={this.submit}>
           <Form.Item>
             {getFieldDecorator('title', {
-              rules: [{ required: true, message: 'Please input title!' }],
+              rules: [{ required: true, message: 'Tiêu đề thông báo không để trống!' }],
             })(
               <Input
                 prefix={
                   <Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />
                 }
-                placeholder="Enter title"
+                placeholder="Nhập tiêu đều thông báo"
               />,
             )}
           </Form.Item>
@@ -121,7 +120,10 @@ class New extends Component {
           >
             {/* <div className="my-editing-area" style={{height:'400px'}}/> */}
           </ReactQuill>
-          <Form.Item label="Upload">
+          <br/>
+          <br/>
+
+          <Form.Item >
             {getFieldDecorator('files', {
               valuePropName: 'fileList',
               getValueFromEvent: this.normFile,
@@ -133,7 +135,7 @@ class New extends Component {
               >
                 <div>
                   <Icon type="plus" />
-                  <div className="ant-upload-text">Upload</div>
+                  <div className="ant-upload-text">Tải ảnh</div>
                 </div>
               </Upload>,
             )}

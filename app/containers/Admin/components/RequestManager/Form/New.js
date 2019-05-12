@@ -10,29 +10,50 @@ import requestV2 from 'utils/requestV2';
 import message from 'antd/es/message';
 
 const { TextArea } = Input;
-function disabledDate(current) {
-  // Can not select days before today and today
-  return current && current < moment().add(2, 'days');
-}
+
 class New extends Component {
   constructor(props) {
     super(props);
     this.state = {
       type: '1',
+      resultSearch: false,
     };
+  }
+
+  componentWillMount() {
+    const { currentUser } = this.props;
+
+    const json = JSON.stringify({ status: [1, 0, 2] });
+    const apiUrl = `/api/request?value=${json}`;
+    request(apiUrl)
+      .then(data => {
+        if (data.success) {
+          let resultSearch = [];
+          if (currentUser.role === 1000) {
+            resultSearch = data.payload.filter(el => {
+              if (el.u.iid === currentUser.iid) {
+                return true;
+              }
+            });
+          } else {
+            resultSearch = data.payload;
+          }
+          console.log({ resultSearch });
+          this.setState({ resultSearch });
+        }
+      })
+      .catch(err => alert(err));
   }
 
   submit = e => {
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
-      const date = values.date.unix()*1000;
-      console.log({date:date})
+      const date = values.date.unix() * 1000;
 
       if (err) {
-        console.log(err)
+        console.log(err);
         return;
       }
-      console.log(values)
       requestV2('/api/request', {
         method: 'POST',
         body: { ...values, date },
@@ -59,6 +80,43 @@ class New extends Component {
     });
   };
 
+  disabledDate = (current = moment()) => {
+    // Can not select days before today and today
+    if (current && current < moment().subtract(1, 'days')) {
+      return true;
+    }
+    console.log({ current });
+    const { resultSearch } = this.state;
+    if (resultSearch) {
+      const date = resultSearch.map(el => ({
+        year: new Date(el.addition.date).getFullYear(),
+        month: new Date(el.addition.date).getMonth(),
+        date: new Date(el.addition.date).getDate(),
+      }));
+      console.log({date})
+      const index = date.findIndex(el => {
+        if (
+          el.year == current.year() &&
+          el.month == current.month() &&
+          el.date == current.date()
+        ) {
+          return true;
+        }
+        return false;
+      });
+      console.log({
+        index,
+        year: current.year(),
+        month: current.month(),
+        date: current.date(),
+      });
+      if (index !== -1) {
+        return true;
+      }
+      return false;
+    }
+  };
+
   handleWhenTick = e => {
     alert(`checked = ${e.target.checked}`);
     this.setState({ type: e.target.checked });
@@ -72,13 +130,14 @@ class New extends Component {
   handleReset = () => {
     this.props.form.resetFields();
   };
+
   normFile = e => {
-    console.log('Upload event:', e);
     if (Array.isArray(e)) {
       return e;
     }
     return e && e.fileList;
   };
+
   render() {
     const { getFieldDecorator } = this.props.form;
     const formItemLayout = {
@@ -152,7 +211,10 @@ class New extends Component {
           {this.state.type == '1' ? (
             <Form.Item label="Yêu cầu xin nghỉ phải trước 2 ngày">
               {getFieldDecorator('date', config)(
-                <DatePicker format="YYYY-MM-DD" />,
+                <DatePicker
+                  disabledDate={this.disabledDate}
+                  format="YYYY-MM-DD"
+                />,
               )}
             </Form.Item>
           ) : null}

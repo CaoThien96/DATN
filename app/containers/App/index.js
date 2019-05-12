@@ -76,7 +76,6 @@ class Index extends Component {
         {/* <Button onClick={this.props.onShowLoading}>Show loading</Button> */}
         {showLoading && (
           <SpinWrapper>
-            <Button onClick={this.props.onHiddenLoading}>Hidden loading</Button>
             <Spin style={{ marginTop: '400px' }} size="large" />
           </SpinWrapper>
         )}

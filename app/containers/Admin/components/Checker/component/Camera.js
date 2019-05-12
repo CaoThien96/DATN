@@ -14,9 +14,11 @@ import {
   makeSelectPredict,
   makeSelectPending,
 } from '../seclectors';
+import adminCommon from '../../../common';
 
 const DivWrapper = styled.div`
   position: relative;
+  height: 480px;
 `;
 
 const VideoTag = styled.video`
@@ -62,54 +64,93 @@ class CameraWrapper extends Component {
       !faceapi.nets.tinyFaceDetector.params
     )
       return setTimeout(() => this.onPlay(this.videoTag.current));
-    const options = getFaceDetectorOptions();
+    const options = getFaceDetectorOptions(0.6);
     const tmpHtmlMedia = faceapi.createCanvasFromMedia(this.videoTag.current);
     const result = await faceapi
       .detectSingleFace(tmpHtmlMedia, options)
       .withFaceLandmarks()
-      .withFaceDescriptor();
-
     if (result) {
       const alignedRect = result.alignedRect;
+      const imageExtract = await faceapi.extractFaces(
+        this.videoTag.current,
+        [alignedRect],
+      );
+      const imageToSquare = await faceapi.imageToSquare(
+        imageExtract[0],
+        128,
+        true,
+      );
+      const grayImage = adminCommon.getGrayImage(imageToSquare)
+      const descriptor = await faceapi.computeFaceDescriptor(grayImage)
+      const iid = this.props.faceMatch.findBestMatch(descriptor)
+      const boxesWithText = new faceapi.BoxWithText(
+        alignedRect.box,
+        iid.toString()
+      )
+      drawDetections(this.videoTag.current, this.canvasRef.current, []);
+      faceapi.drawDetection(this.canvasRef.current, boxesWithText)
       // console.log({pendding:this.pendding,checkInManual:this.props.checkInManual})
       if (!this.pendding && !this.props.checkInManual) {
         this.pendding = true;
-        this.onRecognition(result);
+        const tmpIid = this.onRecognition({descriptor});
+        if(iid.label !== 'unknown'){
+          if(tmpIid == parseInt(iid.label)){
+            this.onCheckInSuccessWithFaceMatcher(iid.label)
+          }else{
+            console.log(`model va findbestmatch khong khop`)
+          }
+        }else{
+          this.pendding = false
+        }
       }
-      drawDetections(this.imageTag.current, this.canvasRef.current, [
-        alignedRect,
-      ]);
+      // drawDetections(this.videoTag.current, this.canvasRef.current, [
+      //   alignedRect,
+      // ]);
     } else {
-      drawDetections(this.imageTag.current, this.canvasRef.current, []);
+      drawDetections(this.videoTag.current, this.canvasRef.current, []);
     }
     setTimeout(() => this.onPlay(this.videoTag.current));
   };
-
   onRecognition(result) {
     const tfDescriptor = tf.tensor2d(result.descriptor, [1, 128]);
     const yPredict = this.props.model.predict(tfDescriptor);
     let { values, indices } = tf.topk(yPredict);
     values = values.as1D().dataSync();
     indices = indices.as1D().dataSync();
-    console.log({val:values[0],indices:indices[0]});
-    // console.log(indices);
 
-    if (values < 0.6) {
+    if (values < 0.9) {
       this.miss = this.miss + 1;
-      if (this.miss > 2) {
-        this.props.handleOpenCheckInManually();
-        this.pendding = false;
-      } else {
-        console.log('thu lai');
-        this.pendding = false;
-      }
+      this.props.handleShowCurrentPredict(indices,values);
+      // if (this.miss > 2) {
+      //   this.props.handleOpenCheckInManually();
+      //   this.pendding = false;
+      // } else {
+      //   console.log('thu lai');
+      //   this.pendding = false;
+      // }
+      this.pendding = false;
+      return null;
     } else {
       this.miss=0
-      this.props.handleCheckInAutoSuccess(indices);
+      this.props.handleShowCurrentPredict(indices,values);
+      if (this.props.usersOfModel) {
+        // console.log(this.props.usersOfModel)
+        const userPredict = this.props.usersOfModel[indices];
+        this.pendding = false;
+        return userPredict.iid;
+      }
+
+
+      // this.props.handleCheckInAutoSuccess(indices);
       this.pendding = false;
+      // return userPredict.iid
+      return null;
     }
   }
-
+  onCheckInSuccessWithFaceMatcher = (iid)=>{
+    this.props.handleCheckInAutoSuccessV2WithFaceMatcher(iid)
+    this.pendding = false;
+  }
   onStop = () => {
     this.videoTag.current.stop();
   };
@@ -129,17 +170,11 @@ class CameraWrapper extends Component {
           // style={{ position: 'absolute' }}
           onPlay={this.onPlay}
           ref={this.videoTag}
-          width="594"
-          height="383"
+          width="640"
+          height="480"
           controls
           autoPlay
           muted
-        />
-        <img
-          style={{ position: 'absolute', display: 'none' }}
-          ref={this.imageTag}
-          src={TrainingImage}
-          alt=""
         />
         <CanvasTag ref={this.canvasRef} id="overlay" />
       </DivWrapper>

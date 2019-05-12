@@ -29,7 +29,7 @@ import commonFirebase from './common';
 import { askForPermissioToReceiveNotifications } from '../../push-notification';
 import saga from './saga';
 const { SubMenu } = Menu;
-const { Header, Content, Sider } = Layout;
+const { Header, Content, Sider, Footer } = Layout;
 const menu = props => {
   const { news } = props;
   return (
@@ -106,6 +106,7 @@ class LayoutAdmin extends Component {
 
   componentWillMount() {
     this.props.getCurrentUser();
+    console.log('componentWillMount admin')
     this.props.updateNews();
   }
 
@@ -256,7 +257,7 @@ class LayoutAdmin extends Component {
             theme="dark"
             selectedKeys={[routerCurrent && routerCurrent.key]}
             defaultOpenKeys={keySubRouterOpen ? [keySubRouterOpen] : []}
-            style={{ height: '100%', borderRight: 0 }}
+            style={{ borderRight: 0 }}
           >
             {filter &&
               filter.map(menu => {
@@ -317,7 +318,7 @@ class LayoutAdmin extends Component {
                         <Icon
                           style={{ fontSize: '25px' }}
                           size="large"
-                          type="notification"
+                          type="sound"
                         />
                       </Badge>
                     </div>
@@ -354,7 +355,7 @@ class LayoutAdmin extends Component {
           </Header>
 
           <Layout style={{ padding: '0 24px 24px' }}>
-            <Breadcrumb style={{ margin: '16px 0' }}>
+            <Breadcrumb style={{ margin: '5px 0' }}>
               {breadcrumbe.length == 1 ? (
                 <Breadcrumb.Item>DASHBOARD</Breadcrumb.Item>
               ) : (
@@ -381,6 +382,9 @@ class LayoutAdmin extends Component {
                 ))}
               </Switch>
             </Content>
+            <Footer style={{ textAlign: 'center' }}>
+              Đại Học Bách Khoa Hà Nội ©2019 Created by Cao Thien
+            </Footer>
           </Layout>
         </Layout>
       </Layout>

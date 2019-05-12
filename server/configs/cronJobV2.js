@@ -9,9 +9,10 @@ async function createJobUpdateModel() {
   return new Promise(resolve => {
     Configuration.findOne({ name: 'time_update_model' }, (err, doc) => {
       const time = moment.unix(doc.value);
-      const configJob = `0 ${time.minute()} ${time.hour()} * * 0-4`.toString();
+      const configJob = `0 ${time.minute()} ${time.hour()} * * 0-6`.toString();
       const job = new CronJob(configJob, async () => {
         console.log(`time_update_model${new Date().toDateString()}`);
+        JobExcuse.saveAndUpdateModel();
       });
       resolve(job);
     });
@@ -26,7 +27,7 @@ async function createJobCheckIn() {
   return new Promise(resolve => {
     Configuration.findOne({ name: 'time_create_checkin' }, (err, doc) => {
       const time = moment.unix(doc.value);
-      const configJob = `0 ${time.minute()} ${time.hour()} * * 0-4`.toString();
+      const configJob = `0 ${time.minute()} ${time.hour()} * * 0-6`.toString();
       const job = new CronJob(configJob, async () => {
         console.log(`createJobCheckIn${new Date().toDateString()}`);
         JobExcuse.createCheckin();

@@ -7,11 +7,13 @@ const apiAuth = require('../module/auth/api');
 const apiCheckIn = require('../module/checkin/api');
 const ai = require('../module/ai/api');
 const apiNews = require('../module/news/api');
+const apiDashboard = require('../module/dashboard/api');
 module.exports = app => {
   app.use('/', apiAuth);
   app.use('/api/ai', ai);
   app.use('/api', authCheck);
   app.use('/api/employee', apiEmployee);
+  app.use('/api/dashboard', apiDashboard);
   app.use('/api/news', apiNews);
   app.use('/api/request', apiRequest);
   app.use('/api/notification', apiNotification);

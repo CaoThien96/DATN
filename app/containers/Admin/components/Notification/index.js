@@ -28,7 +28,6 @@ class NotificationManagement extends Component {
   }
 
   componentWillMount() {
-    console.log('NotificationManagement');
   }
 
   componentDidMount() {}

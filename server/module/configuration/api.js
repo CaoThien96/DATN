@@ -42,7 +42,7 @@ routes.post('/', (req, res) => {
       req.app.jobs[index].job.stop();
       req.app.jobs.splice(index, 1);
       const time = moment.unix(value);
-      const configJob = `0 ${time.minute()} ${time.hour()} * * 1-6`.toString();
+      const configJob = `0 ${time.minute()} ${time.hour()} * * 0-6`.toString();
       const job = new CronJob(configJob, async () => {
         console.log(`time_create_checkin${new Date().toDateString()}`);
         JobExcuse.createCheckin();
@@ -64,9 +64,9 @@ routes.post('/', (req, res) => {
       req.app.jobs[index].job.stop();
       req.app.jobs.splice(index, 1);
       const time = moment.unix(value);
-      const configJob = `0 ${time.minute()} ${time.hour()} * * 1-5`.toString();
+      const configJob = `0 ${time.minute()} ${time.hour()} * * 0-6`.toString();
       const job = new CronJob(configJob, async () => {
-        console.log(`createJobUpdateModel ${new Date().toDateString()}`);
+        JobExcuse.saveAndUpdateModel();
       });
       job.start();
       req.app.jobs.push({

@@ -109,7 +109,7 @@ const CustomTooltip = ({ active, payload, label }) => {
         <Badge status="warning" text={`Muộn giờ: ${payload[1].value} người`} />
         <br />
         <Badge
-          color="#2db7f5"
+          color="#b5b5b5"
           text={`Nghỉ có phép: ${payload[2].value} người`}
         />
         <br />
@@ -182,8 +182,8 @@ export default class Example extends PureComponent {
           <YAxis domain={[0, 'auto']} />
           <Tooltip content={<CustomTooltip />} />
           <Legend content={renderLegend} />
-          <Bar dataKey="on_time" stackId="a" fill="#9ADD79" />
-          <Bar dataKey="late" stackId="a" fill="#ffff00" />
+          <Bar dataKey="on_time" stackId="a" fill="#52C41A" />
+          <Bar dataKey="late" stackId="a" fill="#FAAD14" />
           <Bar dataKey="license" stackId="a" fill="#b5b5b5" />
           <Bar dataKey="miss" stackId="a" fill="#F5222D" />
         </ComposedChart>

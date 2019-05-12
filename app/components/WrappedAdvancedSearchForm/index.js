@@ -19,6 +19,9 @@ class Wrapper extends Component {
   handleSearch = (e)=>{
     e.preventDefault();
     this.props.form.validateFields((err, values) => {
+      if(err){
+        return;
+      }
       this.props.handleSearch(values);
     });
   }

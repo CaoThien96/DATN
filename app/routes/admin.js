@@ -72,7 +72,7 @@ const routes = [
     exact: true,
     component: Checker,
     label: 'Giám sát',
-    icon: <Icon type="clock-circle" />,
+    icon: <Icon type="eye" />,
   },
   {
     path: '/admin/attendance',

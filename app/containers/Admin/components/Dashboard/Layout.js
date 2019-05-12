@@ -27,7 +27,7 @@ class Layout extends Component {
           <TabPane tab={<span><Icon type="credit-card" />Thông kê chi tiết theo ngày</span>} key="2">
             <OverviewDate />
           </TabPane>
-          <TabPane tab={<span><Icon type="alert" />Cảnh báo</span>} key="3">
+          <TabPane tab={<span><Icon type="team" />Thống kê chi tiết theo nhân viên</span>} key="3">
             <OverviewWarning />
           </TabPane>
         </Tabs>

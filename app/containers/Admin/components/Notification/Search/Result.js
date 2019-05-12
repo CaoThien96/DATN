@@ -77,7 +77,7 @@ const Result = ({ items, handleDelete, handleChangeActive, currentUser }) => {
       key: 'status',
     },
     {
-      title: 'Actions',
+      title: 'Hành Động',
       render(text, record) {
         return {
           props:

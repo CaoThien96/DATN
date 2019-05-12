@@ -184,17 +184,21 @@ routes.get('/dataset', async (req, res) => {
       yTrainFull,
       xTestFull,
       yTestFull,
+      xValidation,
+      yValidation
     } = commonControll.getDataSetTfModel(users.length, users);
     xTrainFull = xTrainFull.arraySync();
     yTrainFull = yTrainFull.arraySync();
     xTestFull = xTestFull.arraySync();
     yTestFull = yTestFull.arraySync();
-    console.log({
-      xTrainFull,
-      yTrainFull,
-      xTestFull,
-      yTestFull,
-    });
+    xValidation = xValidation.arraySync();
+    yValidation = yValidation.arraySync();
+    // console.log({
+    //   xTrainFull,
+    //   yTrainFull,
+    //   xTestFull,
+    //   yTestFull,
+    // });
     // let valAcc;
     const model = commonControll.getModel(numberClass);
     // const history = await model.fit(xTrainFull, yTrainFull, {
@@ -246,6 +250,8 @@ routes.get('/dataset', async (req, res) => {
       yTrainFull,
       xTestFull,
       yTestFull,
+      xValidation,
+      yValidation,
       numberClass,
       users,
     });
@@ -254,10 +260,7 @@ routes.get('/dataset', async (req, res) => {
   }
 });
 routes.post('/save', async (req, res) => {
-  req.app.io.emit('action', {
-    type: 'boilerplate/App/Should_Update_Model',
-    payload: 'dasdasda',
-  });
+
   if (Object.keys(req.files).length == 0) {
     return res.status(400).send('No files were uploaded.');
   }
@@ -271,6 +274,10 @@ routes.post('/save', async (req, res) => {
     if (err) return res.status(500).send(err);
     modelWeight.mv(`${pathSave}/${modelWeight.name}`, err => {
       if (err) return res.status(500).send(err);
+      req.app.io.emit('action', {
+        type: 'boilerplate/App/Should_Update_Model',
+        payload: 'dasdasda',
+      });
       res.send('File uploaded!');
     });
   });

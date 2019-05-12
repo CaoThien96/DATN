@@ -17,8 +17,6 @@
   <script src="/dist/face-api.js"></script>
 
   <script>
-    console.log({tf})
-    console.log({faceapi})
     async function loadModel(){
         try {
           await  faceapi.nets.tinyFaceDetector.load('/dist/weights');
