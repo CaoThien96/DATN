@@ -10,13 +10,13 @@ import { createStructuredSelector } from 'reselect';
 import connect from 'react-redux/es/connect/connect';
 import { withRouter } from 'react-router-dom';
 import { compose } from 'redux';
+import Modal from 'antd/es/modal/Modal';
 import FormSearch from './FormSearch';
 import FormCheckIn from './FormCheckIn';
 import { makeSelectCurrentUser } from '../../../../../App/selectors';
 import { onUpdateListCheckIn } from '../../actions';
 import { getPathImage } from '../../../../../../common/pathImage';
-import Modal from 'antd/es/modal/Modal';
-import User from './User'
+import User from './User';
 const Error = styled.div`
   text-align: center;
   color: red;
@@ -90,6 +90,7 @@ class StepFormWrapper extends Component {
     const values = {
       userIid: this.state.user.iid,
       statusCheckIn: this.state.statusCheckIn,
+      idCheckInDetail: this.state.check_in_detail._id,
     };
     request('/api/check-in', {
       method: 'PUT', // or 'PUT'

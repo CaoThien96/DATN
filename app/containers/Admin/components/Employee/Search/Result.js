@@ -3,8 +3,8 @@ import Table from 'antd/es/table/Table';
 import Button from 'antd/es/button/button';
 import Link from 'react-router-dom/es/Link';
 import Switch from 'antd/es/switch';
-
-const Result = ({ items, handleDelete, handleChangeActive }) => {
+import CanWrapper from '../Can';
+const Result = ({ items, handleDelete, handleChangeActive,user }) => {
   const columns = [
     {
       title: 'Mã số',
@@ -88,19 +88,23 @@ const Result = ({ items, handleDelete, handleChangeActive }) => {
               <div>Deleted</div>
             ) : (
               <div>
-                <Switch
-                  onChange={status => handleChangeActive(record, status)}
-                  checkedChildren="Active"
-                  unCheckedChildren="Unlock"
-                  checked={record.status == 1}
-                />
-                <Button
-                  onClick={() => handleDelete(record)}
-                  type="danger"
-                  icon="delete"
-                >
-                  Delete
-                </Button>
+                <CanWrapper I="change-status" user={user} a="Employee">
+                  <Switch
+                    onChange={status => handleChangeActive(record, status)}
+                    checkedChildren="Active"
+                    unCheckedChildren="Unlock"
+                    checked={record.status == 1}
+                  />
+                </CanWrapper>
+                <CanWrapper I="delete" user={user} a="Employee">
+                  <Button
+                    onClick={() => handleDelete(record)}
+                    type="danger"
+                    icon="delete"
+                  >
+                    Delete
+                  </Button>
+                </CanWrapper>
                 <Button icon="diff">
                   <Link to={`employee/training/${record && record.iid}`}>
                     Tranning

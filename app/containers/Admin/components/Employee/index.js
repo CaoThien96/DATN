@@ -6,9 +6,14 @@ import WrapperFormSearch from 'components/WrappedAdvancedSearchForm';
 import Row from 'antd/es/grid/row';
 import Col from 'antd/es/grid/col';
 import request from 'utils/request';
+import { createStructuredSelector } from 'reselect';
+import connect from 'react-redux/es/connect/connect';
+import { compose } from 'redux';
+import { withRouter } from 'react-router-dom';
 import FromNew from './Form/New';
 import FormSearch from './Search/Form';
 import Result from './Search/Result';
+import { makeSelectCurrentUser } from '../../../App/selectors';
 class LayoutEmployee extends Component {
   constructor(props) {
     super(props);
@@ -65,8 +70,7 @@ class LayoutEmployee extends Component {
   handleDelete = item => {
     request(`/api/employee/${item.iid}`, {
       method: 'DELETE',
-    }).then(data => {
-    });
+    }).then(data => {});
     const resultSearch = this.state.resultSearch.filter(i => {
       if (i.iid !== item.iid) {
         return true;
@@ -88,11 +92,11 @@ class LayoutEmployee extends Component {
       },
     }).then(data => {
       const resultSearch = this.state.resultSearch.map(el => {
-        const tmp = status ? 1  :2;
+        const tmp = status ? 1 : 2;
         if (el.iid == item.iid) {
           return {
             ...item,
-            status:tmp,
+            status: tmp,
           };
         }
         return el;
@@ -126,6 +130,7 @@ class LayoutEmployee extends Component {
           <FormSearch />
         </WrapperFormSearch>
         <Result
+          user={this.props.currentUser}
           items={this.state.resultSearch}
           handleDelete={this.handleDelete}
           handleChangeActive={this.handleChangeActive}
@@ -149,5 +154,8 @@ class LayoutEmployee extends Component {
 
 LayoutEmployee.defaultProps = {};
 LayoutEmployee.propTypes = {};
-
-export default LayoutEmployee;
+const mapStateToProps = createStructuredSelector({
+  currentUser: makeSelectCurrentUser(),
+});
+const withConnect = connect(mapStateToProps);
+export default withRouter(compose(withConnect)(LayoutEmployee));

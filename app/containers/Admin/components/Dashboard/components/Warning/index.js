@@ -58,6 +58,7 @@ class Index extends Component {
   handleGetDataPreview = (start, end) => {
     request(`/api/dashboard/get-warning/${start}/${end}`).then(data => {
       if (data.success) {
+        console.log({data:data.payload})
         const result = data.payload.map(el => {
           const { on_time, later, miss, miss_request } = filterData(
             el.created_at,
