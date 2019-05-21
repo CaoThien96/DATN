@@ -18,7 +18,7 @@ module.exports.getDataSetTfModel = (numberClass, users) => {
     let training = [];
     let test = [];
     let validation = [];
-    const numTraining = parseInt((numDescriptor * 70) / 100);
+    const numTraining = parseInt((numDescriptor * 60) / 100);
     const numValidation =
       parseInt((numDescriptor * 20) / 100) < 1
         ? 1
@@ -72,8 +72,8 @@ module.exports.getModel = numberClass => {
   model.add(
     tf.layers.dense({
       inputShape: [128],
-      activation: 'sigmoid',
-      units: 128,
+      activation: 'tanh',
+      units: 64,
     }),
   );
 
@@ -86,7 +86,7 @@ module.exports.getModel = numberClass => {
   );
   model.compile({
     loss: 'categoricalCrossentropy',
-    optimizer: tf.train.adam(0.01),
+    optimizer: tf.train.adam(0.02),
     metrics: ['accuracy'],
   });
   return model;

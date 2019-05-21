@@ -2,6 +2,7 @@ const routes = require('express').Router();
 const passport = require('passport');
 global.fetch = require('node-fetch');
 // const svm = require('node-svm');
+const { evaluate } = require('nodeml');
 const jwt = require('jsonwebtoken');
 const tf = require('@tensorflow/tfjs');
 const faceapi = require('face-api.js');
@@ -10,7 +11,7 @@ const User = require('../employee/model');
 const config = require('../../configs/index');
 const commonPath = require('../../common/path');
 const commonControll = require('./common');
-const job  = require('../../configs/JobExcuse')
+const job = require('../../configs/JobExcuse');
 
 async function training() {
   return new Promise(async (resolve, reject) => {
@@ -170,6 +171,13 @@ routes.post('/', async (req, res) => {
   // }
 });
 routes.post('/train-tf-model', (req, res) => {});
+routes.post('/fscore', (req, res) => {
+  const { yTestFullTmp, yPredictTmp } = req.body;
+  res.send({
+    success: true,
+    payload: evaluate.accuracy(yTestFullTmp, yPredictTmp),
+  });
+});
 routes.get('/dataset', async (req, res) => {
   try {
     let numberClass = 12;
@@ -185,7 +193,7 @@ routes.get('/dataset', async (req, res) => {
       xTestFull,
       yTestFull,
       xValidation,
-      yValidation
+      yValidation,
     } = commonControll.getDataSetTfModel(users.length, users);
     xTrainFull = xTrainFull.arraySync();
     yTrainFull = yTrainFull.arraySync();
@@ -260,7 +268,6 @@ routes.get('/dataset', async (req, res) => {
   }
 });
 routes.post('/save', async (req, res) => {
-
   if (Object.keys(req.files).length == 0) {
     return res.status(400).send('No files were uploaded.');
   }

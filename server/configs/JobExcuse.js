@@ -84,28 +84,32 @@ async function saveAndUpdateModel() {
       yTrainFull,
       xTestFull,
       yTestFull,
+      xValidation,
+      yValidation
     } = commonControll.getDataSetTfModel(users.length, users);
     xTrainFull = xTrainFull.arraySync();
     yTrainFull = yTrainFull.arraySync();
     xTestFull = xTestFull.arraySync();
     yTestFull = yTestFull.arraySync();
-    console.log({
-      xTrainFull,
-      yTrainFull,
-      xTestFull,
-      yTestFull,
-    });
+
+    xValidation = xValidation.arraySync();
+    yValidation = yValidation.arraySync();
+
     xTrainFull = tf.tensor2d(xTrainFull);
     yTrainFull = tf.tensor2d(yTrainFull);
 
     xTestFull = tf.tensor2d(xTestFull);
     yTestFull = tf.tensor2d(yTestFull);
+
+    xValidationFull = tf.tensor2d(xValidation);
+    yValidationFull = tf.tensor2d(yValidation);
+
+
     // let valAcc;
     const model = commonControll.getModel(numberClass);
     const history = await model.fit(xTrainFull, yTrainFull, {
-      batchSize: 7,
-      epochs: 100,
-      // validationData: [xTestFull, yTestFull],
+      epochs: 20,
+      validationData: [xValidationFull, yValidationFull],
       // validationSplit:0.4,
       shuffle: true,
       callbacks: {
@@ -124,25 +128,6 @@ async function saveAndUpdateModel() {
       },
     });
     commonControll.saveModel(model);
-    // const yPredict = model.predict(xTestFull);
-    // yPredict.print(true);
-    // yPredict.argMax(1).print();
-    // yTestFull.print(true);
-    // console.log(history.history.loss[0]);
-    // const testResult = model.evaluate(xTestFull, yTestFull);
-    // const testAccPercent = testResult[1].dataSync()[0] * 100;
-    // const finalValAccPercent = valAcc * 100;
-    // console.log(
-    //   `Final validation accuracy: ${finalValAccPercent.toFixed(1)}%; ` +
-    //     `Final test accuracy: ${testAccPercent.toFixed(1)}%
-    //         `,
-    // );
-    // const out = tf.math.confusionMatrix(
-    //   yTestFull.argMax(1),
-    //   yPredict.argMax(1),
-    //   numberClass,
-    // );
-    // out.print();
   } catch (e) {
     console.log(e);
   }

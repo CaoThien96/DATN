@@ -13,7 +13,10 @@ const getMatch = (
 ) => {
   let check = false;
   const timeTmp = new Date(time2.created_at);
-  if (time1.date() === timeTmp.getDate()) {
+  if (
+    time1.date() === timeTmp.getDate() &&
+    time1.month() === timeTmp.getMonth()
+  ) {
     check = true;
   }
   if (check) {
@@ -178,10 +181,9 @@ class Result extends Component {
         title: 'Địa chỉ email',
         dataIndex: '_id',
         key: 'email',
-        sorter: (a, b) =>
-          a._id.email.length - b._id.email.length,
+        sorter: (a, b) => a._id.email.length - b._id.email.length,
         // sortDirections: 'descend',
-        defaultSortOrder:'descend',
+        defaultSortOrder: 'descend',
         sortOrder: sortedInfo.columnKey === 'email' && sortedInfo.order,
         render: (text, record) => <p>{record._id.email}</p>,
       },
@@ -193,7 +195,13 @@ class Result extends Component {
           a.created_at.on_time.length - b.created_at.on_time.length,
         sortOrder: sortedInfo.columnKey === 'on_time' && sortedInfo.order,
         render: (text, record) => (
-          <p>{record && record.created_at.on_time.length?(<Badge status="success" text={record.created_at.miss.length} />):(<Badge status="success" text={0} />)}</p>
+          <p>
+            {record && record.created_at.on_time.length ? (
+              <Badge status="success" text={record.created_at.on_time.length} />
+            ) : (
+              <Badge status="success" text={0} />
+            )}
+          </p>
         ),
       },
       {
@@ -204,7 +212,16 @@ class Result extends Component {
           a.created_at.miss_request.length - b.created_at.miss_request.length,
         sortOrder: sortedInfo.columnKey === 'miss_request' && sortedInfo.order,
         render: (text, record) => (
-          <p>{record && record.created_at.miss_request.length ? (<Badge status="default" text={record.created_at.miss_request.length} />):<Badge status="default" text={0} />}</p>
+          <p>
+            {record && record.created_at.miss_request.length ? (
+              <Badge
+                status="default"
+                text={record.created_at.miss_request.length}
+              />
+            ) : (
+              <Badge status="default" text={0} />
+            )}
+          </p>
         ),
       },
       {
@@ -214,7 +231,13 @@ class Result extends Component {
         sorter: (a, b) => a.created_at.later.length - b.created_at.later.length,
         sortOrder: sortedInfo.columnKey === 'later' && sortedInfo.order,
         render: (text, record) => (
-          <p>{record && record.created_at.later.length ? (<Badge status="warning" text={record.created_at.miss.length} />):(<Badge status="warning" text={0} />)}</p>
+          <p>
+            {record && record.created_at.later.length ? (
+              <Badge status="warning" text={record.created_at.later.length} />
+            ) : (
+              <Badge status="warning" text={0} />
+            )}
+          </p>
         ),
       },
 
@@ -226,7 +249,13 @@ class Result extends Component {
         sortOrder: sortedInfo.columnKey === 'miss' && sortedInfo.order,
         // ...this.getColumnSearchProps(),
         render: (text, record) => (
-          <p>{record && record.created_at.miss.length ? (<Badge status="error" text={record.created_at.miss.length} />):(<Badge status="error" text={0} />)}</p>
+          <p>
+            {record && record.created_at.miss.length ? (
+              <Badge status="error" text={record.created_at.miss.length} />
+            ) : (
+              <Badge status="error" text={0} />
+            )}
+          </p>
         ),
       },
     ];

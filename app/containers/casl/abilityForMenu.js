@@ -35,7 +35,7 @@ export default function defineAbilitiesFor(user) {
       can(['admin-notification', 'admin-request','admin-dashboard-employee','admin-test','admin-user'], 'Menu');
     } else if (user.role === 1002) {
       // Giam sat vien
-      can(['admin-configuration','admin-configuration-model', 'admin-checker','admin-user'], 'Menu');
+      can(['admin-configuration','admin-configuration-model', 'admin-checker','admin-employee'], 'Menu');
     }
   });
 }

@@ -48,7 +48,7 @@ class Result extends Component {
         <div
           ref={this.scrollTag}
           style={{
-            maxHeight: '350px',
+            maxHeight: '550px',
             overflow: 'auto',
             boxShadow: '0px 0px 10px 0px #888888',
           }}

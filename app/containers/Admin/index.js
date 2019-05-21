@@ -20,7 +20,7 @@ import RenderRoute from '../../routes/render';
 import request from '../../utils/request';
 import { makeSelectCurrentUser, makeSelectError } from '../App/selectors';
 import { makeSelectNews } from './selectors';
-import { loadUserLogin, removeUser,loadUserSuccess } from '../App/actions';
+import { loadUserLogin, removeUser, loadUserSuccess } from '../App/actions';
 import { updateNews } from './actions';
 import injectReducer from '../../utils/injectReducer';
 import reducer from './reducer';
@@ -106,7 +106,7 @@ class LayoutAdmin extends Component {
 
   componentWillMount() {
     this.props.getCurrentUser();
-    console.log('componentWillMount admin')
+    console.log('componentWillMount admin');
     this.props.updateNews();
   }
 
@@ -172,14 +172,14 @@ class LayoutAdmin extends Component {
     } catch (e) {
       console.log({ e });
     }
-    this.props.loadUserSuccess(false)
+    this.props.loadUserSuccess(false);
     this.props.history.replace('/');
   };
 
   render() {
     const { routes, currentUser, error, history } = this.props;
-    if(!currentUser){
-      return null
+    if (!currentUser) {
+      return null;
     }
     const ability = defineAbilitiesFor(currentUser);
     const filter = lodashcommon.lodashFilter(routes, el =>
@@ -355,17 +355,7 @@ class LayoutAdmin extends Component {
           </Header>
 
           <Layout style={{ padding: '0 24px 24px' }}>
-            <Breadcrumb style={{ margin: '5px 0' }}>
-              {breadcrumbe.length == 1 ? (
-                <Breadcrumb.Item>DASHBOARD</Breadcrumb.Item>
-              ) : (
-                breadcrumbe.map((el, key) => (
-                  <Breadcrumb.Item key={key}>
-                    {el.toUpperCase()}
-                  </Breadcrumb.Item>
-                ))
-              )}
-            </Breadcrumb>
+            <Breadcrumb style={{ margin: '5px 0' }} />
             <Content
               style={{
                 background: '#fff',
@@ -400,7 +390,7 @@ const mapDispatchToProps = dispatch => ({
   logout: () => dispatch(removeUser()),
   getCurrentUser: () => dispatch(loadUserLogin()),
   updateNews: () => dispatch(updateNews()),
-  loadUserSuccess: (user)=>dispatch(loadUserSuccess(user))
+  loadUserSuccess: user => dispatch(loadUserSuccess(user)),
 });
 const withConnect = connect(
   mapStateToProps,

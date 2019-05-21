@@ -1,9 +1,9 @@
 const routes = require('express').Router();
+const mongoose = require('mongoose');
 const lodash = require('lodash');
 const CheckIn = require('./model');
 const User = require('../employee/model');
 const CheckInDetail = require('./model/check_in_detail');
-
 
 routes.get('/list-check-in-success', (req, res) => {
   console.log(req.app.socket.id);
@@ -153,4 +153,33 @@ routes.get(
     );
   },
 );
+
+routes.put('/', async (req, res) => {
+  const { userIid, statusCheckIn, idCheckInDetail } = req.body;
+  const checkInDetail = await CheckInDetail.find({
+    'user.iid': userIid,
+  });
+
+  // const id = tmpCheckIn._id;
+  const id = mongoose.Types.ObjectId(idCheckInDetail.toString());
+  const check_in_detail = await CheckInDetail.findOne({ _id: id });
+  if (check_in_detail) {
+    check_in_detail.updateStatus((err, mes) => {
+      if (mes) {
+        CheckInDetail.findCheckInSuccess(
+          { iid: check_in_detail.pid },
+          (err, listCheckSuccess) =>
+            res.status(200).send({
+              success: true,
+              listCheckSuccess,
+            }),
+        );
+      }else {
+        return res.status(500).send(err);
+      }
+    });
+  } else {
+    return res.status(500).send('Khong tim thay check in detail');
+  }
+});
 module.exports = routes;

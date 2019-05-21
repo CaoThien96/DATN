@@ -33,6 +33,7 @@ import {
 class LayoutChecker extends Component {
   constructor(props) {
     super(props);
+    this.score = 0.8;
     this.state = {
       checkInManual: false,
       curentPredict: false,
@@ -51,7 +52,7 @@ class LayoutChecker extends Component {
         // status:1,
       });
       const users = await request(`/api/employee?value=${params}`);
-      console.log({ users });
+      // console.log({ users });
       this.setState({ model, users });
       const faceMatch = await createFetchMatcher(faceapi, users);
       this.setState({ faceMatch });
@@ -100,11 +101,11 @@ class LayoutChecker extends Component {
   handleShowCurrentPredict = (indices, value) => {
     if (this.props.usersOfModel) {
       const userPredict = this.props.usersOfModel[indices[0]];
-      console.log({
-        userPredict,
-        indices,
-        usersOfModel: this.props.usersOfModel,
-      });
+      // console.log({
+      //   userPredict,
+      //   indices,
+      //   usersOfModel: this.props.usersOfModel,
+      // });
       this.setState({
         currentPredict: {
           userPredict,
@@ -149,7 +150,6 @@ class LayoutChecker extends Component {
     const { usersOfModel, model } = this.props;
     const currentDate = new Date();
     const stringDate = `${currentDate.getDate()}/${currentDate.getMonth()}/${currentDate.getFullYear()}`;
-    console.log({ faceMatch, usersOfModel });
     return (
       <div>
         {faceMatch && usersOfModel ? (
@@ -169,7 +169,7 @@ class LayoutChecker extends Component {
               <h2 className="text-center">Camera </h2>
               {currentPredict ? (
                 <div>
-                  {currentPredict.value < 0.9 ? (
+                  {currentPredict.value < this.score ? (
                     <Alert message="Hãy giám thủ công!!" type="error" />
                   ) : (
                     <Alert
@@ -194,6 +194,7 @@ class LayoutChecker extends Component {
                 }
                 handleOpenCheckInManually={this.onOpenCheckInManual}
                 handleShowCurrentPredict={this.handleShowCurrentPredict}
+                score={this.score}
               />
               <div className="text-center">
                 <Button type="danger" onClick={this.onOpenCheckInManual}>

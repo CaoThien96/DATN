@@ -3,6 +3,8 @@ import Button from 'antd/es/button/button';
 import request from 'utils/request';
 import Row from 'antd/es/grid/row';
 import Col from 'antd/es/grid/col';
+import Input from 'antd/es/input-number';
+import fscore from 'fscore';
 import message from 'antd/es/message';
 import { createStructuredSelector } from 'reselect';
 import connect from 'react-redux/es/connect/connect';
@@ -29,7 +31,8 @@ import { onUpdateModel } from './actions';
 class LayoutConfigurationModel extends Component {
   constructor(props) {
     super(props);
-    this.matrixRef = React.createRef()
+    this.matrixRef = React.createRef();
+    this.inputRef = React.createRef();
     this.state = {
       statusTraining: false,
       status: 'un-train', // status: un-train, training, trained
@@ -37,8 +40,9 @@ class LayoutConfigurationModel extends Component {
       yTestFull: null,
       users: null,
       model: null,
+      loop: 50,
       epoch: 0,
-      stop:false,
+      stop: false,
       dataAcc: [
         {
           epoch: 0,
@@ -50,8 +54,7 @@ class LayoutConfigurationModel extends Component {
   }
 
   handleTrain = async () => {
-
-    this.setState({ statusTraining: true,stop:false });
+    this.setState({ statusTraining: true, stop: false });
     if (this.state.status == 'trained') {
       this.setState({
         epoch: 0,
@@ -78,7 +81,7 @@ class LayoutConfigurationModel extends Component {
           numberClass,
           users,
         } = data;
-        console.log({length:users.length})
+        console.log({ length: users.length });
         xTrainFull = tf.tensor2d(xTrainFull);
         yTrainFull = tf.tensor2d(yTrainFull);
 
@@ -89,6 +92,10 @@ class LayoutConfigurationModel extends Component {
         yValidation = tf.tensor2d(yValidation);
 
         this.setState({ xTestFull, yTestFull, users });
+        xTrainFull.print(true);
+        xTestFull.print(true);
+        xValidation.print(true);
+        yTestFull.print(true);
         console.log(`
           Thông tin dataset:
           - Số lượng mẫu ${xTrainFull.shape}
@@ -102,20 +109,10 @@ class LayoutConfigurationModel extends Component {
             activation: 'tanh',
             kernelInitializer: 'varianceScaling',
             useBias: true,
-            units: 128,
+            units: 64,
           }),
         );
         model.add(tf.layers.dropout({ rate: 0.5 }));
-        // model.add(
-        //   tf.layers.dense({
-        //     inputShape: [128],
-        //     activation: 'relu',
-        //     kernelInitializer: 'varianceScaling',
-        //     useBias: true,
-        //     units: 128,
-        //   }),
-        // );
-        // model.add(tf.layers.dropout({ rate: 0.2 }));
         model.add(
           tf.layers.dense({
             activation: 'softmax',
@@ -129,19 +126,20 @@ class LayoutConfigurationModel extends Component {
           optimizer: tf.train.adam(0.02),
           metrics: ['accuracy'],
         });
-        model.summary()
+        model.summary();
         // const callbacks = tfvis.show.fitCallbacks(container, metrics);
+        const startTime = new Date();
         const history = await model.fit(xTrainFull, yTrainFull, {
-          epochs: 100,
+          epochs: this.state.loop,
           validationData: [xValidation, yValidation],
           shuffle: true,
           callbacks: {
             onBatchEnd: (onBatch, logBatch) => {
               // console.log(onBatch)
-              console.log({ onBatch, logBatch });
+              // console.log({ onBatch, logBatch });
             },
             onEpochEnd: async (epoch, logs) => {
-              console.log(logs);
+              // console.log(logs);
               this.setState(prevState => ({
                 ...prevState,
                 dataAcc: [
@@ -157,7 +155,7 @@ class LayoutConfigurationModel extends Component {
                   {
                     epoch,
                     loss: logs.loss,
-                    val_loss: logs.val_loss
+                    val_loss: logs.val_loss,
                   },
                 ],
                 epoch,
@@ -168,6 +166,11 @@ class LayoutConfigurationModel extends Component {
               });
               valAcc = logs.val_acc;
               if (this.state.stop) {
+                const endTime1 = new Date();
+                console.log(
+                  'thoi gian dao tao: %d',
+                  (endTime1 - startTime) / 1000,
+                );
                 model.stopTraining = true;
               } else {
                 await tf.nextFrame();
@@ -177,6 +180,8 @@ class LayoutConfigurationModel extends Component {
           },
           // callbacks,
         });
+        const endTime2 = new Date();
+        console.log('thoi gian dao tao: %d', (endTime2 - startTime) / 1000);
         this.setState({ model });
         // const yPredict = model.predict(xTestFull);
         // yPredict.print(true);
@@ -212,15 +217,44 @@ class LayoutConfigurationModel extends Component {
       return;
     }
     const yPredict = model.predict(xTestFull);
-    yPredict.print(true);
-    yPredict.argMax(1).print();
-    yTestFull.print(true);
     const testResult = model.evaluate(xTestFull, yTestFull);
     const testAccPercent = testResult[1].dataSync()[0] * 100;
+    console.log(testResult)
     console.log(
       `Final test accuracy: ${testAccPercent.toFixed(1)}%
                 `,
     );
+
+    yPredict.argMax(1).print(true);
+    const yPredictTmp = Object.values(yPredict.argMax(1).dataSync());
+    const yTestFullTmp = Object.values(yTestFull.argMax(1).dataSync());
+    console.log({
+      yPredictTmp,
+      yTestFullTmp,
+    });
+    request('/api/ai/fscore', {
+      method: 'POST', // or 'PUT'
+      body: JSON.stringify({
+        yTestFullTmp,
+        yPredictTmp,
+      }), // data can be `string` or {object}!
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    }).then(data => {
+      console.log({ data });
+      this.setState({
+        recall: data.payload.macro.RECALL,
+        precision: data.payload.macro.PRECISION,
+        f1Score: data.payload.macro,
+        accuracy: testAccPercent.toFixed(1),
+      });
+    });
+    // const { micro, matrix, accuracy, macro } = nodeml(
+    //   yTestFullTmp,
+    //   yPredictTmp,
+    // );
+    // console.log({ micro, matrix, accuracy, macro });
     const confusionMatrix = await tfvis.metrics.confusionMatrix(
       yTestFull.argMax(1),
       yPredict.argMax(1),
@@ -236,18 +270,24 @@ class LayoutConfigurationModel extends Component {
         tickLabels: classNames,
       },
       {
-        width:1200,
-        height:800
-      }
+        width: 1200,
+        height: 800,
+      },
     );
     if (!tfvis.visor().isOpen()) {
       tfvis.visor().toggle();
     }
   };
-  handleStopTraing = ()=>{
-    this.setState({stop:true})
-  }
+
+  handleStopTraing = () => {
+    this.setState({ stop: true });
+  };
+
   showEvaluation = data => {};
+
+  handleChangeEpoch = value => {
+    this.setState({ loop: value });
+  };
 
   render() {
     const {
@@ -286,8 +326,14 @@ class LayoutConfigurationModel extends Component {
             from: '#108ee9',
             to: '#87d068',
           }}
-          percent={this.state.epoch}
+          percent={parseInt((this.state.epoch * 100) / 50)}
           status="active"
+        />
+        <Input
+          type="number"
+          onChange={this.handleChangeEpoch}
+          style={{ width: '250px' }}
+          placeholder="Nhập số lần lặp, mặc định 50 lần"
         />
         <p>Loss</p>
         <LineChart
@@ -303,7 +349,7 @@ class LayoutConfigurationModel extends Component {
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="epoch">
-            <Label value="Kỷ nguyên" offset={0} position="insideBottom" />
+            <Label value="Epoch" offset={0} position="insideBottom" />
           </XAxis>
           <YAxis
             label={{ value: 'Độ mất mát', angle: -90, position: 'insideLeft' }}
@@ -327,7 +373,7 @@ class LayoutConfigurationModel extends Component {
         >
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="epoch">
-            <Label value="Kỷ nguyên" offset={0} position="insideBottom" />
+            <Label value="Epoch" offset={0} position="insideBottom" />
           </XAxis>
           <YAxis
             label={{
@@ -345,27 +391,25 @@ class LayoutConfigurationModel extends Component {
         </LineChart>
         <Row>
           <Col>
-            {trueLabels ? (
+            {this.state.recall ? (
               <div>
-                <ShowConfusion
-                  labels={labels}
-                  trueLabels={trueLabels}
-                  predictedLabels={predictedLabels}
-                />
-                <ShowReport reportDataTest={reportDataTest} />
+                {/*<ShowConfusion*/}
+                  {/*labels={labels}*/}
+                  {/*trueLabels={trueLabels}*/}
+                  {/*predictedLabels={predictedLabels}*/}
+                {/*/>*/}
+                <ShowReport reportDataTest={this.state} />
               </div>
             ) : null}
           </Col>
         </Row>
         <Row />
-        <div ref={this.matrixRef}>
-
-        </div>
+        <div ref={this.matrixRef} />
       </div>
     );
   }
 }
-const mapStateToProps = state => state;
+const mapStateToProps = state => ({});
 const mapDispatchToProps = dispatch => ({
   onUpdateModel: () => dispatch(onUpdateModel()),
 });

@@ -68,39 +68,39 @@ class CameraWrapper extends Component {
     const tmpHtmlMedia = faceapi.createCanvasFromMedia(this.videoTag.current);
     const result = await faceapi
       .detectSingleFace(tmpHtmlMedia, options)
-      .withFaceLandmarks()
+      .withFaceLandmarks();
     if (result) {
       const alignedRect = result.alignedRect;
-      const imageExtract = await faceapi.extractFaces(
-        this.videoTag.current,
-        [alignedRect],
-      );
+      const imageExtract = await faceapi.extractFaces(this.videoTag.current, [
+        alignedRect,
+      ]);
       const imageToSquare = await faceapi.imageToSquare(
         imageExtract[0],
         128,
         true,
       );
-      const grayImage = adminCommon.getGrayImage(imageToSquare)
-      const descriptor = await faceapi.computeFaceDescriptor(grayImage)
-      const iid = this.props.faceMatch.findBestMatch(descriptor)
+      const grayImage = adminCommon.getGrayImage(imageToSquare);
+      const descriptor = await faceapi.computeFaceDescriptor(grayImage);
+      const iid = this.props.faceMatch.findBestMatch(descriptor);
       const boxesWithText = new faceapi.BoxWithText(
         alignedRect.box,
-        iid.toString()
-      )
+        iid.toString(),
+      );
       drawDetections(this.videoTag.current, this.canvasRef.current, []);
-      faceapi.drawDetection(this.canvasRef.current, boxesWithText)
+      faceapi.drawDetection(this.canvasRef.current, boxesWithText);
       // console.log({pendding:this.pendding,checkInManual:this.props.checkInManual})
       if (!this.pendding && !this.props.checkInManual) {
         this.pendding = true;
-        const tmpIid = this.onRecognition({descriptor});
-        if(iid.label !== 'unknown'){
-          if(tmpIid == parseInt(iid.label)){
-            this.onCheckInSuccessWithFaceMatcher(iid.label)
-          }else{
-            console.log(`model va findbestmatch khong khop`)
+        const tmpIid = this.onRecognition({ descriptor });
+        if (iid.label !== 'unknown') {
+          if (tmpIid == parseInt(iid.label)) {
+            this.onCheckInSuccessWithFaceMatcher(iid.label);
+          } else {
+            console.log({ modelIid: tmpIid, matcherLabel: iid.label });
+            console.log(`model va findbestmatch khong khop`);
           }
-        }else{
-          this.pendding = false
+        } else {
+          this.pendding = false;
         }
       }
       // drawDetections(this.videoTag.current, this.canvasRef.current, [
@@ -111,6 +111,7 @@ class CameraWrapper extends Component {
     }
     setTimeout(() => this.onPlay(this.videoTag.current));
   };
+
   onRecognition(result) {
     const tfDescriptor = tf.tensor2d(result.descriptor, [1, 128]);
     const yPredict = this.props.model.predict(tfDescriptor);
@@ -118,9 +119,9 @@ class CameraWrapper extends Component {
     values = values.as1D().dataSync();
     indices = indices.as1D().dataSync();
 
-    if (values < 0.9) {
+    if (values < this.props.score) {
       this.miss = this.miss + 1;
-      this.props.handleShowCurrentPredict(indices,values);
+      this.props.handleShowCurrentPredict(indices, values);
       // if (this.miss > 2) {
       //   this.props.handleOpenCheckInManually();
       //   this.pendding = false;
@@ -129,28 +130,29 @@ class CameraWrapper extends Component {
       //   this.pendding = false;
       // }
       this.pendding = false;
-      return null;
-    } else {
-      this.miss=0
-      this.props.handleShowCurrentPredict(indices,values);
-      if (this.props.usersOfModel) {
-        // console.log(this.props.usersOfModel)
-        const userPredict = this.props.usersOfModel[indices];
-        this.pendding = false;
-        return userPredict.iid;
-      }
-
-
-      // this.props.handleCheckInAutoSuccess(indices);
-      this.pendding = false;
-      // return userPredict.iid
+      console.log({ values, indices });
       return null;
     }
-  }
-  onCheckInSuccessWithFaceMatcher = (iid)=>{
-    this.props.handleCheckInAutoSuccessV2WithFaceMatcher(iid)
+    this.miss = 0;
+    this.props.handleShowCurrentPredict(indices, values);
+    if (this.props.usersOfModel) {
+      // console.log(this.props.usersOfModel)
+      const userPredict = this.props.usersOfModel[indices];
+      this.pendding = false;
+      return userPredict.iid;
+    }
+
+    // this.props.handleCheckInAutoSuccess(indices);
     this.pendding = false;
+    // return userPredict.iid
+    return null;
   }
+
+  onCheckInSuccessWithFaceMatcher = iid => {
+    this.props.handleCheckInAutoSuccessV2WithFaceMatcher(iid);
+    this.pendding = false;
+  };
+
   onStop = () => {
     this.videoTag.current.stop();
   };
