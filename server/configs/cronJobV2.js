@@ -1,10 +1,11 @@
 const CronJob = require('cron').CronJob;
 const moment = require('moment');
 const User = require('../module/employee/model');
+const Request = require('../module/request/model');
 const Configuration = require('../module/configuration/model');
 const CheckIn = require('../module/checkin/model');
 const CheckInDetail = require('../module/checkin/model/check_in_detail');
-const JobExcuse = require('./JobExcuse')
+const JobExcuse = require('./JobExcuse');
 async function createJobUpdateModel() {
   return new Promise(resolve => {
     Configuration.findOne({ name: 'time_update_model' }, (err, doc) => {
@@ -36,7 +37,21 @@ async function createJobCheckIn() {
     });
   });
 }
+async function createJobCheckRequest() {
+  return new Promise((resolve, reject) => {
+    try {
+      const configJob = `0 04 11 * * *`.toString();
+      const job = new CronJob(configJob, async () => {
+        Request.findRequestOutOfDate();
+      });
+      resolve(job);
+    } catch (e) {
+      reject(e);
+    }
+  });
+}
 module.exports = {
   createJobCheckIn,
   createJobUpdateModel,
+  createJobCheckRequest,
 };

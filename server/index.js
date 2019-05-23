@@ -70,19 +70,30 @@ io.listen(
     if (err) {
       return logger.error(err.message);
     }
-    const jobCreateJobCheckIn = await createJob.createJobCheckIn();
-    jobs.push({
-      name: 'createJobCheckIn',
-      job: jobCreateJobCheckIn,
-    });
-    const jobUpdateModel = await createJob.createJobUpdateModel();
-    jobs.push({
-      name: 'createJobUpdateModel',
-      job: jobUpdateModel,
-    });
-    jobs.map(j => {
-      j.job.start();
-    });
+    try {
+      const jobCreateJobCheckIn = await createJob.createJobCheckIn();
+      jobs.push({
+        name: 'createJobCheckIn',
+        job: jobCreateJobCheckIn,
+      });
+      const jobUpdateModel = await createJob.createJobUpdateModel();
+      jobs.push({
+        name: 'createJobUpdateModel',
+        job: jobUpdateModel,
+      });
+      const jobCheckRequestOutOfDate = await createJob.createJobCheckRequest();
+      jobs.push({
+        name: 'jobCheckRequestOutOfDate',
+        job: jobCheckRequestOutOfDate,
+      });
+      jobs.map(j => {
+        console.log(j.name)
+        j.job.start();
+      });
+    }catch (e) {
+      console.log(e)
+    }
+
     /**
      * Load model
      * @type {any}
