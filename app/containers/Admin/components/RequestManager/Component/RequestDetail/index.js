@@ -119,39 +119,41 @@ class RequestDetail extends Component {
                 )}
               </Col>
               <Col span={12}>
-                <CanWrapper
-                  I="handle"
-                  a="Request"
-                  user={this.props.currentUser}
-                >
-                  <span>Xử lý yêu cầu: </span>
-                  {requestDetail.status == 0 ? (
-                    <Select
-                      style={{ width: '150px' }}
-                      placeholder="Xử lý yêu cầu"
-                      onChange={status =>
-                        this.handleChangeActive(requestDetail, status)
-                      }
-                    >
-                      <Option value="1">Accept</Option>
-                      <Option value="2">Reject</Option>
-                    </Select>
-                  ) : (
-                    <span>
+                {requestDetail.status == 0 ? (
+                  <CanWrapper
+                    I="handle"
+                    a="Request"
+                    user={this.props.currentUser}
+                  >
+                    <span>Xử lý yêu cầu: </span>
+                    {requestDetail.status == 0 ? (
                       <Select
                         style={{ width: '150px' }}
-                        placeholder="Handle request"
+                        placeholder="Xử lý yêu cầu"
                         onChange={status =>
                           this.handleChangeActive(requestDetail, status)
                         }
-                        defaultValue={requestDetail.status.toString()}
                       >
-                        <Option value="1">Chấp nhận</Option>
-                        <Option value="2">Từ chối</Option>
+                        <Option value="1">Accept</Option>
+                        <Option value="2">Reject</Option>
                       </Select>
-                    </span>
-                  )}
-                </CanWrapper>
+                    ) : (
+                      <span>
+                        <Select
+                          style={{ width: '150px' }}
+                          placeholder="Handle request"
+                          onChange={status =>
+                            this.handleChangeActive(requestDetail, status)
+                          }
+                          defaultValue={requestDetail.status.toString()}
+                        >
+                          <Option value="1">Chấp nhận</Option>
+                          <Option value="2">Từ chối</Option>
+                        </Select>
+                      </span>
+                    )}
+                  </CanWrapper>
+                ) : null}
               </Col>
             </Row>
             <Divider />
