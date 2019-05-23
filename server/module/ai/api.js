@@ -1,7 +1,6 @@
 const routes = require('express').Router();
 const passport = require('passport');
 global.fetch = require('node-fetch');
-// const svm = require('node-svm');
 const { evaluate } = require('nodeml');
 const jwt = require('jsonwebtoken');
 const tf = require('@tensorflow/tfjs');
