@@ -120,5 +120,21 @@ RequestSchema.statics.findRequestByUserMatchTime = function(user) {
     );
   });
 };
+RequestSchema.statics.findRequestOutOfDate = async function() {
+  try {
+    const startDate = timeCommon.getStartDay().getTime();
+    const taskFindRequestOutOfDate = await this.model('Request').find({
+      'addition.date': { $lt: startDate },
+      status: 0,
+    });
+    const listIidRequest = taskFindRequestOutOfDate.map(el => el.iid);
+    const taskUpdate = await this.model('Request').updateMany(
+      { iid: { $in: listIidRequest } },
+      { status: 3 },
+    );
+  } catch (e) {
+    console.log(e);
+  }
+};
 const RequestModel = mongoose.model('Request', RequestSchema);
 module.exports = RequestModel;

@@ -175,5 +175,8 @@ routes.put('/:id', async (req, res) => {
 /**
  * Xoa yeu cau
  */
-routes.delete('/', (req, res) => {});
+routes.delete('/', (req, res) => {
+  Request.findRequestOutOfDate();
+  res.send('đasad')
+});
 module.exports = routes;
