@@ -13,6 +13,7 @@ import {
   makeSelectObject,
   makeSelectPredict,
   makeSelectPending,
+  makeSelectListCheckIn,
 } from '../seclectors';
 import adminCommon from '../../../common';
 
@@ -94,7 +95,17 @@ class CameraWrapper extends Component {
         const tmpIid = this.onRecognition({ descriptor });
         if (iid.label !== 'unknown') {
           if (tmpIid == parseInt(iid.label)) {
-            this.onCheckInSuccessWithFaceMatcher(iid.label);
+            console.log({ listChecKInV2: this.props.listCheckInV2 });
+            const indexUser = this.props.listCheckInV2.findIndex(el => {
+              if (tmpIid == el.user.iid) {
+                return true;
+              }
+              return false;
+            });
+            console.log(indexUser);
+            if (indexUser === -1) {
+              this.onCheckInSuccessWithFaceMatcher(iid.label);
+            }
           } else {
             console.log({ modelIid: tmpIid, matcherLabel: iid.label });
             console.log(`model va findbestmatch khong khop`);
@@ -188,6 +199,7 @@ const mapStateToProps = createStructuredSelector({
   object: makeSelectObject(),
   predict: makeSelectPredict(),
   pending: makeSelectPending(),
+  listCheckInV2: makeSelectListCheckIn(),
 });
 const mapDispatchToProps = dispatch => ({
   onPredict: payload => dispatch(onPredict(payload)),

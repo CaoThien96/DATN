@@ -3,8 +3,6 @@ import styled from 'styled-components';
 import Steps from 'antd/es/steps';
 import Divider from 'antd/es/divider';
 import Button from 'antd/es/button/button';
-import List from 'antd/es/list';
-import Avatar from 'antd/es/avatar';
 import request from 'utils/request';
 import { createStructuredSelector } from 'reselect';
 import connect from 'react-redux/es/connect/connect';
@@ -15,7 +13,6 @@ import FormSearch from './FormSearch';
 import FormCheckIn from './FormCheckIn';
 import { makeSelectCurrentUser } from '../../../../../App/selectors';
 import { onUpdateListCheckIn } from '../../actions';
-import { getPathImage } from '../../../../../../common/pathImage';
 import User from './User';
 const Error = styled.div`
   text-align: center;
@@ -100,7 +97,7 @@ class StepFormWrapper extends Component {
       },
     })
       .then(data => {
-        alert(data);
+        this.setState({ step: 0, user: null });
         this.props.onUpdateListCheckIn(data.listCheckSuccess);
         this.props.onCheckInSuccess();
       })
