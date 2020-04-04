@@ -95,7 +95,7 @@
     "konva": "^2.6.0",
     "loadable-components": "2.2.3",
     "lodash": "^4.17.11",
-    "minimist": "1.2.0",
+    "minimist": "1.2.5",
     "ml-confusion-matrix": "^0.3.0",
     "moment": "^2.24.0",
     "mongoose": "^5.4.3",
